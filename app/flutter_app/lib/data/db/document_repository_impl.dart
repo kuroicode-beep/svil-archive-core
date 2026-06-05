@@ -20,13 +20,21 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   Database get _db => _databaseService.requireDatabase();
 
+  static const String _selectWithRevision = '''
+    SELECT d.*, s.revision AS sync_revision
+    FROM documents d
+    LEFT JOIN sync_state s ON d.id = s.document_id
+  ''';
+
   @override
   Future<DocumentMetadata?> findById(String id) async {
-    final rows = await _db.query(
-      'documents',
-      where: 'id = ? AND workspace_id = ? AND is_deleted = 0',
-      whereArgs: [id, _workspaceId],
-      limit: 1,
+    final rows = await _db.rawQuery(
+      '''
+      $_selectWithRevision
+      WHERE d.id = ? AND d.workspace_id = ? AND d.is_deleted = 0
+      LIMIT 1
+      ''',
+      [id, _workspaceId],
     );
     if (rows.isEmpty) return null;
     return _mapRow(rows.first);
@@ -34,11 +42,13 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<DocumentMetadata?> findByPath(String relativePath) async {
-    final rows = await _db.query(
-      'documents',
-      where: 'relative_path = ? AND workspace_id = ? AND is_deleted = 0',
-      whereArgs: [relativePath, _workspaceId],
-      limit: 1,
+    final rows = await _db.rawQuery(
+      '''
+      $_selectWithRevision
+      WHERE d.relative_path = ? AND d.workspace_id = ? AND d.is_deleted = 0
+      LIMIT 1
+      ''',
+      [relativePath, _workspaceId],
     );
     if (rows.isEmpty) return null;
     return _mapRow(rows.first);
@@ -50,19 +60,21 @@ class DocumentRepositoryImpl implements DocumentRepository {
     String? project,
     String? type,
   }) async {
-    final where = <String>['workspace_id = ?', 'is_deleted = 0'];
+    final where = <String>['d.workspace_id = ?', 'd.is_deleted = 0'];
     final args = <Object?>[_workspaceId];
 
     if (type != null) {
-      where.add('category = ?');
+      where.add('d.category = ?');
       args.add(type);
     }
 
-    final rows = await _db.query(
-      'documents',
-      where: where.join(' AND '),
-      whereArgs: args,
-      orderBy: 'updated_at DESC',
+    final rows = await _db.rawQuery(
+      '''
+      $_selectWithRevision
+      WHERE ${where.join(' AND ')}
+      ORDER BY d.updated_at DESC
+      ''',
+      args,
     );
     return rows.map(_mapRow).toList();
   }
@@ -138,7 +150,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
       tags: tags,
       contentHash: row['content_hash'] as String,
-      revision: 1,
+      revision: row['sync_revision'] as int? ?? 1,
       sacSchema: '1',
     );
   }

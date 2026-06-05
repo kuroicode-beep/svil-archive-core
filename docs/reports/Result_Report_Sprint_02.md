@@ -4,7 +4,8 @@ author: "Cursor"
 project: "SAC — SVIL Archive Core"
 type: "완료보고서"
 created: "2026-06-06"
-base_commit: "8738008"
+sprint01_base_commit: "8738008"
+implementation_commit: "b5c8676"
 ---
 
 # 완료 보고서 — SAC Sprint 02 Workspace / SQLite Foundation
@@ -12,7 +13,8 @@ base_commit: "8738008"
 ## 01. 작업 요약
 - **목표**: Workspace → Markdown → SQLite → UI 최소 vertical slice 연결
 - **결과**: ✅ 완료
-- **기준 커밋**: `8738008` (Sprint 01 재작업 반영본 위에 구현)
+- **Sprint 01 기준 커밋**: `8738008`
+- **Sprint 02 구현 커밋**: `b5c8676`
 - **작업 브랜치**: `master`
 
 ## 02. 작업 로그

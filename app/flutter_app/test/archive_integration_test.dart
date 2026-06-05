@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:sac_app/application/sac_container.dart';
+import 'package:sac_app/data/platform/path_adapter.dart';
 import 'package:sac_app/domain/services/archive_service.dart';
 
 void main() {
@@ -74,5 +75,20 @@ void main() {
 
     final dbFile = File(p.join(workspace.rootPath, '.sac', 'sac.sqlite'));
     expect(await dbFile.exists(), isTrue);
+
+    final listedRevision = listed.firstWhere((d) => d.id == created.metadata.id).revision;
+    expect(listedRevision, 1);
+
+    await expectLater(
+      archive.createDocument(
+        const CreateDocumentInput(
+          title: 'Escape',
+          type: '../../outside',
+          relativeDir: 'documents/Dev',
+          initialContent: 'bad',
+        ),
+      ),
+      throwsA(isA<WorkspacePathException>()),
+    );
   });
 }

@@ -8,6 +8,7 @@ import '../../domain/services/document_file_store.dart';
 import '../../domain/services/document_repository.dart';
 import '../file/content_hasher.dart';
 import '../file/frontmatter_parser.dart';
+import '../platform/path_adapter.dart';
 import '../sync/sync_service_impl.dart';
 
 class ArchiveServiceImpl implements ArchiveService {
@@ -56,9 +57,12 @@ class ArchiveServiceImpl implements ArchiveService {
   @override
   Future<Document> createDocument(CreateDocumentInput input) async {
     final id = _uuid.v4();
-    final category = input.type ?? 'Dev';
-    final safeTitle = _sanitizeFileName(input.title);
-    final relativePath = 'documents/$category/$safeTitle.md';
+    final relativePath = resolveCreateDocumentRelativePath(
+      relativeDir: input.relativeDir,
+      type: input.type,
+      title: input.title,
+    );
+    final category = sanitizeDocumentCategory(input.type);
     final revision = 1;
     final body = input.initialContent;
 
@@ -187,14 +191,6 @@ class ArchiveServiceImpl implements ArchiveService {
     throw UnimplementedError('moveDocument is planned for Sprint 3');
   }
 
-  /// 파일명에 사용할 수 없는 문자를 제거한다.
-  String _sanitizeFileName(String title) {
-    final cleaned = title
-        .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
-        .replaceAll(RegExp(r'\s+'), '_')
-        .trim();
-    return cleaned.isEmpty ? 'untitled' : cleaned;
-  }
 }
 
 /// DocumentMetadata revision 필드 보조 extension

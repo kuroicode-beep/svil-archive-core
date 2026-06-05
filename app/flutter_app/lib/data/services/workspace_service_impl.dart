@@ -19,17 +19,8 @@ class WorkspaceServiceImpl implements WorkspaceService {
   final Uuid _uuid = const Uuid();
   Workspace? _activeWorkspace;
 
-  static const List<String> _defaultCategories = [
-    'Dev',
-    'Log',
-    'Idea',
-    'Research',
-    'Blog',
-    'Novel',
-    'YT',
-    'Resource',
-    'IB',
-  ];
+  static final List<String> _defaultCategories =
+      kAllowedDocumentCategories.toList()..sort();
 
   WorkspaceServiceImpl({
     required DatabaseServiceImpl databaseService,

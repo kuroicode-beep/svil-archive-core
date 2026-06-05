@@ -11,7 +11,8 @@ created: "2026-06-06"
 ## 검증 대상
 - 작업지시문: `Dev_20260605_SAC_Work_Instruction_02_Workspace_SQLite_Foundation_v1_Lumi`
 - 완료보고서: `docs/reports/Result_Report_Sprint_02.md`
-- 기준: Sprint 01 `8738008` 위 Sprint 02 구현
+- Sprint 01 기준: `8738008`
+- Sprint 02 구현 커밋: `b5c8676`
 
 ## 검증 포인트
 1. SQLite WAL mode 실제 적용 (`database_service_impl.dart` onConfigure)
