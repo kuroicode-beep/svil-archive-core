@@ -1,15 +1,28 @@
-// SAC 앱 진입점 — Friendly Light 기본 테마
+// main.dart — SAC 앱 진입점 (Desktop SQLite FFI 초기화 포함)
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import 'application/sac_container.dart';
 import 'ui/screens/welcome_screen.dart';
 import 'ui/theme/app_theme.dart';
 
-void main() {
-  runApp(const SacApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+  final container = await SacContainer.create();
+  runApp(SacApp(container: container));
 }
 
 class SacApp extends StatelessWidget {
-  const SacApp({super.key});
+  final SacContainer container;
+
+  const SacApp({super.key, required this.container});
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +31,8 @@ class SacApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildLightTheme(),
       darkTheme: buildDarkTheme(),
-      // TODO(Cursor): ThemeService 연동 후 themeMode 동적 변경
       themeMode: ThemeMode.light,
-      home: const WelcomeScreen(),
+      home: WelcomeScreen(container: container),
     );
   }
 }

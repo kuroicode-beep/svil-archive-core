@@ -70,17 +70,27 @@ MCP Sidecar = TypeScript (stdio transport)
 
 ## 4. Phase 1 최소 구현 범위
 
-### 포함
+### 포함 (Sprint 01 + Sprint 02)
 
 - Flutter Desktop Windows 앱 skeleton (빌드 가능)
-- 3패널 placeholder UI
+- 3패널 UI + 문서 목록/편집 최소 동작 (Sprint 02)
 - 도메인 모델 (Dart)
-- 서비스 인터페이스 (Dart abstract class)
-- SQLite schema draft (migration 파일)
+- 서비스 인터페이스 + Sprint 02 구현체 (`data/db`, `data/file`, `data/sync`, `data/services`)
+- SQLite migration v1 + WAL 적용 (Sprint 02)
+- Workspace 생성/열기 + Markdown CRUD + sync_state/revision (Sprint 02)
 - MCP sidecar 폴더 구조 + tool contract 문서
 - asset/design/ 폴더 + 규칙 문서
-- Markdown frontmatter 최소 정책 문서
+- Markdown frontmatter 최소 정책 (코드 + 문서)
+- sync_journal append-only 기록 (Sprint 02)
 - Cursor Handoff 문서
+
+### 설정 저장 source (Sprint 02 결정)
+
+| 데이터 | Source of Truth |
+|--------|-----------------|
+| Workspace 목록 (앱 전역) | `%AppSupport%/SAC/workspaces_registry.json` |
+| Workspace 메타 (로컬) | `.sac/settings.json` |
+| 앱 활성 Workspace / MCP 플래그 | SQLite `app_settings` (workspace DB 내부) |
 
 ### 제외 (Phase 2+ 구현)
 
@@ -99,7 +109,7 @@ MCP Sidecar = TypeScript (stdio transport)
 
 Phase 1 완료 후 macOS 검증 체크리스트:
 
-- [ ] `flutter build macos` 오류 없이 완료
+- [ ] `flutter build macos` 오류 없이 완료 (Sprint 02: Windows 환경으로 미실행)
 - [ ] 경로 처리 로직에 Windows 하드코딩(`\`, `C:\`) 없음
 - [ ] Workspace path adapter 플랫폼 분기 확인
 - [ ] MCP sidecar 실행 경로가 플랫폼 어댑터로 분리 가능한지 확인

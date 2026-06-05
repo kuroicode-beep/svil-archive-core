@@ -1,13 +1,20 @@
-// FooterBar: 하단 푸터 — MCP 상태, Workspace명, 고대비 토글 고정 배치
-// 접근성: 터치 타겟 50px 이상 — footer 높이를 50px로 맞춰 Switch clipping 방지
+// footer_bar.dart — 하단 푸터 (Workspace, sync 상태, 고대비 토글)
 
 import 'package:flutter/material.dart';
 
-// 접근성 기준 최소 터치 타겟 높이
 const double _kFooterHeight = 50.0;
 
 class FooterBar extends StatefulWidget {
-  const FooterBar({super.key});
+  final String? workspaceName;
+  final String? workspacePath;
+  final String? syncStatus;
+
+  const FooterBar({
+    super.key,
+    this.workspaceName,
+    this.workspacePath,
+    this.syncStatus,
+  });
 
   @override
   State<FooterBar> createState() => _FooterBarState();
@@ -18,23 +25,31 @@ class _FooterBarState extends State<FooterBar> {
 
   @override
   Widget build(BuildContext context) {
+    final workspaceLabel = widget.workspaceName ?? '—';
+    final pathLabel = widget.workspacePath ?? '—';
+    final syncLabel = widget.syncStatus ?? '—';
+
     return Container(
-      // 50px: 접근성 기준 최소 터치 타겟 + Switch overflow 방지
       height: _kFooterHeight,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       color: Theme.of(context).colorScheme.surface,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // MCP 상태
           const Icon(Icons.circle, size: 10, color: Colors.grey),
           const SizedBox(width: 6),
           const Text('MCP: 대기', style: TextStyle(fontSize: 13)),
           const SizedBox(width: 16),
-          // Workspace명
-          const Text('Workspace: —', style: TextStyle(fontSize: 13)),
-          const Spacer(),
-          // 고대비 토글 — Semantics로 접근성 레이블 명시
+          Expanded(
+            child: Text(
+              'Workspace: $workspaceLabel ($pathLabel)',
+              style: const TextStyle(fontSize: 13),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Text('sync: $syncLabel', style: const TextStyle(fontSize: 13)),
+          const SizedBox(width: 16),
           const Text('고대비', style: TextStyle(fontSize: 13)),
           Semantics(
             label: '고대비 모드',
@@ -43,7 +58,6 @@ class _FooterBarState extends State<FooterBar> {
               value: _highContrast,
               onChanged: (val) {
                 setState(() => _highContrast = val);
-                // TODO(Cursor): ThemeService.toggleHighContrast 연결
               },
             ),
           ),
