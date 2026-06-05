@@ -104,6 +104,71 @@ Future<void> setSpeed(double multiplier)        // 0.5 ~ 2.0
 
 ---
 
+## DocumentRepository (DB 계층)
+
+```dart
+Future<DocumentMetadata?> findById(String id)
+Future<DocumentMetadata?> findByPath(String relativePath)
+Future<List<DocumentMetadata>> findAll({status, project, type})
+Future<void> save(DocumentMetadata metadata)
+Future<void> delete(String id)
+Future<bool> exists(String id)
+```
+
+---
+
+## DocumentFileStore (파일 계층)
+
+```dart
+Future<String> readContent(String relativePath)
+Future<void> writeContent(String relativePath, String markdownWithFrontmatter)
+Future<bool> exists(String relativePath)
+Future<void> move(String fromPath, String toPath)
+Future<void> delete(String relativePath)
+Future<String> computeHash(String relativePath)
+Future<List<String>> listMarkdownFiles(String relativeDirPath)
+Future<DocumentMetadata> parseFrontmatter(String relativePath)
+```
+
+---
+
+## DatabaseService
+
+```dart
+Future<void> initialize(String dbPath)   // WAL 모드 활성화 + 마이그레이션
+Future<void> close()
+Future<int> getSchemaVersion()
+Future<void> migrate(int targetVersion)
+Future<void> reset()                     // Markdown 재스캔 시 DB 재생성
+Future<String> createSnapshot(String destinationPath)
+Future<bool> isOpen()
+```
+
+---
+
+## TrashService
+
+```dart
+Future<TrashItem> moveToTrash(String documentId, {String? actor})
+Future<void> restoreFromTrash(String trashItemId, {String? targetPath})
+Future<List<TrashItem>> listTrashItems()
+Future<void> permanentlyDelete(String trashItemId)
+Future<void> emptyTrash()
+```
+
+---
+
+## DesignAssetRegistry
+
+```dart
+Future<void> register(DesignAssetEntry entry)
+Future<List<DesignAssetEntry>> listByTool(String tool)
+Future<List<DesignAssetEntry>> listAll()
+Future<void> unregister(String relativePath)
+```
+
+---
+
 ## McpBridgeService
 
 ```dart
