@@ -8,6 +8,7 @@ import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/permission_token_service.dart';
 import '../../domain/services/privacy_service.dart';
+import '../../domain/services/queue_execution_service.dart';
 import '../db/database_service_impl.dart';
 
 class PrivacyServiceImpl implements PrivacyService {
@@ -15,16 +16,19 @@ class PrivacyServiceImpl implements PrivacyService {
   final PermissionTokenService _permissionTokenService;
   final McpToolRegistryService _toolRegistryService;
   final McpBridgeStatusService _mcpBridgeService;
+  final QueueExecutionService _queueExecutionService;
 
   PrivacyServiceImpl({
     required DatabaseServiceImpl databaseService,
     required PermissionTokenService permissionTokenService,
     required McpToolRegistryService toolRegistryService,
     required McpBridgeStatusService mcpBridgeService,
+    required QueueExecutionService queueExecutionService,
   })  : _databaseService = databaseService,
         _permissionTokenService = permissionTokenService,
         _toolRegistryService = toolRegistryService,
-        _mcpBridgeService = mcpBridgeService;
+        _mcpBridgeService = mcpBridgeService,
+        _queueExecutionService = queueExecutionService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -79,6 +83,8 @@ class PrivacyServiceImpl implements PrivacyService {
     final tools = await _toolRegistryService.listTools();
     final enabledCount = tools.where((t) => t.enabled).length;
 
+    final executionSummary = await _queueExecutionService.getExecutionSummary();
+
     return PrivacySummary(
       localProcessingEnabled: true,
       externalTransferEnabled: false,
@@ -99,6 +105,7 @@ class PrivacyServiceImpl implements PrivacyService {
         enabledToolCount: enabledCount,
         disabledToolCount: tools.length - enabledCount,
       ),
+      executionSummary: executionSummary,
     );
   }
 }

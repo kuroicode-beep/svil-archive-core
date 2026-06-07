@@ -39,7 +39,7 @@ void main() {
     await container.bindWorkspace(workspace);
   }
 
-  test('migration v5 creates work queue and MCP tables', () async {
+  test('migration v6 creates work queue MCP and execution tables', () async {
     await bindWorkspace();
     final version = await container.databaseService.getSchemaVersion();
     expect(version, kSacSchemaVersion);
@@ -54,6 +54,8 @@ void main() {
     expect(names.contains('work_queue_tickets'), isTrue);
     expect(names.contains('mcp_tool_settings'), isTrue);
     expect(names.contains('permission_tokens'), isTrue);
+    expect(names.contains('ticket_execution_logs'), isTrue);
+    expect(names.contains('ticket_dry_run_previews'), isTrue);
   });
 
   test('manual personal archive item create update delete', () async {

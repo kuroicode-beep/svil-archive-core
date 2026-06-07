@@ -291,6 +291,7 @@ class _MainShellState extends State<MainShell> {
       case SacSection.workQueue:
         return WorkQueuePanel(
           workQueueService: widget.container.workQueueService,
+          queueExecutionService: widget.container.queueExecutionService,
         );
     }
   }

@@ -85,37 +85,44 @@ class ArchiveServiceImpl implements ArchiveService {
     await _fileStore.writeContent(relativePath, markdown);
 
     final now = DateTime.now();
-    final metadata = DocumentMetadata(
-      id: id,
-      path: relativePath,
-      title: input.title,
-      author: input.author,
-      project: input.project,
-      type: category,
-      status: DocumentStatus.active,
-      createdAt: now,
-      updatedAt: now,
-      tags: input.tags,
-      contentHash: computeContentHash(body),
-      revision: revision,
-    );
+    try {
+      final metadata = DocumentMetadata(
+        id: id,
+        path: relativePath,
+        title: input.title,
+        author: input.author,
+        project: input.project,
+        type: category,
+        status: DocumentStatus.active,
+        createdAt: now,
+        updatedAt: now,
+        tags: input.tags,
+        contentHash: computeContentHash(body),
+        revision: revision,
+      );
 
-    await _repository.save(metadata);
-    await _syncService.createInitialState(
-      documentId: id,
-      actor: input.author ?? 'user',
-      revision: revision,
-    );
-    _indexingQueue.queueDocument(id);
-
-    return Document(
-      metadata: metadata,
-      content: DocumentContent(
+      await _repository.save(metadata);
+      await _syncService.createInitialState(
         documentId: id,
-        rawMarkdown: body,
-        loadedAt: now,
-      ),
-    );
+        actor: input.author ?? 'user',
+        revision: revision,
+      );
+      _indexingQueue.queueDocument(id);
+
+      return Document(
+        metadata: metadata,
+        content: DocumentContent(
+          documentId: id,
+          rawMarkdown: body,
+          loadedAt: now,
+        ),
+      );
+    } catch (e) {
+      if (await _fileStore.exists(relativePath)) {
+        await _fileStore.delete(relativePath);
+      }
+      rethrow;
+    }
   }
 
   @override
@@ -187,28 +194,34 @@ class ArchiveServiceImpl implements ArchiveService {
       sourceWorkspace: _workspaceId,
     );
 
-    await _fileStore.writeContent(existing.path, markdown);
+    final fileBackup = await _fileStore.readContent(existing.path);
+    try {
+      await _fileStore.writeContent(existing.path, markdown);
 
-    final hash = computeContentHash(body);
-    final saved = updated.copyWithRevision(newRevision).copyWithContentHash(hash);
+      final hash = computeContentHash(body);
+      final saved = updated.copyWithRevision(newRevision).copyWithContentHash(hash);
 
-    await _repository.save(saved);
-    await _syncService.recordUserUpdate(
-      documentId: input.id,
-      actor: actor,
-      revision: newRevision,
-      contentHash: hash,
-    );
-    _indexingQueue.queueDocument(input.id);
-
-    return Document(
-      metadata: saved,
-      content: DocumentContent(
+      await _repository.save(saved);
+      await _syncService.recordUserUpdate(
         documentId: input.id,
-        rawMarkdown: body,
-        loadedAt: DateTime.now(),
-      ),
-    );
+        actor: actor,
+        revision: newRevision,
+        contentHash: hash,
+      );
+      _indexingQueue.queueDocument(input.id);
+
+      return Document(
+        metadata: saved,
+        content: DocumentContent(
+          documentId: input.id,
+          rawMarkdown: body,
+          loadedAt: DateTime.now(),
+        ),
+      );
+    } catch (e) {
+      await _fileStore.writeContent(existing.path, fileBackup);
+      rethrow;
+    }
   }
 
   @override

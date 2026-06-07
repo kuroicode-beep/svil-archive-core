@@ -9,6 +9,7 @@ import '../../domain/models/work_queue.dart';
 import '../../domain/services/dashboard_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
+import '../../domain/services/queue_execution_service.dart';
 import '../../domain/services/work_queue_service.dart';
 import '../db/database_service_impl.dart';
 
@@ -17,16 +18,19 @@ class DashboardServiceImpl implements DashboardService {
   final WorkQueueService _workQueueService;
   final McpBridgeStatusService _mcpBridgeService;
   final McpToolRegistryService _toolRegistryService;
+  final QueueExecutionService _queueExecutionService;
 
   DashboardServiceImpl({
     required DatabaseServiceImpl databaseService,
     required WorkQueueService workQueueService,
     required McpBridgeStatusService mcpBridgeService,
     required McpToolRegistryService toolRegistryService,
+    required QueueExecutionService queueExecutionService,
   })  : _databaseService = databaseService,
         _workQueueService = workQueueService,
         _mcpBridgeService = mcpBridgeService,
-        _toolRegistryService = toolRegistryService;
+        _toolRegistryService = toolRegistryService,
+        _queueExecutionService = queueExecutionService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -50,6 +54,7 @@ class DashboardServiceImpl implements DashboardService {
     final tools = await _toolRegistryService.listTools();
     final enabledCount = tools.where((t) => t.enabled).length;
     final queueActivities = await _loadWorkQueueActivities();
+    final executionSummary = await _queueExecutionService.getExecutionSummary();
 
     return DashboardSummary(
       aiCollaboration: _buildAiCollaborationSummary(critical, queueSummary),
@@ -65,6 +70,7 @@ class DashboardServiceImpl implements DashboardService {
       enabledMcpToolCount: enabledCount,
       disabledMcpToolCount: tools.length - enabledCount,
       recentWorkQueueActivities: queueActivities,
+      executionSummary: executionSummary,
     );
   }
 

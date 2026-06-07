@@ -19,6 +19,8 @@ import '../data/services/ollama_adapter.dart';
 import '../data/services/permission_token_service_impl.dart';
 import '../data/services/personal_archive_service_impl.dart';
 import '../data/services/privacy_service_impl.dart';
+import '../data/services/queue_execution_service_impl.dart';
+import '../data/services/safe_apply_service_impl.dart';
 import '../data/services/work_queue_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
@@ -44,6 +46,7 @@ import '../domain/services/mcp_tool_registry_service.dart';
 import '../domain/services/permission_token_service.dart';
 import '../domain/services/personal_archive_service.dart';
 import '../domain/services/privacy_service.dart';
+import '../domain/services/queue_execution_service.dart';
 import '../domain/services/work_queue_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
@@ -69,6 +72,7 @@ class SacContainer {
   McpBridgeStatusService? _mcpBridgeStatusService;
   McpToolRegistryService? _mcpToolRegistryService;
   PermissionTokenService? _permissionTokenService;
+  QueueExecutionService? _queueExecutionService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -202,6 +206,12 @@ class SacContainer {
     return service;
   }
 
+  QueueExecutionService get queueExecutionService {
+    final service = _queueExecutionService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -280,18 +290,34 @@ class SacContainer {
       toolRegistry: _mcpToolRegistryService!,
       workQueue: _workQueueService!,
     );
+    final safeApplyService = SafeApplyServiceImpl(
+      archiveService: _archiveService!,
+      repository: _repository!,
+      syncService: _syncService!,
+    );
+    _queueExecutionService = QueueExecutionServiceImpl(
+      databaseService: databaseService,
+      workQueueService: _workQueueService!,
+      safeApplyService: safeApplyService,
+      conflictGuard: _conflictGuardService!,
+      permissionTokenService: _permissionTokenService!,
+      toolRegistry: _mcpToolRegistryService!,
+      syncService: _syncService!,
+    );
     await _mcpToolRegistryService!.ensureDefaultTools();
     _dashboardService = DashboardServiceImpl(
       databaseService: databaseService,
       workQueueService: _workQueueService!,
       mcpBridgeService: _mcpBridgeStatusService!,
       toolRegistryService: _mcpToolRegistryService!,
+      queueExecutionService: _queueExecutionService!,
     );
     _privacyService = PrivacyServiceImpl(
       databaseService: databaseService,
       permissionTokenService: _permissionTokenService!,
       toolRegistryService: _mcpToolRegistryService!,
       mcpBridgeService: _mcpBridgeStatusService!,
+      queueExecutionService: _queueExecutionService!,
     );
     _localAiService = OllamaAdapter();
     _llmSelfInfoExportService = LlmSelfInfoExportServiceImpl(

@@ -205,6 +205,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       '상태: 차단 ${summary.workQueueSummary.blockedCount}건',
                       style: const TextStyle(fontSize: 16),
                     ),
+                    Text(
+                      '실행 대기(approved): ${summary.executionSummary.approvedReadyCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '실행 실패: ${summary.executionSummary.executionFailedCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '실행 완료: ${summary.executionSummary.completedCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
                   ],
                 ),
               ),

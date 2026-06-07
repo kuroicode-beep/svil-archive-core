@@ -1,4 +1,4 @@
-// privacy_screen.dart — 개인정보 보호 화면 (Sprint 6)
+// privacy_screen.dart — 개인정보 보호 화면 (Sprint 8)
 
 import 'package:flutter/material.dart';
 
@@ -69,8 +69,9 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                     SizedBox(height: 8),
                     Text('외부 MCP: 비활성화', style: TextStyle(fontSize: 16)),
                     Text('원격 포트: 열지 않음', style: TextStyle(fontSize: 16)),
-                    Text('쓰기 작업: queue 승인 필요', style: TextStyle(fontSize: 16)),
-                    Text('파괴적 작업: destructive token + 승인 필요', style: TextStyle(fontSize: 16)),
+                    Text('쓰기 작업: queue 승인 후 실행', style: TextStyle(fontSize: 16)),
+                    Text('파괴적 작업: destructive token + 승인 + 2단계 확인', style: TextStyle(fontSize: 16)),
+                    Text('실행 로그: 본문·token 값 미저장', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),

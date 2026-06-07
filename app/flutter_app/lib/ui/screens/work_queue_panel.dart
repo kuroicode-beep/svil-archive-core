@@ -1,16 +1,20 @@
-// work_queue_panel.dart — 작업큐 / 티켓 화면 (Sprint 7)
+// work_queue_panel.dart — 작업큐 / 티켓 / 실행 화면 (Sprint 8)
 
 import 'package:flutter/material.dart';
 
+import '../../domain/models/ticket_execution.dart';
 import '../../domain/models/work_queue.dart';
+import '../../domain/services/queue_execution_service.dart';
 import '../../domain/services/work_queue_service.dart';
 
 class WorkQueuePanel extends StatefulWidget {
   final WorkQueueService workQueueService;
+  final QueueExecutionService queueExecutionService;
 
   const WorkQueuePanel({
     super.key,
     required this.workQueueService,
+    required this.queueExecutionService,
   });
 
   @override
@@ -24,6 +28,8 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
   WorkQueueTicket? _selected;
   bool _loading = true;
   String? _actionInProgress;
+  DryRunPreview? _dryRunPreview;
+  List<TicketExecutionLog> _executionLogs = [];
 
   @override
   void initState() {
@@ -54,6 +60,91 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
       await widget.workQueueService.approveTicket(id);
       if (!mounted) return;
       setState(() => _selected = null);
+      await _refresh();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
+  }
+
+  /// 선택 티켓의 실행 로그를 로드한다.
+  Future<void> _loadExecutionLogs(String ticketId) async {
+    final logs = await widget.queueExecutionService.listExecutionLogs(ticketId);
+    if (!mounted) return;
+    setState(() => _executionLogs = logs);
+  }
+
+  /// dry-run preview를 생성한다.
+  Future<void> _dryRun(String id) async {
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      final preview = await widget.queueExecutionService.createDryRunPreview(id);
+      if (!mounted) return;
+      setState(() => _dryRunPreview = preview);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dry-run 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
+  }
+
+  /// 승인된 티켓을 실행한다.
+  Future<void> _execute(WorkQueueTicket ticket) async {
+    if (_actionInProgress != null) return;
+    if (ticket.permissionLevel == PermissionLevel.destructive) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('파괴적 작업 확인', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          content: const Text(
+            '이 작업은 문서를 휴지통으로 이동합니다. 영구 삭제가 아닙니다. 계속하시겠습니까?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('취소')),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: const Text('휴지통 이동 실행'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true) return;
+    }
+
+    setState(() => _actionInProgress = ticket.id);
+    try {
+      final result = await widget.queueExecutionService.executeApprovedTicket(ticket.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('실행 결과: ${result.status.name}')),
+      );
+      await _refresh();
+      await _loadExecutionLogs(ticket.id);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('실행 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
+  }
+
+  /// 티켓을 취소한다.
+  Future<void> _cancel(String id) async {
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      await widget.workQueueService.cancelTicket(id);
+      if (!mounted) return;
+      setState(() {
+        _selected = null;
+        _dryRunPreview = null;
+      });
       await _refresh();
     } finally {
       if (mounted) setState(() => _actionInProgress = null);
@@ -137,10 +228,20 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
     );
   }
 
+  /// risk level 라벨을 반환한다.
+  String _riskLabel(PermissionLevel level) {
+    if (level == PermissionLevel.destructive) return '위험도: 파괴적 (휴지통 이동)';
+    if (level == PermissionLevel.write) return '위험도: 중간 (쓰기)';
+    return '위험도: 낮음';
+  }
+
   /// 티켓 상세 패널을 구성한다.
   Widget _buildDetailPanel(WorkQueueTicket ticket) {
     final isDestructive = ticket.permissionLevel == PermissionLevel.destructive;
-    final canAct = ticket.status == WorkQueueTicketStatus.pending;
+    final canApprove = ticket.status == WorkQueueTicketStatus.pending;
+    final canExecute = ticket.status == WorkQueueTicketStatus.approved;
+    final canCancel = ticket.status == WorkQueueTicketStatus.pending ||
+        ticket.status == WorkQueueTicketStatus.approved;
 
     return Card(
       child: Padding(
@@ -154,6 +255,11 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
             Text('action: ${ticket.requestedAction}', style: const TextStyle(fontSize: 16)),
             Text('권한: ${_permissionLabel(ticket.permissionLevel)}', style: const TextStyle(fontSize: 16)),
             Text(_statusLabel(ticket.status), style: const TextStyle(fontSize: 16)),
+            Text(_riskLabel(ticket.permissionLevel), style: const TextStyle(fontSize: 16)),
+            Text(
+              'dry-run: ${canExecute ? '가능' : '불가'} · 실행: ${canExecute ? '가능' : '불가'}',
+              style: const TextStyle(fontSize: 16),
+            ),
             if (ticket.targetPath != null)
               Text('경로: ${ticket.targetPath}', style: const TextStyle(fontSize: 16)),
             if (ticket.reason != null)
@@ -163,7 +269,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 12),
-            if (canAct) ...[
+            if (canApprove) ...[
               SizedBox(
                 height: 50,
                 width: double.infinity,
@@ -182,6 +288,59 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                 ),
               ),
             ],
+            if (canExecute) ...[
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _dryRun(ticket.id),
+                  child: const Text('Dry-run 보기'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _execute(ticket),
+                  child: Text(isDestructive ? '휴지통 이동 실행' : '실행'),
+                ),
+              ),
+            ],
+            if (canCancel) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _cancel(ticket.id),
+                  child: const Text('취소'),
+                ),
+              ),
+            ],
+            if (_dryRunPreview != null && _dryRunPreview!.ticketId == ticket.id) ...[
+              const SizedBox(height: 12),
+              const Text('Dry-run Preview', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 160,
+                child: SingleChildScrollView(
+                  child: Text(_dryRunPreview!.summary, style: const TextStyle(fontSize: 16)),
+                ),
+              ),
+            ],
+            if (_executionLogs.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              const Text('실행 기록', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              ..._executionLogs.map(
+                (log) => Text(
+                  '${log.resultStatus.name} · ${log.action} · ${log.errorMessage ?? 'ok'}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+            if (ticket.errorMessage != null)
+              Text('오류 요약: ${ticket.errorMessage}', style: const TextStyle(fontSize: 16)),
             if (ticket.status == WorkQueueTicketStatus.conflict)
               const Text(
                 '상태: 충돌 — 사용자 확인 필요',
@@ -234,7 +393,13 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                           '${_statusLabel(ticket.status)} · ${ticket.actor}',
                           style: const TextStyle(fontSize: 14),
                         ),
-                        onTap: () => setState(() => _selected = ticket),
+                        onTap: () {
+                          setState(() {
+                            _selected = ticket;
+                            _dryRunPreview = null;
+                          });
+                          _loadExecutionLogs(ticket.id);
+                        },
                       ),
                     );
                   }),

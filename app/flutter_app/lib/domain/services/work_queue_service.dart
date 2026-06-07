@@ -27,4 +27,10 @@ abstract class WorkQueueService {
 
   /// 작업 티켓을 conflict 상태로 변경한다.
   Future<void> markConflict(String ticketId, String reason);
+
+  /// ticket ID로 단일 티켓을 조회한다.
+  Future<WorkQueueTicket?> findTicketById(String ticketId);
+
+  /// ticket을 취소한다 (pending/approved만).
+  Future<void> cancelTicket(String ticketId);
 }

@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 5;
+const int kSacSchemaVersion = 6;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -239,6 +239,42 @@ List<String> sprint7MigrationSql() {
   ];
 }
 
+/// Sprint 8 ticket execution migration SQL 목록을 반환한다.
+List<String> sprint8MigrationSql() {
+  return [
+    'ALTER TABLE work_queue_tickets ADD COLUMN base_revision INTEGER',
+    'ALTER TABLE work_queue_tickets ADD COLUMN permission_token_id TEXT',
+    'ALTER TABLE work_queue_tickets ADD COLUMN payload_json TEXT',
+    '''
+    CREATE TABLE IF NOT EXISTS ticket_execution_logs (
+      id TEXT PRIMARY KEY,
+      ticket_id TEXT NOT NULL,
+      action TEXT NOT NULL,
+      target_path TEXT,
+      result_status TEXT NOT NULL,
+      error_code TEXT,
+      error_message TEXT,
+      revision_before INTEGER,
+      revision_after INTEGER,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS ticket_dry_run_previews (
+      id TEXT PRIMARY KEY,
+      ticket_id TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      risk_level TEXT NOT NULL,
+      preview_status TEXT NOT NULL DEFAULT 'ready',
+      created_at TEXT NOT NULL,
+      expires_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_execution_logs_ticket ON ticket_execution_logs(ticket_id)',
+    'CREATE INDEX IF NOT EXISTS idx_dry_run_ticket ON ticket_dry_run_previews(ticket_id)',
+  ];
+}
+
 /// 스키마 버전에 맞는 migration을 적용한다.
 Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) async {
   if (fromVersion < 1) {
@@ -279,6 +315,18 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
   if (fromVersion < 5) {
     for (final sql in sprint7MigrationSql()) {
       await db.execute(sql);
+    }
+  }
+  if (fromVersion < 6) {
+    for (final sql in sprint8MigrationSql()) {
+      try {
+        await db.execute(sql);
+      } catch (e) {
+        final msg = e.toString().toLowerCase();
+        if (!msg.contains('duplicate column')) {
+          rethrow;
+        }
+      }
     }
   }
 }

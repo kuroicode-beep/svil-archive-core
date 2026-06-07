@@ -1,5 +1,6 @@
 // dashboard.dart — 대시보드 / 개인정보 / 로컬 AI 요약 모델
 
+import 'ticket_execution.dart';
 import 'work_queue.dart';
 
 class AiCollaborationSummary {
@@ -68,6 +69,7 @@ class DashboardSummary {
   final int enabledMcpToolCount;
   final int disabledMcpToolCount;
   final List<RecentActivityItem> recentWorkQueueActivities;
+  final QueueExecutionSummary executionSummary;
 
   const DashboardSummary({
     required this.aiCollaboration,
@@ -83,6 +85,7 @@ class DashboardSummary {
     required this.enabledMcpToolCount,
     required this.disabledMcpToolCount,
     required this.recentWorkQueueActivities,
+    required this.executionSummary,
   });
 }
 
@@ -96,6 +99,7 @@ class PrivacySummary {
   final List<RecentActivityItem> recentPrivacyAuditLogs;
   final String exportPolicyLabel;
   final McpPrivacySummary mcpPrivacy;
+  final QueueExecutionSummary executionSummary;
 
   const PrivacySummary({
     required this.localProcessingEnabled,
@@ -107,6 +111,7 @@ class PrivacySummary {
     required this.recentPrivacyAuditLogs,
     required this.exportPolicyLabel,
     required this.mcpPrivacy,
+    required this.executionSummary,
   });
 }
 

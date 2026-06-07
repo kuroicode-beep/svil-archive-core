@@ -154,6 +154,9 @@ class WorkQueueServiceImpl implements WorkQueueService {
       'reason': resolvedReason,
       'error_message': errorMessage ??
           (guard?.action == ConflictGuardAction.block ? resolvedReason : null),
+      'base_revision': input.baseRevision,
+      'permission_token_id': input.permissionTokenId,
+      'payload_json': input.payloadJson,
       'created_at': now,
       'updated_at': now,
     });
@@ -171,9 +174,42 @@ class WorkQueueServiceImpl implements WorkQueueService {
       'reason': resolvedReason,
       'error_message': errorMessage ??
           (guard?.action == ConflictGuardAction.block ? resolvedReason : null),
+      'base_revision': input.baseRevision,
+      'permission_token_id': input.permissionTokenId,
+      'payload_json': input.payloadJson,
       'created_at': now,
       'updated_at': now,
     });
+  }
+
+  @override
+  Future<void> cancelTicket(String ticketId) async {
+    final now = DateTime.now().toUtc().toIso8601String();
+    final updated = await _db.update(
+      'work_queue_tickets',
+      {
+        'status': WorkQueueTicketStatus.cancelled.name,
+        'updated_at': now,
+      },
+      where: "id = ? AND status IN ('pending', 'approved')",
+      whereArgs: [ticketId],
+    );
+    if (updated != 1) {
+      throw StateError('Ticket cannot be cancelled: $ticketId');
+    }
+    await _audit('cancel_ticket', ticketId);
+  }
+
+  @override
+  Future<WorkQueueTicket?> findTicketById(String ticketId) async {
+    final rows = await _db.query(
+      'work_queue_tickets',
+      where: 'id = ?',
+      whereArgs: [ticketId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return _mapRow(rows.first);
   }
 
   @override
@@ -352,6 +388,9 @@ class WorkQueueServiceImpl implements WorkQueueService {
       priority: row['priority'] as int? ?? 5,
       reason: row['reason'] as String?,
       errorMessage: row['error_message'] as String?,
+      baseRevision: row['base_revision'] as int?,
+      permissionTokenId: row['permission_token_id'] as String?,
+      payloadJson: row['payload_json'] as String?,
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
     );

@@ -28,6 +28,9 @@ class WorkQueueTicket {
   final int priority;
   final String? reason;
   final String? errorMessage;
+  final int? baseRevision;
+  final String? permissionTokenId;
+  final String? payloadJson;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -43,6 +46,9 @@ class WorkQueueTicket {
     this.priority = 5,
     this.reason,
     this.errorMessage,
+    this.baseRevision,
+    this.permissionTokenId,
+    this.payloadJson,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -59,6 +65,7 @@ class CreateWorkQueueTicketInput {
   final String? reason;
   final int? baseRevision;
   final String? permissionTokenId;
+  final String? payloadJson;
 
   const CreateWorkQueueTicketInput({
     required this.actor,
@@ -71,6 +78,7 @@ class CreateWorkQueueTicketInput {
     this.reason,
     this.baseRevision,
     this.permissionTokenId,
+    this.payloadJson,
   });
 }
 
