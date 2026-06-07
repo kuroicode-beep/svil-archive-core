@@ -4,7 +4,7 @@ author: "Cursor"
 created: "2026-06-08"
 sprint07_base_commit: "7d3b615"
 codex_verification: "37886404-8e54-8179-bb46-cc3305cd0e1b"
-rework_commit: "548236f"
+rework_commit: "11b9454"
 ---
 
 # 재작업 보고서 — SAC Sprint 08 Codex 검증 반영
@@ -50,4 +50,4 @@ rework_commit: "548236f"
 | `docs/handoff/Codex_Verification_Request_Sprint_08.md` | 재검증 항목 갱신 |
 
 ## 05. Git 커밋
-- `548236f` — Sprint 08 + Codex B1/I1 재작업
+- `11b9454` — Sprint 08 + Codex B1/I1 재작업

@@ -1,7 +1,7 @@
 # Cursor Handoff — Sprint 08 (Queue Execution / Safe Apply)
 
 > **Sprint 07 기준 커밋**: `7d3b615`
-> **Sprint 08 구현 커밋**: `548236f`
+> **Sprint 08 구현 커밋**: `11b9454`
 > **작업지시문**: [Notion Sprint 08](https://app.notion.com/p/378864048e5481bfb6eb1bab9c7118a)
 
 ## Sprint 08 완료 — Queue Execution / Safe Apply

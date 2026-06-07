@@ -63,4 +63,4 @@ sprint07_base_commit: "7d3b615"
 - `docs/reports/Rework_Report_Sprint_08.md` 참조
 
 ## 09. Git 커밋
-- `548236f` — Sprint 08 구현 + Codex B1/I1 재작업
+- `11b9454` — Sprint 08 구현 + Codex B1/I1 재작업

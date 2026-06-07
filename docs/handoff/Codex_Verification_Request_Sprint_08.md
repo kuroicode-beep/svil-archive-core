@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 08 (재검증)
 
 > **Sprint 07 기준 커밋**: `7d3b615`
-> **Sprint 08 구현 커밋**: `548236f`
+> **Sprint 08 구현 커밋**: `11b9454`
 > **Codex 1차 검증**: 부분완료 — B1 + I1 + I2
 > **재작업 보고서**: `docs/reports/Rework_Report_Sprint_08.md`
 > **범위**: Queue Execution / Safe Apply
