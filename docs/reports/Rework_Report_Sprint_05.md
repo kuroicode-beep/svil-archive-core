@@ -4,7 +4,7 @@ author: "Cursor"
 created: "2026-06-07"
 verification_report: "Codex Sprint 05 Personal Archive 검증 (2026.06.07)"
 base_commit: "87a3e36"
-rework_commit: "(commit after this report)"
+rework_commit: "33fc74f"
 ---
 
 # 재작업 완료 보고서 — SAC Sprint 05 Personal Archive (Cursor, 2026.06.07)

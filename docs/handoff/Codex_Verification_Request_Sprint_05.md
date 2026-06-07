@@ -2,7 +2,7 @@
 
 ## 검증 대상
 - Sprint 05 Personal Archive / Extraction Queue
-- 기준 커밋: (Sprint 05 구현 커밋)
+- 기준 커밋: `33fc74f`
 - 브랜치: `master`
 
 ## 검증 항목

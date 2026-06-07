@@ -1,6 +1,6 @@
 # Cursor Handoff — Sprint 05 (완료)
 
-> **Sprint 05 구현 커밋**: (see `Result_Report_Sprint_05.md`)
+> **Sprint 05 구현 커밋**: `33fc74f`
 > **Sprint 04 기준 커밋**: `87a3e36`
 
 ## Sprint 05 완료 — Personal Archive / Extraction Queue
