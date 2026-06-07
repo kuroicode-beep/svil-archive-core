@@ -176,6 +176,90 @@ void main() {
     expect(serialized.contains('SECRET_PII_VALUE'), isFalse);
   });
 
+  test('second approve on same candidate fails with single archive item', () async {
+    await bindWorkspace();
+    final queue = container.extractionQueueService;
+    final archive = container.personalArchiveService;
+
+    final candidate = await queue.enqueueCandidate(
+      const CreateExtractionCandidateInput(
+        candidateType: 'approved',
+        candidateTitle: '중복 승인',
+        candidateContent: '한 번만 저장',
+      ),
+    );
+
+    await queue.approveCandidate(candidate.id);
+    expect(
+      () => queue.approveCandidate(candidate.id),
+      throwsA(isA<StateError>()),
+    );
+    expect((await archive.listItems()).length, 1);
+  });
+
+  test('concurrent approve and edit approve create only one archive item', () async {
+    await bindWorkspace();
+    final queue = container.extractionQueueService;
+    final archive = container.personalArchiveService;
+
+    final candidate = await queue.enqueueCandidate(
+      const CreateExtractionCandidateInput(
+        candidateType: 'approved',
+        candidateTitle: '동시 처리',
+        candidateContent: '원본',
+      ),
+    );
+
+    Object? approveError;
+    Object? editError;
+
+    Future<void> runApprove() async {
+      try {
+        await queue.approveCandidate(candidate.id);
+      } catch (e) {
+        approveError = e;
+      }
+    }
+
+    Future<void> runEditApprove() async {
+      try {
+        await queue.editAndApproveCandidate(
+          EditExtractionCandidateInput(
+            candidateId: candidate.id,
+            title: '수정본',
+            content: '수정',
+          ),
+        );
+      } catch (e) {
+        editError = e;
+      }
+    }
+
+    await Future.wait([runApprove(), runEditApprove()]);
+
+    expect((await archive.listItems()).length, 1);
+    expect(approveError != null || editError != null, isTrue);
+  });
+
+  test('second reject on same candidate fails', () async {
+    await bindWorkspace();
+    final queue = container.extractionQueueService;
+
+    final candidate = await queue.enqueueCandidate(
+      const CreateExtractionCandidateInput(
+        candidateType: 'approved',
+        candidateTitle: '거절 중복',
+        candidateContent: '내용',
+      ),
+    );
+
+    await queue.rejectCandidate(candidate.id);
+    expect(
+      () => queue.rejectCandidate(candidate.id),
+      throwsA(isA<StateError>()),
+    );
+  });
+
   test('journal comment create and list', () async {
     await bindWorkspace();
     final journal = container.journalCommentService;

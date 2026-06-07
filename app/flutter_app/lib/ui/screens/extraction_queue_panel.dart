@@ -22,6 +22,7 @@ class _ExtractionQueuePanelState extends State<ExtractionQueuePanel> {
   List<ExtractionCandidate> _all = [];
   ExtractionCandidate? _selected;
   bool _loading = true;
+  String? _actionInProgress;
 
   @override
   void initState() {
@@ -44,16 +45,30 @@ class _ExtractionQueuePanelState extends State<ExtractionQueuePanel> {
 
   /// 후보를 승인한다.
   Future<void> _approve(String id) async {
-    await widget.extractionQueueService.approveCandidate(id);
-    setState(() => _selected = null);
-    await _refresh();
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      await widget.extractionQueueService.approveCandidate(id);
+      if (!mounted) return;
+      setState(() => _selected = null);
+      await _refresh();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
   }
 
   /// 후보를 거절한다.
   Future<void> _reject(String id) async {
-    await widget.extractionQueueService.rejectCandidate(id);
-    setState(() => _selected = null);
-    await _refresh();
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      await widget.extractionQueueService.rejectCandidate(id);
+      if (!mounted) return;
+      setState(() => _selected = null);
+      await _refresh();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
   }
 
   /// 수정 후 승인 다이얼로그를 연다.
@@ -92,15 +107,22 @@ class _ExtractionQueuePanelState extends State<ExtractionQueuePanel> {
       ),
     );
     if (saved != true) return;
-    await widget.extractionQueueService.editAndApproveCandidate(
-      EditExtractionCandidateInput(
-        candidateId: candidate.id,
-        title: titleController.text.trim(),
-        content: contentController.text.trim(),
-      ),
-    );
-    setState(() => _selected = null);
-    await _refresh();
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = candidate.id);
+    try {
+      await widget.extractionQueueService.editAndApproveCandidate(
+        EditExtractionCandidateInput(
+          candidateId: candidate.id,
+          title: titleController.text.trim(),
+          content: contentController.text.trim(),
+        ),
+      );
+      if (!mounted) return;
+      setState(() => _selected = null);
+      await _refresh();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
   }
 
   @override
@@ -182,15 +204,23 @@ class _ExtractionQueuePanelState extends State<ExtractionQueuePanel> {
                                       SizedBox(
                                         height: 50,
                                         child: ElevatedButton(
-                                          onPressed: () => _approve(_selected!.id),
-                                          child: const Text('승인'),
+                                          onPressed: _actionInProgress == null
+                                              ? () => _approve(_selected!.id)
+                                              : null,
+                                          child: Text(
+                                            _actionInProgress == _selected!.id
+                                                ? '처리 중...'
+                                                : '승인',
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 8),
                                       SizedBox(
                                         height: 50,
                                         child: OutlinedButton(
-                                          onPressed: () => _editAndApprove(_selected!),
+                                          onPressed: _actionInProgress == null
+                                              ? () => _editAndApprove(_selected!)
+                                              : null,
                                           child: const Text('수정 후 승인'),
                                         ),
                                       ),
@@ -198,7 +228,9 @@ class _ExtractionQueuePanelState extends State<ExtractionQueuePanel> {
                                       SizedBox(
                                         height: 50,
                                         child: OutlinedButton(
-                                          onPressed: () => _reject(_selected!.id),
+                                          onPressed: _actionInProgress == null
+                                              ? () => _reject(_selected!.id)
+                                              : null,
                                           child: const Text('거절'),
                                         ),
                                       ),

@@ -176,7 +176,6 @@ class SacContainer {
     );
     _extractionQueueService = ExtractionQueueServiceImpl(
       databaseService: databaseService,
-      personalArchiveService: _personalArchiveService!,
     );
     _journalCommentService = JournalCommentServiceImpl(
       databaseService: databaseService,
