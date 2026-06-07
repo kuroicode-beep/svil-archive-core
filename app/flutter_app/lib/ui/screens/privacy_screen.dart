@@ -83,6 +83,24 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
+                    Text('무결성 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('자동 삭제: 비활성화', style: TextStyle(fontSize: 16)),
+                    Text('orphan Markdown 자동 삭제: 금지', style: TextStyle(fontSize: 16)),
+                    Text('create_document orphan overwrite: 차단', style: TextStyle(fontSize: 16)),
+                    Text('실행 복구: 새 recovery ticket만 허용', style: TextStyle(fontSize: 16)),
+                    Text('스캔/감사/smoke notes: 민감 본문 미저장', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
                     Text('LLM용 문서 생성 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Text('외부 전송: 비활성화', style: TextStyle(fontSize: 16)),

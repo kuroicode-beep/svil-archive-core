@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 6;
+const int kSacSchemaVersion = 7;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -329,4 +329,63 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       }
     }
   }
+  if (fromVersion < 7) {
+    for (final sql in sprint9MigrationSql()) {
+      try {
+        await db.execute(sql);
+      } catch (e) {
+        final msg = e.toString().toLowerCase();
+        if (!msg.contains('duplicate column')) {
+          rethrow;
+        }
+      }
+    }
+  }
+}
+
+/// Sprint 9 integrity / smoke migration SQL 목록을 반환한다.
+List<String> sprint9MigrationSql() {
+  return [
+    'ALTER TABLE work_queue_tickets ADD COLUMN source_ticket_id TEXT',
+    'ALTER TABLE work_queue_tickets ADD COLUMN recovery_kind TEXT',
+    '''
+    CREATE TABLE IF NOT EXISTS integrity_scan_runs (
+      id TEXT PRIMARY KEY,
+      status TEXT NOT NULL,
+      orphan_count INTEGER NOT NULL DEFAULT 0,
+      stale_db_count INTEGER NOT NULL DEFAULT 0,
+      conflict_count INTEGER NOT NULL DEFAULT 0,
+      warning_count INTEGER NOT NULL DEFAULT 0,
+      started_at TEXT NOT NULL,
+      completed_at TEXT,
+      error_message TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS integrity_scan_items (
+      id TEXT PRIMARY KEY,
+      scan_run_id TEXT NOT NULL,
+      item_type TEXT NOT NULL,
+      target_path TEXT,
+      document_id TEXT,
+      severity TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      reason TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS smoke_test_records (
+      id TEXT PRIMARY KEY,
+      platform TEXT NOT NULL,
+      checklist_name TEXT NOT NULL,
+      status TEXT NOT NULL,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_integrity_items_run ON integrity_scan_items(scan_run_id)',
+    'CREATE INDEX IF NOT EXISTS idx_integrity_items_status ON integrity_scan_items(status)',
+  ];
 }

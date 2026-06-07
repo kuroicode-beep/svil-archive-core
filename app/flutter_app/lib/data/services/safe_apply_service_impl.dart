@@ -2,6 +2,7 @@
 
 import '../../domain/models/ticket_execution.dart';
 import '../../domain/services/archive_service.dart';
+import '../../domain/services/document_file_store.dart';
 import '../../domain/services/document_repository.dart';
 import '../../domain/services/safe_apply_service.dart';
 import '../../domain/services/sync_service.dart';
@@ -10,14 +11,17 @@ import '../platform/path_adapter.dart';
 class SafeApplyServiceImpl implements SafeApplyService {
   final ArchiveService _archiveService;
   final DocumentRepository _repository;
+  final DocumentFileStore _fileStore;
   final SyncService _syncService;
 
   SafeApplyServiceImpl({
     required ArchiveService archiveService,
     required DocumentRepository repository,
+    required DocumentFileStore fileStore,
     required SyncService syncService,
   })  : _archiveService = archiveService,
         _repository = repository,
+        _fileStore = fileStore,
         _syncService = syncService;
 
   @override
@@ -35,6 +39,14 @@ class SafeApplyServiceImpl implements SafeApplyService {
           targetPath: null,
           errorCode: 'file_exists',
           errorMessage: 'Target path already exists',
+        );
+      }
+      if (await _fileStore.exists(relativePath)) {
+        return const SafeApplyResult(
+          success: false,
+          targetPath: null,
+          errorCode: 'orphan_file_exists',
+          errorMessage: 'Orphan Markdown file exists at target path',
         );
       }
 

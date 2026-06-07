@@ -2,19 +2,23 @@
 
 import 'package:flutter/material.dart';
 
+import '../../domain/models/execution_recovery.dart';
 import '../../domain/models/ticket_execution.dart';
 import '../../domain/models/work_queue.dart';
+import '../../domain/services/execution_recovery_service.dart';
 import '../../domain/services/queue_execution_service.dart';
 import '../../domain/services/work_queue_service.dart';
 
 class WorkQueuePanel extends StatefulWidget {
   final WorkQueueService workQueueService;
   final QueueExecutionService queueExecutionService;
+  final ExecutionRecoveryService executionRecoveryService;
 
   const WorkQueuePanel({
     super.key,
     required this.workQueueService,
     required this.queueExecutionService,
+    required this.executionRecoveryService,
   });
 
   @override
@@ -29,6 +33,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
   bool _loading = true;
   String? _actionInProgress;
   DryRunPreview? _dryRunPreview;
+  RecoveryAssessment? _recoveryAssessment;
   List<TicketExecutionLog> _executionLogs = [];
 
   @override
@@ -71,6 +76,53 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
     final logs = await widget.queueExecutionService.listExecutionLogs(ticketId);
     if (!mounted) return;
     setState(() => _executionLogs = logs);
+  }
+
+  /// 복구 가능 여부를 평가한다.
+  Future<void> _assessRecovery(String id) async {
+    final assessment = await widget.executionRecoveryService.assessTicket(id);
+    if (!mounted) return;
+    setState(() => _recoveryAssessment = assessment);
+  }
+
+  /// 복구 preview를 생성한다.
+  Future<void> _recoveryPreview(String id) async {
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      final preview = await widget.executionRecoveryService.createRecoveryPreview(id);
+      if (!mounted) return;
+      setState(() => _dryRunPreview = preview);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('복구 preview 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
+  }
+
+  /// 복구 티켓을 생성한다.
+  Future<void> _createRecoveryTicket(String id) async {
+    if (_actionInProgress != null) return;
+    setState(() => _actionInProgress = id);
+    try {
+      final recovery = await widget.executionRecoveryService.createRecoveryTicket(id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('복구 티켓 생성: ${recovery.id}')),
+      );
+      await _refresh();
+      setState(() => _selected = recovery);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('복구 티켓 생성 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _actionInProgress = null);
+    }
   }
 
   /// dry-run preview를 생성한다.
@@ -242,6 +294,9 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
     final canExecute = ticket.status == WorkQueueTicketStatus.approved;
     final canCancel = ticket.status == WorkQueueTicketStatus.pending ||
         ticket.status == WorkQueueTicketStatus.approved;
+    final canRecover = ticket.status == WorkQueueTicketStatus.failed ||
+        ticket.status == WorkQueueTicketStatus.blocked ||
+        ticket.status == WorkQueueTicketStatus.conflict;
 
     return Card(
       child: Padding(
@@ -255,6 +310,10 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
             Text('action: ${ticket.requestedAction}', style: const TextStyle(fontSize: 16)),
             Text('권한: ${_permissionLabel(ticket.permissionLevel)}', style: const TextStyle(fontSize: 16)),
             Text(_statusLabel(ticket.status), style: const TextStyle(fontSize: 16)),
+            if (ticket.isRecoveryTicket)
+              const Text('복구 티켓', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+            if (ticket.sourceTicketId != null)
+              Text('source ticket: ${ticket.sourceTicketId}', style: const TextStyle(fontSize: 16)),
             Text(_riskLabel(ticket.permissionLevel), style: const TextStyle(fontSize: 16)),
             Text(
               'dry-run: ${canExecute ? '가능' : '불가'} · 실행: ${canExecute ? '가능' : '불가'}',
@@ -315,6 +374,44 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                 child: OutlinedButton(
                   onPressed: _actionInProgress == ticket.id ? null : () => _cancel(ticket.id),
                   child: const Text('취소'),
+                ),
+              ),
+            ],
+            if (canRecover) ...[
+              const SizedBox(height: 12),
+              const Text('실행 복구', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _assessRecovery(ticket.id),
+                  child: const Text('복구 가능 여부 확인'),
+                ),
+              ),
+              if (_recoveryAssessment?.ticketId == ticket.id) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'eligibility: ${_recoveryAssessment!.eligibility.name}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _recoveryPreview(ticket.id),
+                  child: const Text('복구 preview'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _actionInProgress == ticket.id ? null : () => _createRecoveryTicket(ticket.id),
+                  child: const Text('복구 티켓 생성'),
                 ),
               ),
             ],
@@ -386,7 +483,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                       child: ListTile(
                         selected: selected,
                         title: Text(
-                          '${ticket.requestedAction} · ${_permissionLabel(ticket.permissionLevel)}',
+                          '${ticket.isRecoveryTicket ? '[복구] ' : ''}${ticket.requestedAction} · ${_permissionLabel(ticket.permissionLevel)}',
                           style: const TextStyle(fontSize: 16),
                         ),
                         subtitle: Text(
@@ -397,6 +494,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                           setState(() {
                             _selected = ticket;
                             _dryRunPreview = null;
+                            _recoveryAssessment = null;
                           });
                           _loadExecutionLogs(ticket.id);
                         },
@@ -412,14 +510,21 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
                     child: ListTile(
                       selected: selected,
                       title: Text(
-                        '${ticket.requestedAction} · ${_permissionLabel(ticket.permissionLevel)}',
+                        '${ticket.isRecoveryTicket ? '[복구] ' : ''}${ticket.requestedAction} · ${_permissionLabel(ticket.permissionLevel)}',
                         style: const TextStyle(fontSize: 16),
                       ),
                       subtitle: Text(
                         '${_statusLabel(ticket.status)} · ${ticket.actor}',
                         style: const TextStyle(fontSize: 14),
                       ),
-                      onTap: () => setState(() => _selected = ticket),
+                      onTap: () {
+                        setState(() {
+                          _selected = ticket;
+                          _dryRunPreview = null;
+                          _recoveryAssessment = null;
+                        });
+                        _loadExecutionLogs(ticket.id);
+                      },
                     ),
                   );
                 }),

@@ -9,6 +9,8 @@ import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/permission_token_service.dart';
 import '../../domain/services/privacy_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/services/report_consistency_service.dart';
+import '../../domain/services/workspace_integrity_service.dart';
 import '../db/database_service_impl.dart';
 
 class PrivacyServiceImpl implements PrivacyService {
@@ -17,6 +19,8 @@ class PrivacyServiceImpl implements PrivacyService {
   final McpToolRegistryService _toolRegistryService;
   final McpBridgeStatusService _mcpBridgeService;
   final QueueExecutionService _queueExecutionService;
+  final WorkspaceIntegrityService _integrityService;
+  final ReportConsistencyService _reportConsistencyService;
 
   PrivacyServiceImpl({
     required DatabaseServiceImpl databaseService,
@@ -24,11 +28,15 @@ class PrivacyServiceImpl implements PrivacyService {
     required McpToolRegistryService toolRegistryService,
     required McpBridgeStatusService mcpBridgeService,
     required QueueExecutionService queueExecutionService,
+    required WorkspaceIntegrityService integrityService,
+    required ReportConsistencyService reportConsistencyService,
   })  : _databaseService = databaseService,
         _permissionTokenService = permissionTokenService,
         _toolRegistryService = toolRegistryService,
         _mcpBridgeService = mcpBridgeService,
-        _queueExecutionService = queueExecutionService;
+        _queueExecutionService = queueExecutionService,
+        _integrityService = integrityService,
+        _reportConsistencyService = reportConsistencyService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -84,6 +92,8 @@ class PrivacyServiceImpl implements PrivacyService {
     final enabledCount = tools.where((t) => t.enabled).length;
 
     final executionSummary = await _queueExecutionService.getExecutionSummary();
+    final integritySummary = await _integrityService.getLatestSummary();
+    final report = await _reportConsistencyService.checkReports();
 
     return PrivacySummary(
       localProcessingEnabled: true,
@@ -106,6 +116,8 @@ class PrivacyServiceImpl implements PrivacyService {
         disabledToolCount: tools.length - enabledCount,
       ),
       executionSummary: executionSummary,
+      integritySummary: integritySummary,
+      reportConsistent: report.isConsistent,
     );
   }
 }

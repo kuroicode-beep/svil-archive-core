@@ -19,9 +19,14 @@ import '../data/services/ollama_adapter.dart';
 import '../data/services/permission_token_service_impl.dart';
 import '../data/services/personal_archive_service_impl.dart';
 import '../data/services/privacy_service_impl.dart';
+import '../data/services/execution_recovery_service_impl.dart';
 import '../data/services/queue_execution_service_impl.dart';
+import '../data/services/report_consistency_service_impl.dart';
 import '../data/services/safe_apply_service_impl.dart';
+import '../data/services/smoke_test_record_service_impl.dart';
 import '../data/services/work_queue_service_impl.dart';
+import '../data/services/workspace_file_inventory_service_impl.dart';
+import '../data/services/workspace_integrity_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
 import '../data/services/theme_service_impl.dart';
@@ -46,8 +51,13 @@ import '../domain/services/mcp_tool_registry_service.dart';
 import '../domain/services/permission_token_service.dart';
 import '../domain/services/personal_archive_service.dart';
 import '../domain/services/privacy_service.dart';
+import '../domain/services/execution_recovery_service.dart';
 import '../domain/services/queue_execution_service.dart';
+import '../domain/services/report_consistency_service.dart';
+import '../domain/services/smoke_test_record_service.dart';
 import '../domain/services/work_queue_service.dart';
+import '../domain/services/workspace_file_inventory_service.dart';
+import '../domain/services/workspace_integrity_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
 import '../domain/services/trash_service.dart';
@@ -73,6 +83,11 @@ class SacContainer {
   McpToolRegistryService? _mcpToolRegistryService;
   PermissionTokenService? _permissionTokenService;
   QueueExecutionService? _queueExecutionService;
+  WorkspaceIntegrityService? _workspaceIntegrityService;
+  WorkspaceFileInventoryService? _fileInventoryService;
+  ExecutionRecoveryService? _executionRecoveryService;
+  SmokeTestRecordService? _smokeTestRecordService;
+  ReportConsistencyService? _reportConsistencyService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -80,6 +95,7 @@ class SacContainer {
   WorkspaceFileWatcher? _fileWatcher;
   DocumentRepositoryImpl? _repository;
   Workspace? _workspace;
+  final String? _reportDocsRoot;
   VoidCallback? onWorkspaceFileChanged;
 
   SacContainer._({
@@ -88,10 +104,14 @@ class SacContainer {
     required this.settingsService,
     required this.themeService,
     required this.themeController,
-  });
+    String? reportDocsRoot,
+  }) : _reportDocsRoot = reportDocsRoot;
 
   /// 앱 시작 시 기본 컨테이너를 생성한다.
-  static Future<SacContainer> create({String? registryDirectory}) async {
+  static Future<SacContainer> create({
+    String? registryDirectory,
+    String? reportDocsRoot,
+  }) async {
     final databaseService = DatabaseServiceImpl();
     final themeService = ThemeServiceImpl(databaseService: databaseService);
     final themeController = SacThemeController(themeService);
@@ -104,6 +124,7 @@ class SacContainer {
       settingsService: SettingsServiceImpl(databaseService: databaseService),
       themeService: themeService,
       themeController: themeController,
+      reportDocsRoot: reportDocsRoot ?? resolveReportDocsRoot(),
     );
   }
 
@@ -212,6 +233,36 @@ class SacContainer {
     return service;
   }
 
+  WorkspaceIntegrityService get workspaceIntegrityService {
+    final service = _workspaceIntegrityService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  WorkspaceFileInventoryService get fileInventoryService {
+    final service = _fileInventoryService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ExecutionRecoveryService get executionRecoveryService {
+    final service = _executionRecoveryService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  SmokeTestRecordService get smokeTestRecordService {
+    final service = _smokeTestRecordService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ReportConsistencyService get reportConsistencyService {
+    final service = _reportConsistencyService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -290,9 +341,24 @@ class SacContainer {
       toolRegistry: _mcpToolRegistryService!,
       workQueue: _workQueueService!,
     );
+    _fileInventoryService = WorkspaceFileInventoryServiceImpl(fileStore: fileStore);
+    _reportConsistencyService = ReportConsistencyServiceImpl(
+      databaseService: databaseService,
+      reportDocsRoot: _reportDocsRoot,
+    );
+    _smokeTestRecordService = SmokeTestRecordServiceImpl(
+      databaseService: databaseService,
+    );
+    _workspaceIntegrityService = WorkspaceIntegrityServiceImpl(
+      databaseService: databaseService,
+      inventoryService: _fileInventoryService!,
+      reportConsistencyService: _reportConsistencyService!,
+      workspaceId: workspace.id,
+    );
     final safeApplyService = SafeApplyServiceImpl(
       archiveService: _archiveService!,
       repository: _repository!,
+      fileStore: fileStore,
       syncService: _syncService!,
     );
     _queueExecutionService = QueueExecutionServiceImpl(
@@ -305,12 +371,19 @@ class SacContainer {
       syncService: _syncService!,
     );
     await _mcpToolRegistryService!.ensureDefaultTools();
+    _executionRecoveryService = ExecutionRecoveryServiceImpl(
+      databaseService: databaseService,
+      workQueueService: _workQueueService!,
+    );
     _dashboardService = DashboardServiceImpl(
       databaseService: databaseService,
       workQueueService: _workQueueService!,
       mcpBridgeService: _mcpBridgeStatusService!,
       toolRegistryService: _mcpToolRegistryService!,
       queueExecutionService: _queueExecutionService!,
+      integrityService: _workspaceIntegrityService!,
+      reportConsistencyService: _reportConsistencyService!,
+      smokeTestRecordService: _smokeTestRecordService!,
     );
     _privacyService = PrivacyServiceImpl(
       databaseService: databaseService,
@@ -318,6 +391,8 @@ class SacContainer {
       toolRegistryService: _mcpToolRegistryService!,
       mcpBridgeService: _mcpBridgeStatusService!,
       queueExecutionService: _queueExecutionService!,
+      integrityService: _workspaceIntegrityService!,
+      reportConsistencyService: _reportConsistencyService!,
     );
     _localAiService = OllamaAdapter();
     _llmSelfInfoExportService = LlmSelfInfoExportServiceImpl(

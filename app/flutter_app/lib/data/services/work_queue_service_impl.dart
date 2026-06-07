@@ -157,6 +157,8 @@ class WorkQueueServiceImpl implements WorkQueueService {
       'base_revision': input.baseRevision,
       'permission_token_id': input.permissionTokenId,
       'payload_json': input.payloadJson,
+      'source_ticket_id': input.sourceTicketId,
+      'recovery_kind': input.recoveryKind,
       'created_at': now,
       'updated_at': now,
     });
@@ -177,6 +179,8 @@ class WorkQueueServiceImpl implements WorkQueueService {
       'base_revision': input.baseRevision,
       'permission_token_id': input.permissionTokenId,
       'payload_json': input.payloadJson,
+      'source_ticket_id': input.sourceTicketId,
+      'recovery_kind': input.recoveryKind,
       'created_at': now,
       'updated_at': now,
     });
@@ -391,6 +395,8 @@ class WorkQueueServiceImpl implements WorkQueueService {
       baseRevision: row['base_revision'] as int?,
       permissionTokenId: row['permission_token_id'] as String?,
       payloadJson: row['payload_json'] as String?,
+      sourceTicketId: row['source_ticket_id'] as String?,
+      recoveryKind: row['recovery_kind'] as String?,
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
     );

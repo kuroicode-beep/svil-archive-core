@@ -168,6 +168,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('무결성 / 복구', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'orphan Markdown: ${summary.integritySummary.openOrphanCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'stale DB row: ${summary.integritySummary.openStaleDbCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '보고서 정합성: ${summary.reportConsistent ? '일치' : '불일치'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'macOS smoke: ${summary.macSmokeStatus?.name ?? '기록 없음'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const Text('로컬 AI 상태', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text('상태: ${localAi.label}', style: const TextStyle(fontSize: 16)),

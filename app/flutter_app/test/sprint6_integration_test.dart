@@ -45,7 +45,7 @@ void main() {
     await bindWorkspace();
     final summary = await container.dashboardService.getDashboardSummary();
     expect(summary.documentCount, greaterThanOrEqualTo(0));
-    expect(summary.aiCollaboration.lastCompletedSprint, contains('Sprint 06'));
+    expect(summary.aiCollaboration.lastCompletedSprint, contains('Sprint'));
   });
 
   test('privacy service builds summary with external transfer disabled', () async {

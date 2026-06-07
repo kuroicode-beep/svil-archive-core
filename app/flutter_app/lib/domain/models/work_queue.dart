@@ -31,6 +31,8 @@ class WorkQueueTicket {
   final int? baseRevision;
   final String? permissionTokenId;
   final String? payloadJson;
+  final String? sourceTicketId;
+  final String? recoveryKind;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -49,9 +51,15 @@ class WorkQueueTicket {
     this.baseRevision,
     this.permissionTokenId,
     this.payloadJson,
+    this.sourceTicketId,
+    this.recoveryKind,
     required this.createdAt,
     required this.updatedAt,
   });
+
+  /// 복구 티켓 여부를 반환한다.
+  bool get isRecoveryTicket =>
+      recoveryKind != null && recoveryKind!.isNotEmpty;
 }
 
 class CreateWorkQueueTicketInput {
@@ -66,6 +74,8 @@ class CreateWorkQueueTicketInput {
   final int? baseRevision;
   final String? permissionTokenId;
   final String? payloadJson;
+  final String? sourceTicketId;
+  final String? recoveryKind;
 
   const CreateWorkQueueTicketInput({
     required this.actor,
@@ -79,6 +89,8 @@ class CreateWorkQueueTicketInput {
     this.baseRevision,
     this.permissionTokenId,
     this.payloadJson,
+    this.sourceTicketId,
+    this.recoveryKind,
   });
 }
 

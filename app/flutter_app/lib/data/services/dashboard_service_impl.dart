@@ -10,7 +10,10 @@ import '../../domain/services/dashboard_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/services/report_consistency_service.dart';
+import '../../domain/services/smoke_test_record_service.dart';
 import '../../domain/services/work_queue_service.dart';
+import '../../domain/services/workspace_integrity_service.dart';
 import '../db/database_service_impl.dart';
 
 class DashboardServiceImpl implements DashboardService {
@@ -19,6 +22,9 @@ class DashboardServiceImpl implements DashboardService {
   final McpBridgeStatusService _mcpBridgeService;
   final McpToolRegistryService _toolRegistryService;
   final QueueExecutionService _queueExecutionService;
+  final WorkspaceIntegrityService _integrityService;
+  final ReportConsistencyService _reportConsistencyService;
+  final SmokeTestRecordService _smokeTestRecordService;
 
   DashboardServiceImpl({
     required DatabaseServiceImpl databaseService,
@@ -26,11 +32,17 @@ class DashboardServiceImpl implements DashboardService {
     required McpBridgeStatusService mcpBridgeService,
     required McpToolRegistryService toolRegistryService,
     required QueueExecutionService queueExecutionService,
+    required WorkspaceIntegrityService integrityService,
+    required ReportConsistencyService reportConsistencyService,
+    required SmokeTestRecordService smokeTestRecordService,
   })  : _databaseService = databaseService,
         _workQueueService = workQueueService,
         _mcpBridgeService = mcpBridgeService,
         _toolRegistryService = toolRegistryService,
-        _queueExecutionService = queueExecutionService;
+        _queueExecutionService = queueExecutionService,
+        _integrityService = integrityService,
+        _reportConsistencyService = reportConsistencyService,
+        _smokeTestRecordService = smokeTestRecordService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -55,6 +67,9 @@ class DashboardServiceImpl implements DashboardService {
     final enabledCount = tools.where((t) => t.enabled).length;
     final queueActivities = await _loadWorkQueueActivities();
     final executionSummary = await _queueExecutionService.getExecutionSummary();
+    final integritySummary = await _integrityService.getLatestSummary();
+    final report = await _reportConsistencyService.checkReports();
+    final macSmoke = await _smokeTestRecordService.getLatestForPlatform('macOS');
 
     return DashboardSummary(
       aiCollaboration: _buildAiCollaborationSummary(critical, queueSummary),
@@ -71,6 +86,9 @@ class DashboardServiceImpl implements DashboardService {
       disabledMcpToolCount: tools.length - enabledCount,
       recentWorkQueueActivities: queueActivities,
       executionSummary: executionSummary,
+      integritySummary: integritySummary,
+      reportConsistent: report.isConsistent,
+      macSmokeStatus: macSmoke?.status,
     );
   }
 
@@ -84,7 +102,7 @@ class DashboardServiceImpl implements DashboardService {
       handoffPending: critical.pendingExtractionCount > 0 || queueSummary.pendingCount > 0 ? 1 : 0,
       verificationNeeded: queueSummary.conflictCount > 0 ? 1 : 0,
       criticalIssues: critical.hasCritical || queueSummary.blockedCount > 0 ? 1 : 0,
-      lastCompletedSprint: 'Sprint 06 AI Dashboard',
+      lastCompletedSprint: 'Sprint 09 Integrity Recovery',
     );
   }
 

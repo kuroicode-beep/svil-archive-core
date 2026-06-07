@@ -15,6 +15,7 @@ import 'document_editor_panel.dart';
 import 'extraction_queue_panel.dart';
 import 'personal_archive_panel.dart';
 import 'work_queue_panel.dart';
+import 'integrity_screen.dart';
 import 'privacy_screen.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
@@ -292,6 +293,13 @@ class _MainShellState extends State<MainShell> {
         return WorkQueuePanel(
           workQueueService: widget.container.workQueueService,
           queueExecutionService: widget.container.queueExecutionService,
+          executionRecoveryService: widget.container.executionRecoveryService,
+        );
+      case SacSection.integrity:
+        return IntegrityScreen(
+          integrityService: widget.container.workspaceIntegrityService,
+          smokeTestRecordService: widget.container.smokeTestRecordService,
+          reportConsistencyService: widget.container.reportConsistencyService,
         );
     }
   }
