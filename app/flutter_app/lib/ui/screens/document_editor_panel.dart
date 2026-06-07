@@ -4,17 +4,20 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/document.dart';
 import '../../domain/models/sync_state.dart';
+import '../widgets/sync_status_badge.dart';
 
 class DocumentEditorPanel extends StatefulWidget {
   final Document? document;
   final SyncState? syncState;
   final Future<void> Function(String title, String body) onSave;
+  final Future<void> Function(String documentId)? onMoveToTrash;
 
   const DocumentEditorPanel({
     super.key,
     required this.document,
     required this.syncState,
     required this.onSave,
+    this.onMoveToTrash,
   });
 
   @override
@@ -95,7 +98,7 @@ class _DocumentEditorPanelState extends State<DocumentEditorPanel> {
       );
     }
 
-    final status = widget.syncState?.status.name ?? 'clean';
+    final syncStatus = widget.syncState?.status ?? SyncStatus.clean;
     final revision = widget.syncState?.revision ?? widget.document!.metadata.revision;
 
     return Column(
@@ -118,8 +121,14 @@ class _DocumentEditorPanelState extends State<DocumentEditorPanel> {
               const SizedBox(width: 12),
               Text('rev $revision', style: const TextStyle(fontSize: 14)),
               const SizedBox(width: 8),
-              Chip(label: Text(status, style: const TextStyle(fontSize: 13))),
+              SyncStatusBadge(status: syncStatus),
               const SizedBox(width: 8),
+              if (widget.onMoveToTrash != null)
+                IconButton(
+                  tooltip: '휴지통으로 이동',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => widget.onMoveToTrash!(widget.document!.metadata.id),
+                ),
               ElevatedButton(
                 onPressed: _saving ? null : _handleSave,
                 child: _saving

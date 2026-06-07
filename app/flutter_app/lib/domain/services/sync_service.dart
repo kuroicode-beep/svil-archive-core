@@ -12,6 +12,9 @@ abstract class SyncService {
   /// 특정 문서의 SyncState 조회
   Future<SyncState> getSyncState(String documentId);
 
+  /// 활성 문서들의 sync 상태 맵을 반환한다.
+  Future<Map<String, SyncState>> listSyncStates();
+
   /// AI 수정 시도 전 revision 검증 (AI 덮어쓰기 방지)
   Future<bool> validateAiRevision(String documentId, int baseRevision);
 

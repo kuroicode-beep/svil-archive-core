@@ -26,6 +26,10 @@ class UpdateDocumentInput {
   final String id;
   final String? title;
   final String? content;
+  final String? type;
+  final String? project;
+  final List<String>? tags;
+  final String? summary;
   final String? author; // 수정 주체 (user / AI agent ID)
   final int baseRevision; // 충돌 방지용
 
@@ -33,6 +37,10 @@ class UpdateDocumentInput {
     required this.id,
     this.title,
     this.content,
+    this.type,
+    this.project,
+    this.tags,
+    this.summary,
     this.author,
     required this.baseRevision,
   });

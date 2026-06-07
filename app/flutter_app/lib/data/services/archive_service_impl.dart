@@ -136,6 +136,40 @@ class ArchiveServiceImpl implements ArchiveService {
     final body = input.content ??
         (await getDocumentWithContent(input.id))?.content?.rawMarkdown ??
         '';
+    final metadataOnly = input.title == null && input.content == null;
+
+    final updated = DocumentMetadata(
+      id: existing.id,
+      path: existing.path,
+      title: title,
+      author: existing.author,
+      project: input.project ?? existing.project,
+      type: input.type ?? existing.type,
+      status: existing.status,
+      createdAt: existing.createdAt,
+      updatedAt: DateTime.now(),
+      tags: input.tags ?? existing.tags,
+      summary: input.summary ?? existing.summary,
+      contentHash: existing.contentHash,
+      revision: existing.revision,
+      sacSchema: existing.sacSchema,
+    );
+
+    if (metadataOnly) {
+      await _repository.save(updated);
+      _indexingQueue.queueDocument(input.id);
+      final current = await getDocumentWithContent(input.id);
+      return current ??
+          Document(
+            metadata: updated,
+            content: DocumentContent(
+              documentId: input.id,
+              rawMarkdown: body,
+              loadedAt: DateTime.now(),
+            ),
+          );
+    }
+
     final newRevision = syncState.revision + 1;
     final actor = input.author ?? 'user';
 
@@ -150,24 +184,9 @@ class ArchiveServiceImpl implements ArchiveService {
     await _fileStore.writeContent(existing.path, markdown);
 
     final hash = computeContentHash(body);
-    final updated = DocumentMetadata(
-      id: existing.id,
-      path: existing.path,
-      title: title,
-      author: existing.author,
-      project: existing.project,
-      type: existing.type,
-      status: existing.status,
-      createdAt: existing.createdAt,
-      updatedAt: DateTime.now(),
-      tags: existing.tags,
-      summary: existing.summary,
-      contentHash: hash,
-      revision: newRevision,
-      sacSchema: existing.sacSchema,
-    );
+    final saved = updated.copyWithRevision(newRevision).copyWithContentHash(hash);
 
-    await _repository.save(updated);
+    await _repository.save(saved);
     await _syncService.recordUserUpdate(
       documentId: input.id,
       actor: actor,
@@ -177,7 +196,7 @@ class ArchiveServiceImpl implements ArchiveService {
     _indexingQueue.queueDocument(input.id);
 
     return Document(
-      metadata: updated,
+      metadata: saved,
       content: DocumentContent(
         documentId: input.id,
         rawMarkdown: body,
@@ -224,6 +243,26 @@ extension DocumentMetadataRevision on DocumentMetadata {
       tags: tags,
       summary: summary,
       contentHash: contentHash,
+      revision: revision,
+      sacSchema: sacSchema,
+    );
+  }
+
+  /// contentHash 값을 갱신한 복사본을 반환한다.
+  DocumentMetadata copyWithContentHash(String hash) {
+    return DocumentMetadata(
+      id: id,
+      path: path,
+      title: title,
+      author: author,
+      project: project,
+      type: type,
+      status: status,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      tags: tags,
+      summary: summary,
+      contentHash: hash,
       revision: revision,
       sacSchema: sacSchema,
     );

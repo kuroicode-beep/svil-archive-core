@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 2;
+const int kSacSchemaVersion = 3;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -136,6 +136,15 @@ List<String> sprint3MigrationSql() {
   ];
 }
 
+/// Sprint 4 문서 메타데이터 확장 migration SQL 목록을 반환한다.
+List<String> sprint4MigrationSql() {
+  return [
+    'ALTER TABLE documents ADD COLUMN author TEXT',
+    'ALTER TABLE documents ADD COLUMN project TEXT',
+    'ALTER TABLE documents ADD COLUMN summary TEXT',
+  ];
+}
+
 /// 스키마 버전에 맞는 migration을 적용한다.
 Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) async {
   if (fromVersion < 1) {
@@ -149,6 +158,18 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
         await db.execute(sql);
       } catch (e) {
         // ALTER ADD COLUMN 중복만 무시 — FTS/인덱스 생성 실패는 전파한다.
+        final msg = e.toString().toLowerCase();
+        if (!msg.contains('duplicate column')) {
+          rethrow;
+        }
+      }
+    }
+  }
+  if (fromVersion < 3) {
+    for (final sql in sprint4MigrationSql()) {
+      try {
+        await db.execute(sql);
+      } catch (e) {
         final msg = e.toString().toLowerCase();
         if (!msg.contains('duplicate column')) {
           rethrow;

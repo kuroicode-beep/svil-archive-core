@@ -64,6 +64,15 @@ class SyncServiceImpl implements SyncService {
   }
 
   @override
+  Future<Map<String, SyncState>> listSyncStates() async {
+    final rows = await _db.query('sync_state');
+    return {
+      for (final row in rows)
+        row['document_id'] as String: _mapRow(row),
+    };
+  }
+
+  @override
   Future<bool> validateAiRevision(String documentId, int baseRevision) async {
     final state = await getSyncState(documentId);
     return state.revision == baseRevision;

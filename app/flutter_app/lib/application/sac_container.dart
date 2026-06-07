@@ -1,4 +1,6 @@
-// sac_container.dart — Sprint 3 서비스 조립 및 Workspace 컨텍스트 관리
+// sac_container.dart — Sprint 4 서비스 조립 및 Workspace 컨텍스트 관리
+
+import 'package:flutter/foundation.dart';
 
 import '../data/db/database_service_impl.dart';
 import '../data/db/document_repository_impl.dart';
@@ -8,11 +10,13 @@ import '../data/indexing/indexing_queue.dart';
 import '../data/services/archive_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
+import '../data/services/theme_service_impl.dart';
 import '../data/services/trash_service_impl.dart';
 import '../data/services/workspace_registry.dart';
 import '../data/services/workspace_service_impl.dart';
-import '../data/sync/file_watcher_skeleton.dart';
 import '../data/sync/sync_journal_writer.dart';
+import '../data/sync/workspace_file_watcher.dart';
+import 'sac_theme_controller.dart';
 import '../data/sync/sync_service_impl.dart';
 import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
@@ -25,25 +29,32 @@ class SacContainer {
   final DatabaseServiceImpl databaseService;
   final WorkspaceServiceImpl workspaceService;
   final SettingsServiceImpl settingsService;
+  final ThemeServiceImpl themeService;
+  final SacThemeController themeController;
 
   ArchiveService? _archiveService;
   SearchService? _searchService;
   TrashService? _trashService;
   IndexingQueue? _indexingQueue;
   SyncServiceImpl? _syncService;
-  FileWatcherSkeleton? _fileWatcher;
+  WorkspaceFileWatcher? _fileWatcher;
   DocumentRepositoryImpl? _repository;
   Workspace? _workspace;
+  VoidCallback? onWorkspaceFileChanged;
 
   SacContainer._({
     required this.databaseService,
     required this.workspaceService,
     required this.settingsService,
+    required this.themeService,
+    required this.themeController,
   });
 
   /// 앱 시작 시 기본 컨테이너를 생성한다.
   static Future<SacContainer> create({String? registryDirectory}) async {
     final databaseService = DatabaseServiceImpl();
+    final themeService = ThemeServiceImpl(databaseService: databaseService);
+    final themeController = SacThemeController(themeService);
     return SacContainer._(
       databaseService: databaseService,
       workspaceService: WorkspaceServiceImpl(
@@ -51,6 +62,8 @@ class SacContainer {
         registry: WorkspaceRegistry(overrideDirectory: registryDirectory),
       ),
       settingsService: SettingsServiceImpl(databaseService: databaseService),
+      themeService: themeService,
+      themeController: themeController,
     );
   }
 
@@ -131,7 +144,7 @@ class SacContainer {
       workspaceId: workspace.id,
     );
 
-    _fileWatcher = FileWatcherSkeleton(
+    _fileWatcher = WorkspaceFileWatcher(
       onChanged: _onFileChanged,
     );
     await _fileWatcher!.start(workspace.rootPath);
@@ -145,6 +158,7 @@ class SacContainer {
         mcpEnabled: current.mcpEnabled,
       ),
     );
+    await themeController.load();
     return workspace;
   }
 
@@ -155,5 +169,11 @@ class SacContainer {
     if (doc != null) {
       _indexingQueue?.queueDocument(doc.id);
     }
+    onWorkspaceFileChanged?.call();
+  }
+
+  /// 테스트/수동 트리거용 파일 변경 이벤트를 전달한다.
+  Future<void> notifyFileChangedForTest(String relativePath) async {
+    await _fileWatcher?.notifyChanged(relativePath);
   }
 }

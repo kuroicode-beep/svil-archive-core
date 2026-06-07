@@ -2,35 +2,34 @@
 
 import 'package:flutter/material.dart';
 
-const double _kFooterHeight = 50.0;
+import '../../domain/models/sync_state.dart';
+import 'sync_status_badge.dart';
 
-class FooterBar extends StatefulWidget {
+const double kFooterHeight = 50.0;
+
+class FooterBar extends StatelessWidget {
   final String? workspaceName;
   final String? workspacePath;
-  final String? syncStatus;
+  final SyncState? syncState;
+  final bool highContrastEnabled;
+  final ValueChanged<bool>? onHighContrastChanged;
 
   const FooterBar({
     super.key,
     this.workspaceName,
     this.workspacePath,
-    this.syncStatus,
+    this.syncState,
+    this.highContrastEnabled = false,
+    this.onHighContrastChanged,
   });
 
   @override
-  State<FooterBar> createState() => _FooterBarState();
-}
-
-class _FooterBarState extends State<FooterBar> {
-  bool _highContrast = false;
-
-  @override
   Widget build(BuildContext context) {
-    final workspaceLabel = widget.workspaceName ?? '—';
-    final pathLabel = widget.workspacePath ?? '—';
-    final syncLabel = widget.syncStatus ?? '—';
+    final workspaceLabel = workspaceName ?? '—';
+    final pathLabel = workspacePath ?? '—';
 
     return Container(
-      height: _kFooterHeight,
+      height: kFooterHeight,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       color: Theme.of(context).colorScheme.surface,
       child: Row(
@@ -48,17 +47,22 @@ class _FooterBarState extends State<FooterBar> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          Text('sync: $syncLabel', style: const TextStyle(fontSize: 13)),
-          const SizedBox(width: 16),
+          if (syncState != null) ...[
+            SyncStatusBadge(status: syncState!.status, compact: true),
+            const SizedBox(width: 6),
+            Text(
+              SyncStatusBadge.labelFor(syncState!.status),
+              style: const TextStyle(fontSize: 13),
+            ),
+            const SizedBox(width: 16),
+          ],
           const Text('고대비', style: TextStyle(fontSize: 13)),
           Semantics(
             label: '고대비 모드',
-            toggled: _highContrast,
+            toggled: highContrastEnabled,
             child: Switch(
-              value: _highContrast,
-              onChanged: (val) {
-                setState(() => _highContrast = val);
-              },
+              value: highContrastEnabled,
+              onChanged: onHighContrastChanged,
             ),
           ),
         ],

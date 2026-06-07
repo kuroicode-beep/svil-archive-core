@@ -7,7 +7,6 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'application/sac_container.dart';
 import 'ui/screens/welcome_screen.dart';
-import 'ui/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,13 +25,19 @@ class SacApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SAC — SVIL Archive Core',
-      debugShowCheckedModeBanner: false,
-      theme: buildLightTheme(),
-      darkTheme: buildDarkTheme(),
-      themeMode: ThemeMode.light,
-      home: WelcomeScreen(container: container),
+    return ListenableBuilder(
+      listenable: container.themeController,
+      builder: (context, _) {
+        final controller = container.themeController;
+        return MaterialApp(
+          title: 'SAC — SVIL Archive Core',
+          debugShowCheckedModeBanner: false,
+          theme: controller.resolveTheme(),
+          darkTheme: controller.resolveTheme(),
+          themeMode: controller.resolveThemeMode(),
+          home: WelcomeScreen(container: container),
+        );
+      },
     );
   }
 }

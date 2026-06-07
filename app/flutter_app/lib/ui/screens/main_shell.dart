@@ -1,4 +1,4 @@
-// main_shell.dart — 3패널 레이아웃 + 아카이브/검색/휴지통 (Sprint 3)
+// main_shell.dart — 3패널 레이아웃 + 폴더 트리/메타데이터 (Sprint 4)
 
 import 'package:flutter/material.dart';
 
@@ -6,10 +6,10 @@ import '../../application/sac_container.dart';
 import '../../domain/models/document.dart';
 import '../../domain/models/sync_state.dart';
 import '../../domain/services/archive_service.dart';
+import '../widgets/folder_tree_panel.dart';
 import '../widgets/footer_bar.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_context_panel.dart';
-import 'document_archive_panel.dart';
 import 'document_editor_panel.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
@@ -26,6 +26,7 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   SacSection _section = SacSection.archive;
   List<DocumentMetadata> _documents = [];
+  Map<String, SyncState> _syncStates = {};
   Document? _selectedDocument;
   SyncState? _selectedSyncState;
   bool _loading = true;
@@ -35,17 +36,36 @@ class _MainShellState extends State<MainShell> {
   @override
   void initState() {
     super.initState();
+    widget.container.onWorkspaceFileChanged = _handleExternalFileChange;
     _refreshDocuments();
   }
 
-  /// 문서 목록을 다시 로드한다.
+  @override
+  void dispose() {
+    widget.container.onWorkspaceFileChanged = null;
+    super.dispose();
+  }
+
+  /// 외부 파일 변경 시 sync 상태를 갱신한다.
+  Future<void> _handleExternalFileChange() async {
+    await _refreshSyncStates();
+    final selectedId = _selectedDocument?.metadata.id;
+    if (selectedId != null) {
+      final sync = await widget.container.syncService.getSyncState(selectedId);
+      if (mounted) setState(() => _selectedSyncState = sync);
+    }
+  }
+
+  /// 문서 목록과 sync 상태를 다시 로드한다.
   Future<void> _refreshDocuments() async {
     setState(() => _loading = true);
     try {
       final docs = await _archive.listDocuments();
+      final syncStates = await widget.container.syncService.listSyncStates();
       if (!mounted) return;
       setState(() {
         _documents = docs;
+        _syncStates = syncStates;
         _loading = false;
       });
     } catch (e) {
@@ -56,6 +76,12 @@ class _MainShellState extends State<MainShell> {
         );
       }
     }
+  }
+
+  /// sync 상태 맵만 갱신한다.
+  Future<void> _refreshSyncStates() async {
+    final syncStates = await widget.container.syncService.listSyncStates();
+    if (mounted) setState(() => _syncStates = syncStates);
   }
 
   /// 문서를 선택하고 내용을 로드한다.
@@ -86,8 +112,10 @@ class _MainShellState extends State<MainShell> {
         title: 'Sample_$count',
         type: 'Dev',
         relativeDir: 'documents/Dev',
-        initialContent: '# Sample Document $count\n\nSAC Sprint 3 indexing test keyword_alpha.',
+        initialContent: '# Sample Document $count\n\nSAC Sprint 4 metadata test.',
         author: 'user',
+        tags: ['sprint4'],
+        project: 'SAC',
       ),
     );
     await widget.container.indexingQueue?.flushForTest();
@@ -95,7 +123,7 @@ class _MainShellState extends State<MainShell> {
     await _selectDocument(doc.metadata);
   }
 
-  /// 문서를 저장한다.
+  /// 문서 본문/제목을 저장한다.
   Future<void> _saveDocument(String title, String body) async {
     final current = _selectedDocument;
     if (current == null) return;
@@ -119,6 +147,35 @@ class _MainShellState extends State<MainShell> {
       _selectedDocument = updated;
       _selectedSyncState = newSync;
     });
+    await _refreshDocuments();
+  }
+
+  /// 문서 메타데이터를 저장한다.
+  Future<void> _saveMetadata({
+    required String type,
+    required String project,
+    required List<String> tags,
+    required String summary,
+  }) async {
+    final current = _selectedDocument;
+    if (current == null) return;
+    final sync = _selectedSyncState ??
+        await widget.container.syncService.getSyncState(current.metadata.id);
+
+    final updated = await _archive.updateDocument(
+      UpdateDocumentInput(
+        id: current.metadata.id,
+        type: type,
+        project: project,
+        tags: tags,
+        summary: summary,
+        author: 'user',
+        baseRevision: sync.revision,
+      ),
+    );
+    await widget.container.indexingQueue?.flushForTest();
+    if (!mounted) return;
+    setState(() => _selectedDocument = updated);
     await _refreshDocuments();
   }
 
@@ -148,6 +205,38 @@ class _MainShellState extends State<MainShell> {
     await widget.container.indexingQueue?.flushForTest();
   }
 
+  /// 아카이브 섹션 중앙 패널을 구성한다.
+  Widget _buildArchivePanel() {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SizedBox(
+          width: 260,
+          child: FolderTreePanel(
+            documents: _documents,
+            syncStates: _syncStates,
+            selectedId: _selectedDocument?.metadata.id,
+            onSelect: _selectDocument,
+            onCreateDocument: _createSampleDocument,
+          ),
+        ),
+        const VerticalDivider(width: 1),
+        Expanded(
+          child: DocumentEditorPanel(
+            document: _selectedDocument,
+            syncState: _selectedSyncState,
+            onSave: _saveDocument,
+            onMoveToTrash: _moveToTrash,
+          ),
+        ),
+      ],
+    );
+  }
+
   /// 중앙 패널 위젯을 반환한다.
   Widget _buildCenterPanel() {
     switch (_section) {
@@ -163,39 +252,14 @@ class _MainShellState extends State<MainShell> {
           onDeletePermanently: _deletePermanently,
         );
       case SacSection.archive:
-        return Column(
-          children: [
-            SizedBox(
-              height: 220,
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : DocumentArchivePanel(
-                      documents: _documents,
-                      selectedId: _selectedDocument?.metadata.id,
-                      onSelect: _selectDocument,
-                      onCreateSample: _createSampleDocument,
-                      onMoveToTrash: _moveToTrash,
-                    ),
-            ),
-            const Divider(height: 1),
-            Expanded(
-              child: DocumentEditorPanel(
-                document: _selectedDocument,
-                syncState: _selectedSyncState,
-                onSave: _saveDocument,
-              ),
-            ),
-          ],
-        );
+        return _buildArchivePanel();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final workspace = widget.container.activeWorkspace;
-    final statusLabel = _section == SacSection.trash
-        ? 'trash'
-        : (_selectedSyncState?.status.name ?? '—');
+    final themeController = widget.container.themeController;
 
     return Scaffold(
       body: Column(
@@ -215,7 +279,14 @@ class _MainShellState extends State<MainShell> {
                 const VerticalDivider(width: 1),
                 Expanded(child: _buildCenterPanel()),
                 const VerticalDivider(width: 1),
-                const SizedBox(width: 280, child: RightContextPanel()),
+                SizedBox(
+                  width: 300,
+                  child: RightContextPanel(
+                    document: _selectedDocument,
+                    syncState: _selectedSyncState,
+                    onSaveMetadata: _saveMetadata,
+                  ),
+                ),
               ],
             ),
           ),
@@ -223,7 +294,9 @@ class _MainShellState extends State<MainShell> {
           FooterBar(
             workspaceName: workspace?.name,
             workspacePath: workspace?.rootPath,
-            syncStatus: statusLabel,
+            syncState: _selectedSyncState,
+            highContrastEnabled: themeController.highContrastEnabled,
+            onHighContrastChanged: themeController.toggleHighContrast,
           ),
         ],
       ),

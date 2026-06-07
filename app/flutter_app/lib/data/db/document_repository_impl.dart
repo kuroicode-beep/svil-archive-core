@@ -102,6 +102,9 @@ class DocumentRepositoryImpl implements DocumentRepository {
       'relative_path': metadata.path,
       'title': metadata.title,
       'category': metadata.type,
+      'author': metadata.author,
+      'project': metadata.project,
+      'summary': metadata.summary,
       'tags': jsonEncode(metadata.tags),
       'content_hash': metadata.contentHash,
       'created_at': metadata.createdAt.toUtc().toIso8601String(),
@@ -167,6 +170,8 @@ class DocumentRepositoryImpl implements DocumentRepository {
       id: row['id'] as String,
       path: row['relative_path'] as String,
       title: row['title'] as String,
+      author: row['author'] as String?,
+      project: row['project'] as String?,
       type: row['category'] as String?,
       status: (row['is_deleted'] as int? ?? 0) == 1
           ? DocumentStatus.trashed
@@ -174,6 +179,7 @@ class DocumentRepositoryImpl implements DocumentRepository {
       createdAt: DateTime.parse(row['created_at'] as String).toLocal(),
       updatedAt: DateTime.parse(row['updated_at'] as String).toLocal(),
       tags: tags,
+      summary: row['summary'] as String?,
       contentHash: row['content_hash'] as String,
       revision: row['sync_revision'] as int? ?? 1,
       sacSchema: '1',

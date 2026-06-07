@@ -27,25 +27,69 @@ class SacColors {
   static const accentHC = Color(0xFFFFFF00);
 }
 
-ThemeData buildLightTheme() => ThemeData(
+/// Comfortable density 기본 텍스트 스타일을 생성한다.
+TextTheme _baseTextTheme(double fontSizeBase, Brightness brightness) {
+  final primary = brightness == Brightness.dark
+      ? SacColors.textPrimaryDark
+      : SacColors.textPrimaryLight;
+  return TextTheme(
+    bodyMedium: TextStyle(fontSize: fontSizeBase, color: primary),
+    bodyLarge: TextStyle(fontSize: fontSizeBase + 2, color: primary),
+    titleMedium: TextStyle(fontSize: fontSizeBase + 2, color: primary),
+    titleLarge: TextStyle(fontSize: fontSizeBase + 6, color: primary),
+    labelLarge: TextStyle(fontSize: fontSizeBase, color: primary),
+  );
+}
+
+ThemeData buildLightTheme({double fontSizeBase = 16.0}) => ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: SacColors.backgroundLight,
       colorScheme: const ColorScheme.light(
         surface: SacColors.surfaceLight,
         primary: SacColors.accentLight,
       ),
+      textTheme: _baseTextTheme(fontSizeBase, Brightness.light),
     );
 
-ThemeData buildDarkTheme() => ThemeData(
+ThemeData buildDarkTheme({double fontSizeBase = 16.0}) => ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: SacColors.backgroundDark,
       colorScheme: const ColorScheme.dark(
         surface: SacColors.surfaceDark,
         primary: SacColors.accentDark,
       ),
+      textTheme: _baseTextTheme(fontSizeBase, Brightness.dark),
     );
 
-// High contrast는 dark 기반으로 강화
-ThemeData buildHighContrastTheme() => buildDarkTheme().copyWith(
+// High contrast는 저시력 기준 색상으로 강화
+ThemeData buildHighContrastTheme({double fontSizeBase = 16.0}) => ThemeData(
+      brightness: Brightness.dark,
       scaffoldBackgroundColor: SacColors.backgroundHC,
+      colorScheme: const ColorScheme.dark(
+        surface: SacColors.surfaceHC,
+        primary: SacColors.accentHC,
+        onSurface: SacColors.textPrimaryHC,
+      ),
+      textTheme: TextTheme(
+        bodyMedium: TextStyle(
+          fontSize: fontSizeBase,
+          color: SacColors.textPrimaryHC,
+        ),
+        bodyLarge: TextStyle(
+          fontSize: fontSizeBase + 2,
+          color: SacColors.textPrimaryHC,
+        ),
+        titleMedium: TextStyle(
+          fontSize: fontSizeBase + 2,
+          color: SacColors.textCyanHC,
+        ),
+        titleLarge: TextStyle(
+          fontSize: fontSizeBase + 6,
+          color: SacColors.textAccentHC,
+        ),
+        labelLarge: TextStyle(
+          fontSize: fontSizeBase,
+          color: SacColors.textPrimaryHC,
+        ),
+      ),
     );

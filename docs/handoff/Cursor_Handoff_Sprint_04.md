@@ -1,5 +1,7 @@
 # Cursor Handoff — Sprint 04
 
+> **기준 커밋**: `fc607f3` (Sprint 03 재작업 완료)
+
 ## Sprint 03 완료
 - FTS5 검색, IndexingQueue, Trash 기본 흐름
 - UI 검색/휴지통/아카이브 삭제 연결
