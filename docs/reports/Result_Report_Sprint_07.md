@@ -48,8 +48,10 @@ sprint06_base_commit: "df0121e"
 - 주요 버튼 높이 50px
 - 최소 폰트 16px 유지
 
-## 07. Codex 재검증 요청
-- `docs/handoff/Codex_Verification_Request_Sprint_07.md` 참조
+## 07. Codex 검증 결과
+- **1차**: 부분완료 / Important 3건 → 재작업 (`45d2b1f`)
+- **재검증**: **PASS / 배포 가능 YES** (2026.06.08)
+- [Codex 재검증 보고서](https://app.notion.com/p/378864048e54810596dbf0338640402a)
 
 ## 08. Git 커밋
-- Sprint 07 구현 + Codex Important 반영 커밋 (아래 커밋 해시 참조)
+- `45d2b1f` — Sprint 07 구현 + Codex Important 반영
