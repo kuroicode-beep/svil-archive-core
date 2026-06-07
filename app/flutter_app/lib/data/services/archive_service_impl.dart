@@ -6,8 +6,10 @@ import '../../domain/models/document.dart';
 import '../../domain/services/archive_service.dart';
 import '../../domain/services/document_file_store.dart';
 import '../../domain/services/document_repository.dart';
+import '../../domain/services/trash_service.dart';
 import '../file/content_hasher.dart';
 import '../file/frontmatter_parser.dart';
+import '../indexing/indexing_queue.dart';
 import '../platform/path_adapter.dart';
 import '../sync/sync_service_impl.dart';
 
@@ -15,6 +17,8 @@ class ArchiveServiceImpl implements ArchiveService {
   final DocumentRepository _repository;
   final DocumentFileStore _fileStore;
   final SyncServiceImpl _syncService;
+  final IndexingQueue _indexingQueue;
+  final TrashService _trashService;
   final String _workspaceId;
   final Uuid _uuid = const Uuid();
 
@@ -22,10 +26,14 @@ class ArchiveServiceImpl implements ArchiveService {
     required DocumentRepository repository,
     required DocumentFileStore fileStore,
     required SyncServiceImpl syncService,
+    required IndexingQueue indexingQueue,
+    required TrashService trashService,
     required String workspaceId,
   })  : _repository = repository,
         _fileStore = fileStore,
         _syncService = syncService,
+        _indexingQueue = indexingQueue,
+        _trashService = trashService,
         _workspaceId = workspaceId;
 
   @override
@@ -62,7 +70,7 @@ class ArchiveServiceImpl implements ArchiveService {
       type: input.type,
       title: input.title,
     );
-    final category = sanitizeDocumentCategory(input.type);
+    final category = categoryFromRelativePath(relativePath);
     final revision = 1;
     final body = input.initialContent;
 
@@ -98,6 +106,7 @@ class ArchiveServiceImpl implements ArchiveService {
       actor: input.author ?? 'user',
       revision: revision,
     );
+    _indexingQueue.queueDocument(id);
 
     return Document(
       metadata: metadata,
@@ -165,6 +174,7 @@ class ArchiveServiceImpl implements ArchiveService {
       revision: newRevision,
       contentHash: hash,
     );
+    _indexingQueue.queueDocument(input.id);
 
     return Document(
       metadata: updated,
@@ -177,20 +187,24 @@ class ArchiveServiceImpl implements ArchiveService {
   }
 
   @override
-  Future<void> moveDocumentToTrash(String id) {
-    throw UnimplementedError('moveDocumentToTrash is planned for Sprint 3');
+  Future<void> moveDocumentToTrash(String id) async {
+    await _trashService.moveToTrash(id, actor: 'user');
   }
 
   @override
-  Future<Document> restoreDocument(String trashItemId) {
-    throw UnimplementedError('restoreDocument is planned for Sprint 3');
+  Future<Document> restoreDocument(String trashItemId) async {
+    final documentId = await _trashService.restoreFromTrash(trashItemId);
+    final doc = await getDocumentWithContent(documentId);
+    if (doc == null) {
+      throw StateError('Restored document not found: $documentId');
+    }
+    return doc;
   }
 
   @override
   Future<DocumentMetadata> moveDocument(String id, String newRelativePath) {
-    throw UnimplementedError('moveDocument is planned for Sprint 3');
+    throw UnimplementedError('moveDocument is planned for Sprint 4');
   }
-
 }
 
 /// DocumentMetadata revision 필드 보조 extension

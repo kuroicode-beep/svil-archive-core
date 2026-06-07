@@ -82,7 +82,12 @@ MCP Sidecar = TypeScript (stdio transport)
 - asset/design/ 폴더 + 규칙 문서
 - Markdown frontmatter 최소 정책 (코드 + 문서)
 - sync_journal append-only 기록 (Sprint 02)
+- FTS5 검색 + IndexingQueue + Trash (Sprint 03)
 - Cursor Handoff 문서
+
+### category/type 정책 (Sprint 03)
+- 문서 category는 `relativeDir` (`documents/<Category>`)가 단일 source
+- `type`이 있으면 `relativeDir` category와 일치해야 함
 
 ### 설정 저장 source (Sprint 02 결정)
 

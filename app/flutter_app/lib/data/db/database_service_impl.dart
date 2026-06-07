@@ -24,14 +24,10 @@ class DatabaseServiceImpl implements DatabaseService {
         await db.execute('PRAGMA foreign_keys=ON');
       },
       onCreate: (db, version) async {
-        for (final sql in sprint2MigrationSql()) {
-          await db.execute(sql);
-        }
+        await applySacMigrations(db, 0, version);
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        for (final sql in sprint2MigrationSql()) {
-          await db.execute(sql);
-        }
+        await applySacMigrations(db, oldVersion, newVersion);
       },
     );
   }
@@ -64,9 +60,8 @@ class DatabaseServiceImpl implements DatabaseService {
   @override
   Future<void> migrate(int targetVersion) async {
     final db = requireDatabase();
-    for (final sql in sprint2MigrationSql()) {
-      await db.execute(sql);
-    }
+    final current = await getSchemaVersion();
+    await applySacMigrations(db, current, targetVersion);
     await db.execute('PRAGMA user_version = $targetVersion');
   }
 
@@ -75,21 +70,25 @@ class DatabaseServiceImpl implements DatabaseService {
     final db = requireDatabase();
     await db.transaction((txn) async {
       for (final table in [
+        'document_fts',
+        'document_chunks',
         'sync_journal',
         'sync_state',
+        'trash_items',
         'documents',
         'workspaces',
         'app_settings',
       ]) {
-        await txn.delete(table);
+        try {
+          await txn.delete(table);
+        } catch (_) {}
       }
     });
   }
 
   @override
   Future<String> createSnapshot(String destinationPath) async {
-    // Sprint 2: 파일 복사는 후속 Sprint에서 구현
-    throw UnimplementedError('createSnapshot is planned for Sprint 3+');
+    throw UnimplementedError('createSnapshot is planned for Sprint 4+');
   }
 
   @override

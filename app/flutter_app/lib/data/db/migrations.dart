@@ -1,6 +1,8 @@
 // migrations.dart — SQLite 스키마 버전 및 migration SQL 정의
 
-const int kSacSchemaVersion = 1;
+import 'package:sqflite/sqflite.dart';
+
+const int kSacSchemaVersion = 2;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -111,4 +113,43 @@ List<String> sprint2MigrationSql() {
     'CREATE INDEX IF NOT EXISTS idx_documents_updated ON documents(updated_at)',
     'CREATE INDEX IF NOT EXISTS idx_sync_journal_document ON sync_journal(document_id)',
   ];
+}
+
+/// Sprint 3 FTS / chunk 확장 migration SQL 목록을 반환한다.
+List<String> sprint3MigrationSql() {
+  return [
+    'ALTER TABLE document_chunks ADD COLUMN content_hash TEXT',
+    'ALTER TABLE document_chunks ADD COLUMN updated_at TEXT',
+    '''
+    CREATE VIRTUAL TABLE IF NOT EXISTS document_fts USING fts5(
+      document_id UNINDEXED,
+      title,
+      heading,
+      content,
+      tags,
+      category,
+      tokenize='unicode61'
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_chunks_document_id ON document_chunks(document_id)',
+    'CREATE INDEX IF NOT EXISTS idx_trash_document ON trash_items(document_id)',
+  ];
+}
+
+/// 스키마 버전에 맞는 migration을 적용한다.
+Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) async {
+  if (fromVersion < 1) {
+    for (final sql in sprint2MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
+  if (fromVersion < 2) {
+    for (final sql in sprint3MigrationSql()) {
+      try {
+        await db.execute(sql);
+      } catch (_) {
+        // ALTER ADD COLUMN 등 이미 적용된 migration은 무시
+      }
+    }
+  }
 }

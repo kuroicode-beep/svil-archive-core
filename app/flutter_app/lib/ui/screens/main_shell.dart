@@ -1,4 +1,4 @@
-// main_shell.dart — 3패널 레이아웃 + 문서 목록/편집 (Sprint 2)
+// main_shell.dart — 3패널 레이아웃 + 아카이브/검색/휴지통 (Sprint 3)
 
 import 'package:flutter/material.dart';
 
@@ -11,6 +11,8 @@ import '../widgets/left_sidebar.dart';
 import '../widgets/right_context_panel.dart';
 import 'document_archive_panel.dart';
 import 'document_editor_panel.dart';
+import 'search_panel.dart';
+import 'trash_panel.dart';
 
 class MainShell extends StatefulWidget {
   final SacContainer container;
@@ -22,6 +24,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
+  SacSection _section = SacSection.archive;
   List<DocumentMetadata> _documents = [];
   Document? _selectedDocument;
   SyncState? _selectedSyncState;
@@ -61,9 +64,18 @@ class _MainShellState extends State<MainShell> {
     final sync = await widget.container.syncService.getSyncState(metadata.id);
     if (!mounted) return;
     setState(() {
+      _section = SacSection.archive;
       _selectedDocument = doc;
       _selectedSyncState = sync;
     });
+  }
+
+  /// document id로 문서를 연다.
+  Future<void> _openDocumentById(String documentId) async {
+    final metadata = await _archive.getDocument(documentId);
+    if (metadata != null) {
+      await _selectDocument(metadata);
+    }
   }
 
   /// 샘플 문서를 생성한다.
@@ -74,15 +86,16 @@ class _MainShellState extends State<MainShell> {
         title: 'Sample_$count',
         type: 'Dev',
         relativeDir: 'documents/Dev',
-        initialContent: '# Sample Document $count\n\nSAC Sprint 2 vertical slice.',
+        initialContent: '# Sample Document $count\n\nSAC Sprint 3 indexing test keyword_alpha.',
         author: 'user',
       ),
     );
+    await widget.container.indexingQueue?.flushForTest();
     await _refreshDocuments();
     await _selectDocument(doc.metadata);
   }
 
-  /// 문서 수정 내용을 저장한다.
+  /// 문서를 저장한다.
   Future<void> _saveDocument(String title, String body) async {
     final current = _selectedDocument;
     if (current == null) return;
@@ -98,6 +111,7 @@ class _MainShellState extends State<MainShell> {
         baseRevision: sync.revision,
       ),
     );
+    await widget.container.indexingQueue?.flushForTest();
     final newSync =
         await widget.container.syncService.getSyncState(updated.metadata.id);
     if (!mounted) return;
@@ -108,9 +122,80 @@ class _MainShellState extends State<MainShell> {
     await _refreshDocuments();
   }
 
+  /// 문서를 휴지통으로 이동한다.
+  Future<void> _moveToTrash(String documentId) async {
+    await _archive.moveDocumentToTrash(documentId);
+    await widget.container.indexingQueue?.flushForTest();
+    if (_selectedDocument?.metadata.id == documentId) {
+      setState(() {
+        _selectedDocument = null;
+        _selectedSyncState = null;
+      });
+    }
+    await _refreshDocuments();
+  }
+
+  /// 휴지통에서 복구한다.
+  Future<void> _restoreTrashItem(String trashItemId) async {
+    await widget.container.trashService.restoreFromTrash(trashItemId);
+    await widget.container.indexingQueue?.flushForTest();
+    await _refreshDocuments();
+  }
+
+  /// 휴지통에서 완전삭제한다.
+  Future<void> _deletePermanently(String trashItemId) async {
+    await widget.container.trashService.permanentlyDelete(trashItemId);
+    await widget.container.indexingQueue?.flushForTest();
+  }
+
+  /// 중앙 패널 위젯을 반환한다.
+  Widget _buildCenterPanel() {
+    switch (_section) {
+      case SacSection.search:
+        return SearchPanel(
+          searchService: widget.container.searchService,
+          onOpenDocument: _openDocumentById,
+        );
+      case SacSection.trash:
+        return TrashPanel(
+          trashService: widget.container.trashService,
+          onRestore: _restoreTrashItem,
+          onDeletePermanently: _deletePermanently,
+        );
+      case SacSection.archive:
+        return Column(
+          children: [
+            SizedBox(
+              height: 220,
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : DocumentArchivePanel(
+                      documents: _documents,
+                      selectedId: _selectedDocument?.metadata.id,
+                      onSelect: _selectDocument,
+                      onCreateSample: _createSampleDocument,
+                      onMoveToTrash: _moveToTrash,
+                    ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: DocumentEditorPanel(
+                document: _selectedDocument,
+                syncState: _selectedSyncState,
+                onSave: _saveDocument,
+              ),
+            ),
+          ],
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final workspace = widget.container.activeWorkspace;
+    final statusLabel = _section == SacSection.trash
+        ? 'trash'
+        : (_selectedSyncState?.status.name ?? '—');
 
     return Scaffold(
       body: Column(
@@ -118,27 +203,17 @@ class _MainShellState extends State<MainShell> {
           Expanded(
             child: Row(
               children: [
-                const SizedBox(width: 240, child: LeftSidebar()),
-                const VerticalDivider(width: 1),
                 SizedBox(
-                  width: 280,
-                  child: _loading
-                      ? const Center(child: CircularProgressIndicator())
-                      : DocumentArchivePanel(
-                          documents: _documents,
-                          selectedId: _selectedDocument?.metadata.id,
-                          onSelect: _selectDocument,
-                          onCreateSample: _createSampleDocument,
-                        ),
-                ),
-                const VerticalDivider(width: 1),
-                Expanded(
-                  child: DocumentEditorPanel(
-                    document: _selectedDocument,
-                    syncState: _selectedSyncState,
-                    onSave: _saveDocument,
+                  width: 240,
+                  child: LeftSidebar(
+                    selected: _section,
+                    onSectionChanged: (section) {
+                      setState(() => _section = section);
+                    },
                   ),
                 ),
+                const VerticalDivider(width: 1),
+                Expanded(child: _buildCenterPanel()),
                 const VerticalDivider(width: 1),
                 const SizedBox(width: 280, child: RightContextPanel()),
               ],
@@ -148,7 +223,7 @@ class _MainShellState extends State<MainShell> {
           FooterBar(
             workspaceName: workspace?.name,
             workspacePath: workspace?.rootPath,
-            syncStatus: _selectedSyncState?.status.name,
+            syncStatus: statusLabel,
           ),
         ],
       ),

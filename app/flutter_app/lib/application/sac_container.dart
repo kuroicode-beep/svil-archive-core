@@ -1,10 +1,14 @@
-// sac_container.dart — Sprint 2 서비스 조립 및 Workspace 컨텍스트 관리
+// sac_container.dart — Sprint 3 서비스 조립 및 Workspace 컨텍스트 관리
 
 import '../data/db/database_service_impl.dart';
 import '../data/db/document_repository_impl.dart';
 import '../data/file/document_file_store_impl.dart';
+import '../data/indexing/document_indexer.dart';
+import '../data/indexing/indexing_queue.dart';
 import '../data/services/archive_service_impl.dart';
+import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
+import '../data/services/trash_service_impl.dart';
 import '../data/services/workspace_registry.dart';
 import '../data/services/workspace_service_impl.dart';
 import '../data/sync/file_watcher_skeleton.dart';
@@ -13,7 +17,9 @@ import '../data/sync/sync_service_impl.dart';
 import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
 import '../domain/services/archive_service.dart';
+import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
+import '../domain/services/trash_service.dart';
 
 class SacContainer {
   final DatabaseServiceImpl databaseService;
@@ -21,8 +27,12 @@ class SacContainer {
   final SettingsServiceImpl settingsService;
 
   ArchiveService? _archiveService;
+  SearchService? _searchService;
+  TrashService? _trashService;
+  IndexingQueue? _indexingQueue;
   SyncServiceImpl? _syncService;
   FileWatcherSkeleton? _fileWatcher;
+  DocumentRepositoryImpl? _repository;
   Workspace? _workspace;
 
   SacContainer._({
@@ -45,20 +55,29 @@ class SacContainer {
   }
 
   Workspace? get activeWorkspace => _workspace;
+  IndexingQueue? get indexingQueue => _indexingQueue;
 
   ArchiveService get archiveService {
     final service = _archiveService;
-    if (service == null) {
-      throw StateError('Workspace is not opened');
-    }
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  SearchService get searchService {
+    final service = _searchService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  TrashService get trashService {
+    final service = _trashService;
+    if (service == null) throw StateError('Workspace is not opened');
     return service;
   }
 
   SyncService get syncService {
     final service = _syncService;
-    if (service == null) {
-      throw StateError('Workspace is not opened');
-    }
+    if (service == null) throw StateError('Workspace is not opened');
     return service;
   }
 
@@ -75,18 +94,45 @@ class SacContainer {
       journalWriter: journalWriter,
     );
     final fileStore = DocumentFileStoreImpl(workspaceRoot: workspace.rootPath);
-    final repository = DocumentRepositoryImpl(
+    _repository = DocumentRepositoryImpl(
       databaseService: databaseService,
       workspaceId: workspace.id,
     );
-    _archiveService = ArchiveServiceImpl(
-      repository: repository,
+
+    final indexer = DocumentIndexer(
+      databaseService: databaseService,
+      repository: _repository!,
       fileStore: fileStore,
-      syncService: _syncService!,
       workspaceId: workspace.id,
     );
+    _indexingQueue = IndexingQueue(indexer: indexer);
+
+    _trashService = TrashServiceImpl(
+      databaseService: databaseService,
+      repository: _repository!,
+      fileStore: fileStore,
+      syncService: _syncService!,
+      indexingQueue: _indexingQueue!,
+      workspaceRoot: workspace.rootPath,
+    );
+
+    _archiveService = ArchiveServiceImpl(
+      repository: _repository!,
+      fileStore: fileStore,
+      syncService: _syncService!,
+      indexingQueue: _indexingQueue!,
+      trashService: _trashService!,
+      workspaceId: workspace.id,
+    );
+
+    _searchService = SearchServiceImpl(
+      databaseService: databaseService,
+      repository: _repository!,
+      workspaceId: workspace.id,
+    );
+
     _fileWatcher = FileWatcherSkeleton(
-      onChanged: _syncService!.onFileChanged,
+      onChanged: _onFileChanged,
     );
     await _fileWatcher!.start(workspace.rootPath);
 
@@ -100,5 +146,14 @@ class SacContainer {
       ),
     );
     return workspace;
+  }
+
+  /// 파일 변경 이벤트를 sync + indexing에 연결한다.
+  Future<void> _onFileChanged(String relativePath) async {
+    await _syncService?.onFileChanged(relativePath);
+    final doc = await _repository?.findByPath(relativePath);
+    if (doc != null) {
+      _indexingQueue?.queueDocument(doc.id);
+    }
   }
 }

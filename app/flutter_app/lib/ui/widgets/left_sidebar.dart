@@ -1,21 +1,23 @@
-// LeftSidebar: 좌측 사이드바 placeholder — 폴더 트리 + 메인 메뉴
+// left_sidebar.dart — 좌측 사이드바 + 화면 전환
 
 import 'package:flutter/material.dart';
 
-class LeftSidebar extends StatelessWidget {
-  const LeftSidebar({super.key});
+enum SacSection { archive, search, trash }
 
-  static const _menuItems = [
-    (Icons.dashboard, '대시보드'),
-    (Icons.folder_open, '문서 아카이브'),
-    (Icons.hub, 'AI 협업 프로토콜'),
-    (Icons.person, '개인 아카이브'),
-    (Icons.search, '검색'),
-    (Icons.delete_outline, '휴지통'),
-    (Icons.queue, '작업큐 / 티켓'),
-    (Icons.electrical_services, 'MCP / AI 도구'),
-    (Icons.security, '개인정보 보호'),
-    (Icons.settings, '설정'),
+class LeftSidebar extends StatelessWidget {
+  final SacSection selected;
+  final ValueChanged<SacSection> onSectionChanged;
+
+  const LeftSidebar({
+    super.key,
+    required this.selected,
+    required this.onSectionChanged,
+  });
+
+  static const _items = <(SacSection, IconData, String)>[
+    (SacSection.archive, Icons.folder_open, '문서 아카이브'),
+    (SacSection.search, Icons.search, '검색'),
+    (SacSection.trash, Icons.delete_outline, '휴지통'),
   ];
 
   @override
@@ -38,14 +40,14 @@ class LeftSidebar extends StatelessWidget {
           const Divider(),
           Expanded(
             child: ListView(
-              children: _menuItems.map((item) {
+              children: _items.map((item) {
+                final isSelected = selected == item.$1;
                 return ListTile(
-                  leading: Icon(item.$1, size: 20),
-                  title: Text(item.$2, style: const TextStyle(fontSize: 16)),
-                  minVerticalPadding: 15, // 터치 타겟 50px 기준
-                  onTap: () {
-                    // TODO(Cursor): 화면 라우팅 연결
-                  },
+                  selected: isSelected,
+                  leading: Icon(item.$2, size: 20),
+                  title: Text(item.$3, style: const TextStyle(fontSize: 16)),
+                  minVerticalPadding: 15,
+                  onTap: () => onSectionChanged(item.$1),
                 );
               }).toList(),
             ),

@@ -7,6 +7,9 @@ abstract class DocumentRepository {
   /// ID로 문서 메타데이터 조회
   Future<DocumentMetadata?> findById(String id);
 
+  /// ID로 문서 메타데이터 조회 (휴지통 포함)
+  Future<DocumentMetadata?> findByIdIncludingDeleted(String id);
+
   /// 상대경로로 문서 메타데이터 조회
   Future<DocumentMetadata?> findByPath(String relativePath);
 

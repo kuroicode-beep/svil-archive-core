@@ -32,10 +32,21 @@ void main() {
   test('resolveCreateDocumentRelativePath uses relativeDir', () {
     final path = resolveCreateDocumentRelativePath(
       relativeDir: 'documents/Log',
-      type: 'Dev',
+      type: 'Log',
       title: 'My Note',
     );
     expect(path, 'documents/Log/My_Note.md');
+  });
+
+  test('resolveCreateDocumentRelativePath rejects type mismatch', () {
+    expect(
+      () => resolveCreateDocumentRelativePath(
+        relativeDir: 'documents/Log',
+        type: 'Dev',
+        title: 'Mismatch',
+      ),
+      throwsA(isA<WorkspacePathException>()),
+    );
   });
 
   test('buildDocumentRelativePath rejects traversal in category', () {

@@ -28,10 +28,24 @@ class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<DocumentMetadata?> findById(String id) async {
+    return _findByIdInternal(id, includeDeleted: false);
+  }
+
+  @override
+  Future<DocumentMetadata?> findByIdIncludingDeleted(String id) async {
+    return _findByIdInternal(id, includeDeleted: true);
+  }
+
+  /// ID 기반 문서 조회 내부 구현
+  Future<DocumentMetadata?> _findByIdInternal(
+    String id, {
+    required bool includeDeleted,
+  }) async {
+    final deletedClause = includeDeleted ? '' : 'AND d.is_deleted = 0';
     final rows = await _db.rawQuery(
       '''
       $_selectWithRevision
-      WHERE d.id = ? AND d.workspace_id = ? AND d.is_deleted = 0
+      WHERE d.id = ? AND d.workspace_id = ? $deletedClause
       LIMIT 1
       ''',
       [id, _workspaceId],
@@ -122,6 +136,9 @@ class DocumentRepositoryImpl implements DocumentRepository {
     );
     return rows.isNotEmpty;
   }
+
+  /// 외부 서비스용 row → metadata 변환
+  DocumentMetadata mapRowPublic(Map<String, Object?> row) => _mapRow(row);
 
   /// DB row를 DocumentMetadata로 변환한다.
   DocumentMetadata _mapRow(Map<String, Object?> row) {

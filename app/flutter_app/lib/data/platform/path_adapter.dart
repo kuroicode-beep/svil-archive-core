@@ -125,6 +125,14 @@ String resolveCreateDocumentRelativePath({
     final parts = p.posix.split(p.posix.normalize(normalizedDir));
     if (parts.isNotEmpty && parts[0] == 'documents' && parts.length >= 2) {
       final category = sanitizeDocumentCategory(parts[1]);
+      if (type != null && type.trim().isNotEmpty) {
+        final typeCategory = sanitizeDocumentCategory(type);
+        if (typeCategory != category) {
+          throw WorkspacePathException(
+            'type ($typeCategory) must match relativeDir category ($category)',
+          );
+        }
+      }
       return buildDocumentRelativePath(category, safeTitle);
     }
     throw WorkspacePathException(
@@ -153,4 +161,22 @@ String syncJournalDirectoryPath(String workspaceRoot) {
 /// settings.json 절대경로를 반환한다.
 String settingsJsonPath(String workspaceRoot) {
   return p.join(sacDirectoryPath(workspaceRoot), 'settings.json');
+}
+
+/// relativePath에서 문서 category를 추출한다.
+String categoryFromRelativePath(String relativePath) {
+  assertSafeRelativePath(relativePath);
+  final parts = p.posix.split(p.posix.normalize(relativePath));
+  if (parts.length >= 2 && parts[0] == 'documents') {
+    return sanitizeDocumentCategory(parts[1]);
+  }
+  throw WorkspacePathException('Cannot resolve category from path: $relativePath');
+}
+
+/// 휴지통 내부 상대경로를 생성한다.
+String buildTrashRelativePath(String documentId, String originalRelativePath) {
+  final baseName = p.basename(originalRelativePath);
+  final trashPath = p.posix.join('.sac', 'trash', '${documentId}_$baseName');
+  assertSafeRelativePath(trashPath);
+  return trashPath;
 }

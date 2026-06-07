@@ -9,6 +9,7 @@ class DocumentArchivePanel extends StatelessWidget {
   final String? selectedId;
   final ValueChanged<DocumentMetadata> onSelect;
   final VoidCallback onCreateSample;
+  final Future<void> Function(String documentId)? onMoveToTrash;
 
   const DocumentArchivePanel({
     super.key,
@@ -16,6 +17,7 @@ class DocumentArchivePanel extends StatelessWidget {
     required this.selectedId,
     required this.onSelect,
     required this.onCreateSample,
+    this.onMoveToTrash,
   });
 
   @override
@@ -64,6 +66,13 @@ class DocumentArchivePanel extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      trailing: onMoveToTrash == null
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.delete_outline),
+                              tooltip: '휴지통으로 이동',
+                              onPressed: () => onMoveToTrash!(doc.id),
+                            ),
                       onTap: () => onSelect(doc),
                     );
                   },
