@@ -35,7 +35,13 @@ sprint06_commit: "ea94e12"
 - audit log에 export 본문 미포함
 - 외부 API 호출 없음
 
-## 05. 문서
+## 05. Codex 검증 (2026.06.07)
+- **판정**: PASS / 배포 가능 **YES**
+- Critical: 없음 | Important: 없음
+- Advisory: macOS smoke test, preview UX 확인
+- 검증 보고서: [Notion — Sprint 06 검증 (Codex)](https://app.notion.com/p/378864048e5481838d81e3856f01ebf3)
+
+## 06. 문서
 - `docs/handoff/Codex_Verification_Request_Sprint_06.md`
 
 ---

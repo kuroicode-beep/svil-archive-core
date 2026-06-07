@@ -1,7 +1,8 @@
-# Cursor Handoff — Sprint 06 (완료)
+# Cursor Handoff — Sprint 06 (완료 + Codex 검증 PASS)
 
 > **Sprint 06 구현 커밋**: `ea94e12`
 > **Sprint 05 기준 커밋**: `c37c8ac`
+> **Codex 검증**: PASS / 배포 가능 YES (2026.06.07)
 
 ## Sprint 06 완료 — AI Dashboard / Privacy
 - 대시보드 (AI 협업 현황, Critical 알림, 바로가기, 최근 활동)

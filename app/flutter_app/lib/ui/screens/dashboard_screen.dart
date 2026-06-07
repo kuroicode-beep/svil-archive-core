@@ -310,7 +310,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('LLM Self Info Preview', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'LLM Self Info Preview',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                            child: TextButton(
+                              onPressed: () => setState(() => _exportPreview = null),
+                              child: const Text('닫기'),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        '상태: 개인정보 미리보기 표시 중 — 주변 노출에 주의하세요.',
+                        style: TextStyle(fontSize: 16),
+                      ),
                       const SizedBox(height: 8),
                       SizedBox(
                         height: 240,
