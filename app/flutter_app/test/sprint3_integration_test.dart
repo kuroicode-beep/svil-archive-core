@@ -61,6 +61,11 @@ void main() {
     final trashItem = await trash.moveToTrash(created.metadata.id);
     await container.indexingQueue!.flushForTest();
 
+    expect(
+      await _syncStatus(container, created.metadata.id),
+      'trashed',
+    );
+
     final afterTrash = await search.search(const SearchQuery(text: 'unique_keyword_zeta'));
     expect(afterTrash.any((r) => r.document.id == created.metadata.id), isFalse);
 
@@ -68,6 +73,10 @@ void main() {
     await container.indexingQueue!.flushForTest();
 
     expect(restoredId, created.metadata.id);
+    expect(
+      await _syncStatus(container, created.metadata.id),
+      'dirty',
+    );
     final afterRestore = await search.search(const SearchQuery(text: 'unique_keyword_zeta'));
     expect(afterRestore.any((r) => r.document.id == created.metadata.id), isTrue);
   });
@@ -81,6 +90,49 @@ void main() {
       ),
       throwsA(isA<WorkspacePathException>()),
     );
+  });
+
+  test('trash move and restore preserve sync_state row', () async {
+    final workspace = await container.workspaceService.createWorkspace(
+      name: 'Sync WS',
+      rootPath: p.join(tempDir.path, 'SAC SYNC'),
+    );
+    await container.bindWorkspace(workspace);
+
+    final created = await container.archiveService.createDocument(
+      const CreateDocumentInput(
+        title: 'SyncStateDoc',
+        relativeDir: 'documents/Dev',
+        initialContent: 'sync state test',
+      ),
+    );
+
+    final db = container.databaseService.requireDatabase();
+    final beforeTrash = await db.query(
+      'sync_state',
+      where: 'document_id = ?',
+      whereArgs: [created.metadata.id],
+    );
+    expect(beforeTrash, isNotEmpty);
+
+    await container.trashService.moveToTrash(created.metadata.id);
+    final afterTrash = await db.query(
+      'sync_state',
+      where: 'document_id = ?',
+      whereArgs: [created.metadata.id],
+    );
+    expect(afterTrash, hasLength(1));
+    expect(afterTrash.first['status'], 'trashed');
+
+    final items = await container.trashService.listTrashItems();
+    await container.trashService.restoreFromTrash(items.first.id);
+    final afterRestore = await db.query(
+      'sync_state',
+      where: 'document_id = ?',
+      whereArgs: [created.metadata.id],
+    );
+    expect(afterRestore, hasLength(1));
+    expect(afterRestore.first['status'], 'dirty');
   });
 
   test('trash path stays inside workspace', () async {
@@ -106,4 +158,17 @@ void main() {
     expect(await File(trashAbs).exists(), isTrue);
     expect(item.originalPath, 'documents/Dev/TrashMe.md');
   });
+}
+
+/// sync_state.status를 조회한다.
+Future<String?> _syncStatus(SacContainer container, String documentId) async {
+  final rows = await container.databaseService.requireDatabase().query(
+    'sync_state',
+    columns: ['status'],
+    where: 'document_id = ?',
+    whereArgs: [documentId],
+    limit: 1,
+  );
+  if (rows.isEmpty) return null;
+  return rows.first['status'] as String?;
 }

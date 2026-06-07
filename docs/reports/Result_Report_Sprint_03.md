@@ -4,6 +4,7 @@ author: "Cursor"
 created: "2026-06-06"
 sprint01_base_commit: "8738008"
 sprint02_base_commit: "be817b7"
+sprint03_implementation_commit: "efe33c5"
 ---
 
 # 완료 보고서 — SAC Sprint 03 Search / Indexing / Trash
@@ -11,7 +12,8 @@ sprint02_base_commit: "be817b7"
 ## 01. 작업 요약
 - **목표**: FTS5 검색, IndexingQueue, 휴지통 이동/복구 기본 흐름
 - **결과**: ✅ 완료
-- **기준 커밋**: `be817b7`
+- **Sprint 02 기준 커밋**: `be817b7`
+- **Sprint 03 구현 커밋**: `efe33c5`
 - **작업 브랜치**: `master`
 
 ## 02. 구현 결과

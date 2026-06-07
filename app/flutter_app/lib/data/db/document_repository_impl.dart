@@ -96,23 +96,31 @@ class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<void> save(DocumentMetadata metadata) async {
     final now = DateTime.now().toUtc().toIso8601String();
-    await _db.insert(
-      'documents',
-      {
-        'id': metadata.id,
-        'workspace_id': _workspaceId,
-        'relative_path': metadata.path,
-        'title': metadata.title,
-        'category': metadata.type,
-        'tags': jsonEncode(metadata.tags),
-        'content_hash': metadata.contentHash,
-        'created_at': metadata.createdAt.toUtc().toIso8601String(),
-        'updated_at': metadata.updatedAt.toUtc().toIso8601String(),
-        'last_indexed_at': now,
-        'is_deleted': metadata.status == DocumentStatus.trashed ? 1 : 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    final row = {
+      'id': metadata.id,
+      'workspace_id': _workspaceId,
+      'relative_path': metadata.path,
+      'title': metadata.title,
+      'category': metadata.type,
+      'tags': jsonEncode(metadata.tags),
+      'content_hash': metadata.contentHash,
+      'created_at': metadata.createdAt.toUtc().toIso8601String(),
+      'updated_at': metadata.updatedAt.toUtc().toIso8601String(),
+      'last_indexed_at': now,
+      'is_deleted': metadata.status == DocumentStatus.trashed ? 1 : 0,
+    };
+
+    // REPLACE는 row 삭제 후 재삽입되어 sync_state FK CASCADE를 유발할 수 있다.
+    if (await exists(metadata.id)) {
+      await _db.update(
+        'documents',
+        row,
+        where: 'id = ? AND workspace_id = ?',
+        whereArgs: [metadata.id, _workspaceId],
+      );
+    } else {
+      await _db.insert('documents', row);
+    }
   }
 
   @override

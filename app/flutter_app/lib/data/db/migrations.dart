@@ -147,8 +147,12 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
     for (final sql in sprint3MigrationSql()) {
       try {
         await db.execute(sql);
-      } catch (_) {
-        // ALTER ADD COLUMN 등 이미 적용된 migration은 무시
+      } catch (e) {
+        // ALTER ADD COLUMN 중복만 무시 — FTS/인덱스 생성 실패는 전파한다.
+        final msg = e.toString().toLowerCase();
+        if (!msg.contains('duplicate column')) {
+          rethrow;
+        }
       }
     }
   }
