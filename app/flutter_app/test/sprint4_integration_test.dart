@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:sac_app/application/sac_container.dart';
+import 'package:sac_app/data/platform/path_adapter.dart';
 import 'package:sac_app/domain/services/archive_service.dart';
 import 'package:sac_app/ui/widgets/folder_tree_panel.dart';
 
@@ -80,7 +81,6 @@ void main() {
     await container.archiveService.updateDocument(
       UpdateDocumentInput(
         id: created.metadata.id,
-        type: 'Dev',
         project: 'SAC Phase 1',
         tags: ['alpha', 'beta'],
         summary: 'summary text',
@@ -112,6 +112,65 @@ void main() {
     await container.notifyFileChangedForTest(created.metadata.path);
     final sync = await container.syncService.getSyncState(created.metadata.id);
     expect(sync.status.name, 'dirty');
+  });
+
+  test('category change without path move is rejected', () async {
+    final workspace = await container.workspaceService.createWorkspace(
+      name: 'Reject WS',
+      rootPath: p.join(tempDir.path, 'SAC REJECT'),
+    );
+    await container.bindWorkspace(workspace);
+
+    final created = await container.archiveService.createDocument(
+      const CreateDocumentInput(
+        title: 'RejectDoc',
+        relativeDir: 'documents/Dev',
+        initialContent: 'reject test',
+      ),
+    );
+    final sync = await container.syncService.getSyncState(created.metadata.id);
+
+    expect(
+      container.archiveService.updateDocument(
+        UpdateDocumentInput(
+          id: created.metadata.id,
+          type: 'Log',
+          project: 'x',
+          baseRevision: sync.revision,
+        ),
+      ),
+      throwsA(isA<WorkspacePathException>()),
+    );
+  });
+
+  test('folder tree groups by path not stale db category', () async {
+    final workspace = await container.workspaceService.createWorkspace(
+      name: 'Stale WS',
+      rootPath: p.join(tempDir.path, 'SAC STALE'),
+    );
+    await container.bindWorkspace(workspace);
+
+    final created = await container.archiveService.createDocument(
+      const CreateDocumentInput(
+        title: 'StaleDoc',
+        relativeDir: 'documents/Dev',
+        initialContent: 'stale type test',
+      ),
+    );
+
+    final db = container.databaseService.requireDatabase();
+    await db.update(
+      'documents',
+      {'category': 'Log'},
+      where: 'id = ?',
+      whereArgs: [created.metadata.id],
+    );
+
+    final docs = await container.archiveService.listDocuments();
+    final tree = buildFolderTree(docs);
+    final devNode = tree.firstWhere((node) => node.label == 'Dev');
+    expect(devNode.children.any((child) => child.id == created.metadata.id), isTrue);
+    expect(tree.any((node) => node.label == 'Log'), isFalse);
   });
 
   test('high contrast toggle persists in app_settings', () async {

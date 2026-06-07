@@ -11,7 +11,6 @@ class RightContextPanel extends StatefulWidget {
   final Document? document;
   final SyncState? syncState;
   final Future<void> Function({
-    required String type,
     required String project,
     required List<String> tags,
     required String summary,
@@ -32,7 +31,6 @@ class _RightContextPanelState extends State<RightContextPanel> {
   final _projectController = TextEditingController();
   final _tagsController = TextEditingController();
   final _summaryController = TextEditingController();
-  String? _selectedType;
   bool _saving = false;
 
   @override
@@ -56,13 +54,11 @@ class _RightContextPanelState extends State<RightContextPanel> {
       _projectController.clear();
       _tagsController.clear();
       _summaryController.clear();
-      _selectedType = null;
       return;
     }
     _projectController.text = metadata.project ?? '';
     _tagsController.text = metadata.tags.join(', ');
     _summaryController.text = metadata.summary ?? '';
-    _selectedType = metadata.type;
   }
 
   @override
@@ -87,7 +83,6 @@ class _RightContextPanelState extends State<RightContextPanel> {
           .where((tag) => tag.isNotEmpty)
           .toList();
       await onSave(
-        type: _selectedType ?? doc.metadata.type ?? 'Dev',
         project: _projectController.text.trim(),
         tags: tags,
         summary: _summaryController.text.trim(),
@@ -124,6 +119,7 @@ class _RightContextPanelState extends State<RightContextPanel> {
 
     final metadata = doc.metadata;
     final sync = widget.syncState;
+    final category = categoryFromRelativePath(metadata.path);
 
     return Container(
       color: Theme.of(context).colorScheme.surface,
@@ -138,21 +134,12 @@ class _RightContextPanelState extends State<RightContextPanel> {
           Text('경로', style: Theme.of(context).textTheme.labelLarge),
           Text(metadata.path, style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
-          DropdownButtonFormField<String>(
-            initialValue: _selectedType,
+          InputDecorator(
             decoration: const InputDecoration(
-              labelText: '카테고리',
+              labelText: '카테고리 (경로 기준, 읽기 전용)',
               border: OutlineInputBorder(),
             ),
-            items: kAllowedDocumentCategories
-                .map(
-                  (category) => DropdownMenuItem(
-                    value: category,
-                    child: Text(category),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) => setState(() => _selectedType = value),
+            child: Text(category, style: const TextStyle(fontSize: 16)),
           ),
           const SizedBox(height: 12),
           TextField(

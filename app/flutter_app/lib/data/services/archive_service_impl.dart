@@ -137,6 +137,12 @@ class ArchiveServiceImpl implements ArchiveService {
         (await getDocumentWithContent(input.id))?.content?.rawMarkdown ??
         '';
     final metadataOnly = input.title == null && input.content == null;
+    final pathCategory = categoryFromRelativePath(existing.path);
+    if (input.type != null && input.type != pathCategory) {
+      throw WorkspacePathException(
+        'Category cannot diverge from path: path=$pathCategory, requested=${input.type}',
+      );
+    }
 
     final updated = DocumentMetadata(
       id: existing.id,
@@ -144,7 +150,7 @@ class ArchiveServiceImpl implements ArchiveService {
       title: title,
       author: existing.author,
       project: input.project ?? existing.project,
-      type: input.type ?? existing.type,
+      type: pathCategory,
       status: existing.status,
       createdAt: existing.createdAt,
       updatedAt: DateTime.now(),

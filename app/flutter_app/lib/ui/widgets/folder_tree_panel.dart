@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/models/document.dart';
 import '../../domain/models/sync_state.dart';
-import '../../data/platform/path_adapter.dart' show kAllowedDocumentCategories;
+import '../../data/platform/path_adapter.dart'
+    show categoryFromRelativePath, kAllowedDocumentCategories;
 import 'sync_status_badge.dart';
 
 class FolderTreeNode {
@@ -27,7 +28,8 @@ class FolderTreeNode {
 List<FolderTreeNode> buildFolderTree(List<DocumentMetadata> documents) {
   final grouped = <String, List<DocumentMetadata>>{};
   for (final doc in documents) {
-    final category = doc.type ?? 'Uncategorized';
+    // category 단일 source = relative path (DB type과 불일치 방지)
+    final category = categoryFromRelativePath(doc.path);
     grouped.putIfAbsent(category, () => []).add(doc);
   }
 

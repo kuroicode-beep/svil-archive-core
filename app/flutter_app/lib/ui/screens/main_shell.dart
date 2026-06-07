@@ -150,9 +150,8 @@ class _MainShellState extends State<MainShell> {
     await _refreshDocuments();
   }
 
-  /// 문서 메타데이터를 저장한다.
+  /// 문서 메타데이터를 저장한다 (category는 경로 기준이므로 편집 불가).
   Future<void> _saveMetadata({
-    required String type,
     required String project,
     required List<String> tags,
     required String summary,
@@ -165,7 +164,6 @@ class _MainShellState extends State<MainShell> {
     final updated = await _archive.updateDocument(
       UpdateDocumentInput(
         id: current.metadata.id,
-        type: type,
         project: project,
         tags: tags,
         summary: summary,

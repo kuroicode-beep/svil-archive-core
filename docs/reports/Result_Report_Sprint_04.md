@@ -3,6 +3,7 @@ title: "Result Report — SAC Sprint 04"
 author: "Cursor"
 created: "2026-06-07"
 sprint03_base_commit: "fc607f3"
+sprint04_implementation_commit: "b3f24a6"
 ---
 
 # 완료 보고서 — SAC Sprint 04 Document Archive UI
@@ -11,11 +12,12 @@ sprint03_base_commit: "fc607f3"
 - **목표**: 폴더 트리, 메타데이터 편집, sync 상태 UI, ThemeService/고대비, OS 파일 watcher
 - **결과**: ✅ 완료
 - **Sprint 03 기준 커밋**: `fc607f3`
+- **Sprint 04 구현 커밋**: `b3f24a6`
 - **작업 브랜치**: `master`
 
 ## 02. 구현 결과
 ✅ `FolderTreePanel` — 카테고리 기준 폴더 트리 + sync 배지
-✅ `RightContextPanel` — project/tags/summary/category 메타데이터 편집
+✅ `RightContextPanel` — project/tags/summary 메타데이터 편집 (category 읽기 전용)
 ✅ `SyncStatusBadge` — clean/dirty/conflict 등 한글 라벨 UI
 ✅ `ThemeServiceImpl` + `SacThemeController` — 고대비 토글 즉시 적용/영속화
 ✅ `WorkspaceFileWatcher` — `watcher` 패키지 OS 감시 + debounce
