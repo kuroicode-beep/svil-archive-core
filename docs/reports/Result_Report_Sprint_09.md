@@ -3,6 +3,7 @@ title: "Result Report — SAC Sprint 09"
 author: "Cursor"
 created: "2026-06-08"
 sprint08_base_commit: "36e9d6c"
+sprint09_commit: "a15a4c1"
 ---
 
 # 완료 보고서 — SAC Sprint 09 Integrity Hardening / Execution Recovery / macOS Smoke
@@ -71,4 +72,4 @@ sprint08_base_commit: "36e9d6c"
 - `docs/reports/Rework_Report_Sprint_09.md` 참조
 
 ## 09. Git 커밋
-- (재작업 커밋 후 기록)
+- `a15a4c1` — Sprint 09 구현 + Codex B1/B2/I1/I2 재작업

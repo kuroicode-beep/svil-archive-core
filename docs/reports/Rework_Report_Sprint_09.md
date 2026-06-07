@@ -4,6 +4,7 @@ author: "Cursor"
 created: "2026-06-08"
 verification_report: "Codex Sprint 09 검증 (2026.06.08)"
 sprint08_base_commit: "36e9d6c"
+rework_commit: "a15a4c1"
 ---
 
 # 재작업 보고서 — SAC Sprint 09 Codex 검증 반영
@@ -44,7 +45,7 @@ sprint08_base_commit: "36e9d6c"
 | MCP sidecar build | 통과 |
 
 ## 04. Git 커밋
-- (재작업 커밋 후 기록)
+- `a15a4c1` — Sprint 09 + Codex B1/B2/I1/I2 재작업
 
 ## 05. Codex 재검증 요청
 - B1/B2/I1/I2 해소 확인 요청
