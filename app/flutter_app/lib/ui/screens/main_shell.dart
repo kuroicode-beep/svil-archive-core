@@ -10,9 +10,11 @@ import '../widgets/folder_tree_panel.dart';
 import '../widgets/footer_bar.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_context_panel.dart';
+import 'dashboard_screen.dart';
 import 'document_editor_panel.dart';
 import 'extraction_queue_panel.dart';
 import 'personal_archive_panel.dart';
+import 'privacy_screen.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
 
@@ -26,7 +28,7 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  SacSection _section = SacSection.archive;
+  SacSection _section = SacSection.dashboard;
   List<DocumentMetadata> _documents = [];
   Map<String, SyncState> _syncStates = {};
   Document? _selectedDocument;
@@ -240,6 +242,27 @@ class _MainShellState extends State<MainShell> {
   /// 중앙 패널 위젯을 반환한다.
   Widget _buildCenterPanel() {
     switch (_section) {
+      case SacSection.dashboard:
+        return DashboardScreen(
+          dashboardService: widget.container.dashboardService,
+          privacyService: widget.container.privacyService,
+          localAiService: widget.container.localAiService,
+          exportService: widget.container.llmSelfInfoExportService,
+          onNavigate: (target) {
+            switch (target) {
+              case DashboardNavTarget.personalArchive:
+                setState(() => _section = SacSection.personalArchive);
+              case DashboardNavTarget.extractionQueue:
+                setState(() => _section = SacSection.extractionQueue);
+              case DashboardNavTarget.search:
+                setState(() => _section = SacSection.search);
+              case DashboardNavTarget.privacy:
+                setState(() => _section = SacSection.privacy);
+            }
+          },
+        );
+      case SacSection.privacy:
+        return PrivacyScreen(privacyService: widget.container.privacyService);
       case SacSection.search:
         return SearchPanel(
           searchService: widget.container.searchService,

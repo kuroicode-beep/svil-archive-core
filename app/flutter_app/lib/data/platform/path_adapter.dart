@@ -163,6 +163,11 @@ String settingsJsonPath(String workspaceRoot) {
   return p.join(sacDirectoryPath(workspaceRoot), 'settings.json');
 }
 
+/// LLM self-info export 디렉터리 절대경로를 반환한다.
+String llmSelfInfoExportDirectory(String workspaceRoot) {
+  return p.join(sacDirectoryPath(workspaceRoot), 'exports');
+}
+
 /// relativePath에서 문서 category를 추출한다.
 String categoryFromRelativePath(String relativePath) {
   assertSafeRelativePath(relativePath);

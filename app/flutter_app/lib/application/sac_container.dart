@@ -8,9 +8,13 @@ import '../data/file/document_file_store_impl.dart';
 import '../data/indexing/document_indexer.dart';
 import '../data/indexing/indexing_queue.dart';
 import '../data/services/archive_service_impl.dart';
+import '../data/services/dashboard_service_impl.dart';
 import '../data/services/extraction_queue_service_impl.dart';
 import '../data/services/journal_comment_service_impl.dart';
+import '../data/services/llm_self_info_export_service_impl.dart';
+import '../data/services/ollama_adapter.dart';
 import '../data/services/personal_archive_service_impl.dart';
+import '../data/services/privacy_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
 import '../data/services/theme_service_impl.dart';
@@ -24,9 +28,13 @@ import '../data/sync/sync_service_impl.dart';
 import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
 import '../domain/services/archive_service.dart';
+import '../domain/services/dashboard_service.dart';
 import '../domain/services/extraction_queue_service.dart';
 import '../domain/services/journal_comment_service.dart';
+import '../domain/services/llm_self_info_export_service.dart';
+import '../domain/services/local_ai_service.dart';
 import '../domain/services/personal_archive_service.dart';
+import '../domain/services/privacy_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
 import '../domain/services/trash_service.dart';
@@ -44,6 +52,10 @@ class SacContainer {
   PersonalArchiveService? _personalArchiveService;
   ExtractionQueueService? _extractionQueueService;
   JournalCommentService? _journalCommentService;
+  DashboardService? _dashboardService;
+  PrivacyService? _privacyService;
+  LocalAiService? _localAiService;
+  LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
   SyncServiceImpl? _syncService;
   WorkspaceFileWatcher? _fileWatcher;
@@ -121,6 +133,30 @@ class SacContainer {
     return service;
   }
 
+  DashboardService get dashboardService {
+    final service = _dashboardService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  PrivacyService get privacyService {
+    final service = _privacyService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  LocalAiService get localAiService {
+    final service = _localAiService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  LlmSelfInfoExportService get llmSelfInfoExportService {
+    final service = _llmSelfInfoExportService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -179,6 +215,13 @@ class SacContainer {
     );
     _journalCommentService = JournalCommentServiceImpl(
       databaseService: databaseService,
+    );
+    _dashboardService = DashboardServiceImpl(databaseService: databaseService);
+    _privacyService = PrivacyServiceImpl(databaseService: databaseService);
+    _localAiService = OllamaAdapter();
+    _llmSelfInfoExportService = LlmSelfInfoExportServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
     );
 
     _fileWatcher = WorkspaceFileWatcher(
