@@ -1,6 +1,6 @@
 # Cursor Handoff — Sprint 06 (완료)
 
-> **Sprint 06 구현 커밋**: (see `Result_Report_Sprint_06.md`)
+> **Sprint 06 구현 커밋**: `ea94e12`
 > **Sprint 05 기준 커밋**: `c37c8ac`
 
 ## Sprint 06 완료 — AI Dashboard / Privacy

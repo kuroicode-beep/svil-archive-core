@@ -2,7 +2,7 @@
 
 ## 검증 대상
 - Sprint 06 AI Dashboard / Privacy
-- 기준 커밋: (Sprint 06 구현 커밋)
+- 기준 커밋: `ea94e12`
 - 브랜치: `master`
 - Sprint 05 기준: `c37c8ac`
 

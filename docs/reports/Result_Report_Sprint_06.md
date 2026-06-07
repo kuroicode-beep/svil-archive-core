@@ -3,6 +3,7 @@ title: "Result Report — SAC Sprint 06"
 author: "Cursor"
 created: "2026-06-07"
 sprint05_base_commit: "c37c8ac"
+sprint06_commit: "ea94e12"
 ---
 
 # 완료 보고서 — SAC Sprint 06 AI Dashboard / Privacy
@@ -11,6 +12,7 @@ sprint05_base_commit: "c37c8ac"
 - **목표**: 대시보드 / 개인정보 보호 / LLM 자기정보 export / 로컬 AI 연결 준비
 - **결과**: ✅ 완료
 - **Sprint 05 기준 커밋**: `c37c8ac`
+- **Sprint 06 구현 커밋**: `ea94e12`
 - **작업 브랜치**: `master`
 
 ## 02. 구현 결과
