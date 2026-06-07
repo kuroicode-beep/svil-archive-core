@@ -8,13 +8,18 @@ import '../data/file/document_file_store_impl.dart';
 import '../data/indexing/document_indexer.dart';
 import '../data/indexing/indexing_queue.dart';
 import '../data/services/archive_service_impl.dart';
+import '../data/services/conflict_guard_service_impl.dart';
 import '../data/services/dashboard_service_impl.dart';
 import '../data/services/extraction_queue_service_impl.dart';
 import '../data/services/journal_comment_service_impl.dart';
 import '../data/services/llm_self_info_export_service_impl.dart';
+import '../data/services/mcp_bridge_status_service_impl.dart';
+import '../data/services/mcp_tool_registry_service_impl.dart';
 import '../data/services/ollama_adapter.dart';
+import '../data/services/permission_token_service_impl.dart';
 import '../data/services/personal_archive_service_impl.dart';
 import '../data/services/privacy_service_impl.dart';
+import '../data/services/work_queue_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
 import '../data/services/theme_service_impl.dart';
@@ -28,13 +33,18 @@ import '../data/sync/sync_service_impl.dart';
 import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
 import '../domain/services/archive_service.dart';
+import '../domain/services/conflict_guard_service.dart';
 import '../domain/services/dashboard_service.dart';
 import '../domain/services/extraction_queue_service.dart';
 import '../domain/services/journal_comment_service.dart';
 import '../domain/services/llm_self_info_export_service.dart';
 import '../domain/services/local_ai_service.dart';
+import '../domain/services/mcp_bridge_status_service.dart';
+import '../domain/services/mcp_tool_registry_service.dart';
+import '../domain/services/permission_token_service.dart';
 import '../domain/services/personal_archive_service.dart';
 import '../domain/services/privacy_service.dart';
+import '../domain/services/work_queue_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
 import '../domain/services/trash_service.dart';
@@ -54,6 +64,11 @@ class SacContainer {
   JournalCommentService? _journalCommentService;
   DashboardService? _dashboardService;
   PrivacyService? _privacyService;
+  WorkQueueService? _workQueueService;
+  ConflictGuardService? _conflictGuardService;
+  McpBridgeStatusService? _mcpBridgeStatusService;
+  McpToolRegistryService? _mcpToolRegistryService;
+  PermissionTokenService? _permissionTokenService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -157,6 +172,36 @@ class SacContainer {
     return service;
   }
 
+  WorkQueueService get workQueueService {
+    final service = _workQueueService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ConflictGuardService get conflictGuardService {
+    final service = _conflictGuardService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  McpBridgeStatusService get mcpBridgeStatusService {
+    final service = _mcpBridgeStatusService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  McpToolRegistryService get mcpToolRegistryService {
+    final service = _mcpToolRegistryService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  PermissionTokenService get permissionTokenService {
+    final service = _permissionTokenService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -216,8 +261,38 @@ class SacContainer {
     _journalCommentService = JournalCommentServiceImpl(
       databaseService: databaseService,
     );
-    _dashboardService = DashboardServiceImpl(databaseService: databaseService);
-    _privacyService = PrivacyServiceImpl(databaseService: databaseService);
+    _conflictGuardService = ConflictGuardServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+    );
+    _mcpToolRegistryService = McpToolRegistryServiceImpl(
+      databaseService: databaseService,
+    );
+    _permissionTokenService = PermissionTokenServiceImpl(
+      databaseService: databaseService,
+    );
+    _workQueueService = WorkQueueServiceImpl(
+      databaseService: databaseService,
+      conflictGuard: _conflictGuardService!,
+      permissionTokenService: _permissionTokenService!,
+    );
+    _mcpBridgeStatusService = McpBridgeStatusServiceImpl(
+      toolRegistry: _mcpToolRegistryService!,
+      workQueue: _workQueueService!,
+    );
+    await _mcpToolRegistryService!.ensureDefaultTools();
+    _dashboardService = DashboardServiceImpl(
+      databaseService: databaseService,
+      workQueueService: _workQueueService!,
+      mcpBridgeService: _mcpBridgeStatusService!,
+      toolRegistryService: _mcpToolRegistryService!,
+    );
+    _privacyService = PrivacyServiceImpl(
+      databaseService: databaseService,
+      permissionTokenService: _permissionTokenService!,
+      toolRegistryService: _mcpToolRegistryService!,
+      mcpBridgeService: _mcpBridgeStatusService!,
+    );
     _localAiService = OllamaAdapter();
     _llmSelfInfoExportService = LlmSelfInfoExportServiceImpl(
       databaseService: databaseService,

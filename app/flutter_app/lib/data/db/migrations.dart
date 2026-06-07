@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 4;
+const int kSacSchemaVersion = 5;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -193,6 +193,52 @@ List<String> sprint5MigrationSql() {
   ];
 }
 
+/// Sprint 7 MCP / Work Queue migration SQL 목록을 반환한다.
+List<String> sprint7MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS work_queue_tickets (
+      id TEXT PRIMARY KEY,
+      actor TEXT NOT NULL,
+      requested_action TEXT NOT NULL,
+      target_type TEXT NOT NULL,
+      target_id TEXT,
+      target_path TEXT,
+      permission_level TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      priority INTEGER NOT NULL DEFAULT 5,
+      reason TEXT,
+      error_message TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS mcp_tool_settings (
+      tool_name TEXT PRIMARY KEY,
+      enabled INTEGER NOT NULL DEFAULT 0,
+      permission_level TEXT NOT NULL,
+      description TEXT,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS permission_tokens (
+      id TEXT PRIMARY KEY,
+      token_type TEXT NOT NULL,
+      actor TEXT NOT NULL,
+      scope TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      expires_at TEXT,
+      created_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_work_queue_status ON work_queue_tickets(status)',
+    'CREATE INDEX IF NOT EXISTS idx_work_queue_created ON work_queue_tickets(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_permission_tokens_status ON permission_tokens(status)',
+  ];
+}
+
 /// 스키마 버전에 맞는 migration을 적용한다.
 Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) async {
   if (fromVersion < 1) {
@@ -227,6 +273,11 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
   }
   if (fromVersion < 4) {
     for (final sql in sprint5MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
+  if (fromVersion < 5) {
+    for (final sql in sprint7MigrationSql()) {
       await db.execute(sql);
     }
   }

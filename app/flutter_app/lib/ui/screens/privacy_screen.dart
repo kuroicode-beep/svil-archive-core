@@ -65,6 +65,23 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
+                    Text('MCP / 작업큐 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('외부 MCP: 비활성화', style: TextStyle(fontSize: 16)),
+                    Text('원격 포트: 열지 않음', style: TextStyle(fontSize: 16)),
+                    Text('쓰기 작업: queue 승인 필요', style: TextStyle(fontSize: 16)),
+                    Text('파괴적 작업: destructive token + 승인 필요', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
                     Text('LLM용 문서 생성 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
                     Text('외부 전송: 비활성화', style: TextStyle(fontSize: 16)),

@@ -14,6 +14,7 @@ import 'dashboard_screen.dart';
 import 'document_editor_panel.dart';
 import 'extraction_queue_panel.dart';
 import 'personal_archive_panel.dart';
+import 'work_queue_panel.dart';
 import 'privacy_screen.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
@@ -258,6 +259,8 @@ class _MainShellState extends State<MainShell> {
                 setState(() => _section = SacSection.search);
               case DashboardNavTarget.privacy:
                 setState(() => _section = SacSection.privacy);
+              case DashboardNavTarget.workQueue:
+                setState(() => _section = SacSection.workQueue);
             }
           },
         );
@@ -284,6 +287,10 @@ class _MainShellState extends State<MainShell> {
       case SacSection.extractionQueue:
         return ExtractionQueuePanel(
           extractionQueueService: widget.container.extractionQueueService,
+        );
+      case SacSection.workQueue:
+        return WorkQueuePanel(
+          workQueueService: widget.container.workQueueService,
         );
     }
   }
@@ -333,6 +340,7 @@ class _MainShellState extends State<MainShell> {
             workspaceName: workspace?.name,
             workspacePath: workspace?.rootPath,
             syncState: _selectedSyncState,
+            mcpBridgeService: widget.container.mcpBridgeStatusService,
             highContrastEnabled: themeController.highContrastEnabled,
             onHighContrastChanged: themeController.toggleHighContrast,
           ),

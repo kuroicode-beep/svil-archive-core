@@ -3,14 +3,28 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/dashboard.dart';
+import '../../domain/models/work_queue.dart';
+import '../../domain/services/mcp_bridge_status_service.dart';
+import '../../domain/services/mcp_tool_registry_service.dart';
+import '../../domain/services/permission_token_service.dart';
 import '../../domain/services/privacy_service.dart';
 import '../db/database_service_impl.dart';
 
 class PrivacyServiceImpl implements PrivacyService {
   final DatabaseServiceImpl _databaseService;
+  final PermissionTokenService _permissionTokenService;
+  final McpToolRegistryService _toolRegistryService;
+  final McpBridgeStatusService _mcpBridgeService;
 
-  PrivacyServiceImpl({required DatabaseServiceImpl databaseService})
-      : _databaseService = databaseService;
+  PrivacyServiceImpl({
+    required DatabaseServiceImpl databaseService,
+    required PermissionTokenService permissionTokenService,
+    required McpToolRegistryService toolRegistryService,
+    required McpBridgeStatusService mcpBridgeService,
+  })  : _databaseService = databaseService,
+        _permissionTokenService = permissionTokenService,
+        _toolRegistryService = toolRegistryService,
+        _mcpBridgeService = mcpBridgeService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -61,6 +75,10 @@ class PrivacyServiceImpl implements PrivacyService {
         )
         .toList();
 
+    final mcpStatus = await _mcpBridgeService.checkStatus();
+    final tools = await _toolRegistryService.listTools();
+    final enabledCount = tools.where((t) => t.enabled).length;
+
     return PrivacySummary(
       localProcessingEnabled: true,
       externalTransferEnabled: false,
@@ -70,6 +88,17 @@ class PrivacyServiceImpl implements PrivacyService {
       deletedPersonalItemCount: deletedPersonalItemCount,
       recentPrivacyAuditLogs: logs,
       exportPolicyLabel: 'approved / active only — pending·rejected·deleted 제외',
+      mcpPrivacy: McpPrivacySummary(
+        localOnly: mcpStatus.localOnly,
+        remoteMcpEnabled: mcpStatus.remoteExposureEnabled,
+        writeTokenCount: await _permissionTokenService.countActiveByType(PermissionLevel.write),
+        destructiveTokenCount:
+            await _permissionTokenService.countActiveByType(PermissionLevel.destructive),
+        personalTokenCount:
+            await _permissionTokenService.countActiveByType(PermissionLevel.personal),
+        enabledToolCount: enabledCount,
+        disabledToolCount: tools.length - enabledCount,
+      ),
     );
   }
 }

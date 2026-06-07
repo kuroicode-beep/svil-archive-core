@@ -30,7 +30,7 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-enum DashboardNavTarget { personalArchive, extractionQueue, search, privacy }
+enum DashboardNavTarget { personalArchive, extractionQueue, search, privacy, workQueue }
 
 class _DashboardScreenState extends State<DashboardScreen> {
   DashboardSummary? _summary;
@@ -186,6 +186,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('MCP / 작업큐 상태', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text('MCP: ${summary.mcpBridgeStatus.label}', style: const TextStyle(fontSize: 16)),
+                    Text(
+                      '활성 MCP tool: ${summary.enabledMcpToolCount} / 비활성: ${summary.disabledMcpToolCount}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '상태: 승인 대기 ${summary.workQueueSummary.pendingCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '상태: 충돌 ${summary.workQueueSummary.conflictCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '상태: 차단 ${summary.workQueueSummary.blockedCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const Text('통합 검색 / 바로가기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     SizedBox(
@@ -212,6 +242,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: OutlinedButton(
                         onPressed: () => widget.onNavigate?.call(DashboardNavTarget.extractionQueue),
                         child: const Text('추출 대기열 열기'),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      height: 50,
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => widget.onNavigate?.call(DashboardNavTarget.workQueue),
+                        child: const Text('작업큐 열기'),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -290,7 +329,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('작업큐 요약', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('아카이브 요약', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text('문서: ${summary.documentCount}건', style: const TextStyle(fontSize: 16)),
                     Text('휴지통: ${summary.trashCount}건', style: const TextStyle(fontSize: 16)),
@@ -298,6 +337,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       '승인 대기 추출: ${summary.criticalAlerts.pendingExtractionCount}건',
                       style: const TextStyle(fontSize: 16),
                     ),
+                    if (summary.recentWorkQueueActivities.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      const Text('최근 작업큐 활동', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ...summary.recentWorkQueueActivities.map(
+                        (item) => Text(
+                          '${item.action} · ${item.targetId ?? '-'}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

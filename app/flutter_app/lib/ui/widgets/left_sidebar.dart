@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-enum SacSection { dashboard, archive, search, trash, personalArchive, extractionQueue, privacy }
+enum SacSection { dashboard, archive, search, trash, personalArchive, extractionQueue, workQueue, privacy }
 
 class LeftSidebar extends StatelessWidget {
   final SacSection selected;
@@ -19,6 +19,7 @@ class LeftSidebar extends StatelessWidget {
     (SacSection.archive, Icons.folder_open, '문서 아카이브'),
     (SacSection.personalArchive, Icons.person_outline, '개인 아카이브'),
     (SacSection.extractionQueue, Icons.pending_actions, '추출 대기열'),
+    (SacSection.workQueue, Icons.confirmation_number_outlined, '작업큐'),
     (SacSection.search, Icons.search, '검색'),
     (SacSection.trash, Icons.delete_outline, '휴지통'),
     (SacSection.privacy, Icons.shield_outlined, '개인정보 보호'),

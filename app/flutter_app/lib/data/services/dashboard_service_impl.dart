@@ -5,14 +5,28 @@ import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/dashboard.dart';
+import '../../domain/models/work_queue.dart';
 import '../../domain/services/dashboard_service.dart';
+import '../../domain/services/mcp_bridge_status_service.dart';
+import '../../domain/services/mcp_tool_registry_service.dart';
+import '../../domain/services/work_queue_service.dart';
 import '../db/database_service_impl.dart';
 
 class DashboardServiceImpl implements DashboardService {
   final DatabaseServiceImpl _databaseService;
+  final WorkQueueService _workQueueService;
+  final McpBridgeStatusService _mcpBridgeService;
+  final McpToolRegistryService _toolRegistryService;
 
-  DashboardServiceImpl({required DatabaseServiceImpl databaseService})
-      : _databaseService = databaseService;
+  DashboardServiceImpl({
+    required DatabaseServiceImpl databaseService,
+    required WorkQueueService workQueueService,
+    required McpBridgeStatusService mcpBridgeService,
+    required McpToolRegistryService toolRegistryService,
+  })  : _databaseService = databaseService,
+        _workQueueService = workQueueService,
+        _mcpBridgeService = mcpBridgeService,
+        _toolRegistryService = toolRegistryService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -31,8 +45,14 @@ class DashboardServiceImpl implements DashboardService {
         ) ??
         0;
 
+    final mcpStatus = await _mcpBridgeService.checkStatus();
+    final queueSummary = await _workQueueService.getSummary();
+    final tools = await _toolRegistryService.listTools();
+    final enabledCount = tools.where((t) => t.enabled).length;
+    final queueActivities = await _loadWorkQueueActivities();
+
     return DashboardSummary(
-      aiCollaboration: _buildAiCollaborationSummary(critical),
+      aiCollaboration: _buildAiCollaborationSummary(critical, queueSummary),
       criticalAlerts: critical,
       personalArchiveItemCount: personalCounts.$1,
       approvedPersonalItemCount: personalCounts.$2,
@@ -40,18 +60,47 @@ class DashboardServiceImpl implements DashboardService {
       recentActivities: recentActivities,
       documentCount: documentCount,
       trashCount: trashCount,
+      mcpBridgeStatus: mcpStatus,
+      workQueueSummary: queueSummary,
+      enabledMcpToolCount: enabledCount,
+      disabledMcpToolCount: tools.length - enabledCount,
+      recentWorkQueueActivities: queueActivities,
     );
   }
 
   /// AI 협업 프로토콜 요약을 구성한다 (v0 local provider).
-  AiCollaborationSummary _buildAiCollaborationSummary(CriticalAlertSummary critical) {
+  AiCollaborationSummary _buildAiCollaborationSummary(
+    CriticalAlertSummary critical,
+    WorkQueueSummary queueSummary,
+  ) {
     return AiCollaborationSummary(
       activeWorkInstructions: 0,
-      handoffPending: critical.pendingExtractionCount > 0 ? 1 : 0,
-      verificationNeeded: 0,
-      criticalIssues: critical.hasCritical ? 1 : 0,
-      lastCompletedSprint: 'Sprint 05 Personal Archive',
+      handoffPending: critical.pendingExtractionCount > 0 || queueSummary.pendingCount > 0 ? 1 : 0,
+      verificationNeeded: queueSummary.conflictCount > 0 ? 1 : 0,
+      criticalIssues: critical.hasCritical || queueSummary.blockedCount > 0 ? 1 : 0,
+      lastCompletedSprint: 'Sprint 06 AI Dashboard',
     );
+  }
+
+  /// 최근 work queue 감사 활동을 조회한다.
+  Future<List<RecentActivityItem>> _loadWorkQueueActivities() async {
+    final rows = await _db.query(
+      'audit_logs',
+      where: "target_type = 'work_queue_ticket'",
+      orderBy: 'occurred_at DESC',
+      limit: 8,
+    );
+    return rows
+        .map(
+          (row) => RecentActivityItem(
+            id: row['id'] as String,
+            action: row['action'] as String? ?? 'unknown',
+            targetType: row['target_type'] as String? ?? 'work_queue_ticket',
+            targetId: row['target_id'] as String?,
+            occurredAt: DateTime.parse(row['occurred_at'] as String).toLocal(),
+          ),
+        )
+        .toList();
   }
 
   /// Critical / 충돌 알림 수치를 집계한다.
