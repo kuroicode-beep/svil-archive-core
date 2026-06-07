@@ -51,3 +51,9 @@ rework_commit: "11b9454"
 
 ## 05. Git 커밋
 - `11b9454` — Sprint 08 + Codex B1/I1 재작업
+- `fa2c641` — 문서 커밋 해시 동기화
+
+## 06. Codex 재검증 (2026.06.08)
+- **판정**: PASS / 배포 가능 YES
+- B1/I1/I2 모두 해소 확인
+- [재검증 보고서](https://app.notion.com/p/378864048e5481aab574d7e6d812ab4a)

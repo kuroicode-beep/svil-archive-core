@@ -58,9 +58,10 @@ sprint07_base_commit: "7d3b615"
 - `test/sprint8_integration_test.dart`
 
 ## 08. Codex 검증
-- **1차**: 부분완료 — B1/I1/I2 → 재작업
-- **재검증**: Codex 재실행 대기
-- `docs/reports/Rework_Report_Sprint_08.md` 참조
+- **1차**: 부분완료 — B1/I1/I2 → 재작업 (`11b9454`)
+- **재검증**: **PASS / 배포 가능 YES** (2026.06.08)
+- [Codex 재검증 보고서](https://app.notion.com/p/378864048e5481aab574d7e6d812ab4a)
 
 ## 09. Git 커밋
 - `11b9454` — Sprint 08 구현 + Codex B1/I1 재작업
+- `fa2c641` — 문서 커밋 해시 동기화

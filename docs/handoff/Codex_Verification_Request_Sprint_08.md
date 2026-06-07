@@ -1,9 +1,9 @@
-# Codex Verification Request — Sprint 08 (재검증)
+# Codex Verification Request — Sprint 08
 
 > **Sprint 07 기준 커밋**: `7d3b615`
 > **Sprint 08 구현 커밋**: `11b9454`
-> **Codex 1차 검증**: 부분완료 — B1 + I1 + I2
-> **재작업 보고서**: `docs/reports/Rework_Report_Sprint_08.md`
+> **Codex 1차 검증**: 부분완료 — B1 + I1 + I2 → 재작업
+> **Codex 재검증**: PASS / 배포 가능 YES (2026.06.08)
 > **범위**: Queue Execution / Safe Apply
 
 ## 검증 항목
@@ -27,7 +27,7 @@
 - [x] Sprint 06 active-only export 회귀 없음
 - [x] Sprint 07 MCP enqueue-only 회귀 없음
 - [x] 접근성: 50px 버튼, 16px 폰트, destructive 2단계 확인
-- [ ] `flutter analyze` / `flutter test` (80/80) / MCP sidecar build — Codex 재실행
+- [x] `flutter analyze` / `flutter test` (80/80) / MCP sidecar build
 ## 핵심 파일
 
 - `lib/data/db/migrations.dart` (v6)
