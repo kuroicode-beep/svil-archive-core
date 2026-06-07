@@ -3,6 +3,7 @@
 > **Sprint 08 기준 커밋**: `36e9d6c`
 > **Sprint 09 구현 커밋**: `a15a4c1`
 > **Codex 1차 검증**: 부분완료 — B1 + B2 + I1 + I2 → 재작업 완료
+> **Codex 재검증**: 부분완료 — B3 → 2차 재작업 `6d2bc91`
 > **범위**: Integrity Hardening / Execution Recovery / macOS Smoke
 > **작업지시문**: [Notion Sprint 09](https://app.notion.com/p/378864048e5481d5a3cbd8c1dd7fcd6f)
 
@@ -33,7 +34,8 @@
 - [x] Sprint 09 Git 커밋 존재 (B1 재작업)
 - [x] Notion Cursor 완료보고서 존재 (B2 재작업)
 - [x] 핸드오프 Notion 링크 정정 (I1 재작업)
-- [x] `flutter analyze` / `flutter test` (105/105) / MCP sidecar build
+- [x] **flutter analyze No issues (B3 재작업 `6d2bc91`)**
+- [x] `flutter test` (105/105) / MCP sidecar build
 
 ## 핵심 파일
 

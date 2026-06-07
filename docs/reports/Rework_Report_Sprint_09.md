@@ -50,6 +50,7 @@ rework_commit: "a15a4c1"
 ## 05. Codex 재검증 반영 (2차 — 2026.06.08)
 - **BLOCKER B3**: `report_consistency_service_impl.dart` 미사용 `inFrontmatter` 변수 제거
 - `flutter analyze`: No issues found
+- Git: `6d2bc91`
 
 ## 06. Codex 재검증 요청
 - B1/B2/I1/I2/B3 해소 확인 요청
