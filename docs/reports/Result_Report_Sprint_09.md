@@ -67,8 +67,9 @@ sprint09_commit: "a15a4c1"
 - **IMPORTANT I2**: ReportConsistencyService docs 검사 보강
 
 ## 08. Codex 검증
-- **1차**: 부분완료 — B1/B2/I1/I2 → 재작업
-- **재검증**: Codex 재실행 대기
+- **1차**: 부분완료 — B1/B2/I1/I2 → 재작업 (`a15a4c1`)
+- **재검증**: 부분완료 — B3 (`flutter analyze` warning) → 2차 재작업
+- **최종 재검증**: Codex 재실행 대기
 - `docs/reports/Rework_Report_Sprint_09.md` 참조
 
 ## 09. Git 커밋

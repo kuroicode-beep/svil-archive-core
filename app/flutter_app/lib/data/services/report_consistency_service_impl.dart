@@ -172,7 +172,6 @@ class ReportConsistencyServiceImpl implements ReportConsistencyService {
     final results = <({String key, String hash})>[];
     final lines = content.split('\n');
     if (lines.isEmpty || lines.first.trim() != '---') return results;
-    var inFrontmatter = true;
     for (var i = 1; i < lines.length; i++) {
       final line = lines[i].trim();
       if (line == '---') break;
