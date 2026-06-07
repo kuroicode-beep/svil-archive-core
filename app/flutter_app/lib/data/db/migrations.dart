@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 3;
+const int kSacSchemaVersion = 4;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -145,6 +145,54 @@ List<String> sprint4MigrationSql() {
   ];
 }
 
+/// Sprint 5 개인 아카이브 migration SQL 목록을 반환한다.
+List<String> sprint5MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS personal_archive_items (
+      id TEXT PRIMARY KEY,
+      item_type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      source_document_id TEXT,
+      source_path TEXT,
+      confidence REAL,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS personal_extraction_queue (
+      id TEXT PRIMARY KEY,
+      source_document_id TEXT,
+      source_path TEXT,
+      candidate_type TEXT NOT NULL,
+      candidate_title TEXT NOT NULL,
+      candidate_content TEXT NOT NULL,
+      confidence REAL,
+      reason TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS journal_comments (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      mood TEXT,
+      tags TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_personal_archive_status ON personal_archive_items(status)',
+    'CREATE INDEX IF NOT EXISTS idx_extraction_queue_status ON personal_extraction_queue(status)',
+  ];
+}
+
 /// 스키마 버전에 맞는 migration을 적용한다.
 Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) async {
   if (fromVersion < 1) {
@@ -175,6 +223,11 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
           rethrow;
         }
       }
+    }
+  }
+  if (fromVersion < 4) {
+    for (final sql in sprint5MigrationSql()) {
+      await db.execute(sql);
     }
   }
 }

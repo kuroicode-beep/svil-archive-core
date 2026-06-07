@@ -8,6 +8,9 @@ import '../data/file/document_file_store_impl.dart';
 import '../data/indexing/document_indexer.dart';
 import '../data/indexing/indexing_queue.dart';
 import '../data/services/archive_service_impl.dart';
+import '../data/services/extraction_queue_service_impl.dart';
+import '../data/services/journal_comment_service_impl.dart';
+import '../data/services/personal_archive_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
 import '../data/services/theme_service_impl.dart';
@@ -21,6 +24,9 @@ import '../data/sync/sync_service_impl.dart';
 import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
 import '../domain/services/archive_service.dart';
+import '../domain/services/extraction_queue_service.dart';
+import '../domain/services/journal_comment_service.dart';
+import '../domain/services/personal_archive_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sync_service.dart';
 import '../domain/services/trash_service.dart';
@@ -35,6 +41,9 @@ class SacContainer {
   ArchiveService? _archiveService;
   SearchService? _searchService;
   TrashService? _trashService;
+  PersonalArchiveService? _personalArchiveService;
+  ExtractionQueueService? _extractionQueueService;
+  JournalCommentService? _journalCommentService;
   IndexingQueue? _indexingQueue;
   SyncServiceImpl? _syncService;
   WorkspaceFileWatcher? _fileWatcher;
@@ -94,6 +103,24 @@ class SacContainer {
     return service;
   }
 
+  PersonalArchiveService get personalArchiveService {
+    final service = _personalArchiveService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ExtractionQueueService get extractionQueueService {
+    final service = _extractionQueueService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  JournalCommentService get journalCommentService {
+    final service = _journalCommentService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -142,6 +169,17 @@ class SacContainer {
       databaseService: databaseService,
       repository: _repository!,
       workspaceId: workspace.id,
+    );
+
+    _personalArchiveService = PersonalArchiveServiceImpl(
+      databaseService: databaseService,
+    );
+    _extractionQueueService = ExtractionQueueServiceImpl(
+      databaseService: databaseService,
+      personalArchiveService: _personalArchiveService!,
+    );
+    _journalCommentService = JournalCommentServiceImpl(
+      databaseService: databaseService,
     );
 
     _fileWatcher = WorkspaceFileWatcher(

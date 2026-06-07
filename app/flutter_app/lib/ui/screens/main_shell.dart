@@ -11,6 +11,8 @@ import '../widgets/footer_bar.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_context_panel.dart';
 import 'document_editor_panel.dart';
+import 'extraction_queue_panel.dart';
+import 'personal_archive_panel.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
 
@@ -251,8 +253,21 @@ class _MainShellState extends State<MainShell> {
         );
       case SacSection.archive:
         return _buildArchivePanel();
+      case SacSection.personalArchive:
+        return PersonalArchivePanel(
+          personalArchiveService: widget.container.personalArchiveService,
+          journalCommentService: widget.container.journalCommentService,
+        );
+      case SacSection.extractionQueue:
+        return ExtractionQueuePanel(
+          extractionQueueService: widget.container.extractionQueueService,
+        );
     }
   }
+
+  /// 문서 아카이브 섹션에서만 우측 컨텍스트 패널을 표시한다.
+  bool get _showDocumentContext =>
+      _section == SacSection.archive;
 
   @override
   Widget build(BuildContext context) {
@@ -276,15 +291,17 @@ class _MainShellState extends State<MainShell> {
                 ),
                 const VerticalDivider(width: 1),
                 Expanded(child: _buildCenterPanel()),
-                const VerticalDivider(width: 1),
-                SizedBox(
-                  width: 300,
-                  child: RightContextPanel(
-                    document: _selectedDocument,
-                    syncState: _selectedSyncState,
-                    onSaveMetadata: _saveMetadata,
+                if (_showDocumentContext) ...[
+                  const VerticalDivider(width: 1),
+                  SizedBox(
+                    width: 300,
+                    child: RightContextPanel(
+                      document: _selectedDocument,
+                      syncState: _selectedSyncState,
+                      onSaveMetadata: _saveMetadata,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
