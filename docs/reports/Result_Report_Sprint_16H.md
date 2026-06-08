@@ -38,7 +38,7 @@ sprint16r_base_commit: "5a2d99b"
 
 ## 04. Git 커밋
 
-- (push 후 기록)
+- `0976c1e` — Sprint 16H hotfix 구현 + 테스트 + handoff
 
 ## 05. 핸드오프
 

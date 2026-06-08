@@ -1,6 +1,6 @@
 # Codex Verification Request — Sprint 16H Emergency UI / Settings / Ollama
 
-> **기준 HEAD**: (push 후 기록)
+> **기준 HEAD**: `0976c1e`
 > **Sprint 16R PASS**: `5a2d99b`
 > **작업지시문**: [Sprint 16H WI](https://app.notion.com/p/379864048e54819ab883fd92ac0305dd)
 
