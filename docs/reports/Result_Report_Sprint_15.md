@@ -12,7 +12,7 @@ sprint14_base_commit: "7d7fd5c"
 ## 01. 작업 요약
 
 - **목표**: 탐색기로 복사한 orphan Markdown을 SAC에 정식 등록 (SQLite + FTS + MCP 반영)
-- **결과**: ✅ 재작업 완료 (Codex 재검증 대기)
+- **결과**: ✅ **Codex PASS** (`d2021bd`) — SAC DOCS 216건 import smoke 진행 가능
 - **Sprint 14 기준**: `7d7fd5c`
 
 ## 02. 구현 결과
@@ -41,13 +41,27 @@ sprint14_base_commit: "7d7fd5c"
 | `flutter test sprint15` | 16/16 |
 | full `flutter test` | 189 pass / 12 fail (report consistency — 미커밋 docs) |
 
-## 05. 소장님 smoke
+## 05. Codex 재검증 (PASS)
+
+| 항목 | 결과 |
+|------|------|
+| HEAD / origin | `d2021bd` |
+| `flutter analyze` | PASS |
+| `flutter test sprint15` | 16/16 |
+| `mcp/sidecar` build + test | 10/10 |
+| Blocker 1 dry-run/execute | 닫힘 |
+| Blocker 2 overwrite | 닫힘 |
+| Sprint 14 MCP 회귀 | 없음 |
+
+**Advisory**: `executeImport(dryRunOnly:false)`가 서비스 API에 남아 UI 밖 호출자가 snapshot 흐름을 우회할 수 있음. MCP/API import 개방 전 deprecated 또는 internal-only 권장.
+
+## 06. 소장님 smoke
 
 - [ ] SAC DOCS workspace orphan import (~216건)
 - [ ] MCP `documentCount > 0` after import
 
-## 06. Git 커밋
+## 07. Git 커밋
 
 - 초기 Sprint 15: `7c519e0`
-- 재작업 커밋: (미커밋 — `커밋 푸시` 요청 시 진행)
-- Codex 검증: 재검증 대기
+- 재작업 (Codex PASS): `d2021bd`
+- Codex 검증: **PASS**
