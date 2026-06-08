@@ -1,6 +1,6 @@
 # Cursor Handoff — Sprint 16H-2 Dry-run Input + Git Repo Save Fix
 
-> **Sprint 16H 기준**: `412109b` (구현 `0976c1e`)
+> **Sprint 16H-2 커밋**: `1b5080d` / Sprint 16H `412109b`
 > **작업지시문**: [Sprint 16H-2 WI](https://app.notion.com/p/379864048e5481438e6bc11cc56be144)
 
 ## Sprint 16H-2 구현 요약 (Hotfix)
