@@ -8,9 +8,13 @@ import 'package:uuid/uuid.dart';
 
 import '../../domain/models/build_environment_check.dart';
 import '../../domain/services/build_environment_check_service.dart';
+import '../../domain/utils/mcp_sidecar_path_resolver.dart';
 import '../db/database_service_impl.dart';
 import '../db/migrations.dart';
 import '../platform/path_adapter.dart';
+
+export '../../domain/utils/mcp_sidecar_path_resolver.dart'
+    show resolveMcpSidecarDistPath, resolveMcpSidecarPath;
 
 class BuildEnvironmentCheckServiceImpl implements BuildEnvironmentCheckService {
   final DatabaseServiceImpl _databaseService;
@@ -131,7 +135,7 @@ class BuildEnvironmentCheckServiceImpl implements BuildEnvironmentCheckService {
 
   /// MCP sidecar 빌드 존재 여부를 점검한다.
   Future<BuildEnvironmentCheck> _checkMcpSidecar(DateTime now) async {
-    final dist = mcpSidecarDistPath ?? resolveMcpSidecarDistPath();
+    final dist = mcpSidecarDistPath ?? resolveMcpSidecarPath().distPath;
     if (dist == null) {
       return _buildCheck(
         checkName: 'mcp_sidecar',
@@ -213,24 +217,4 @@ class BuildEnvironmentCheckServiceImpl implements BuildEnvironmentCheckService {
       checkedAt: DateTime.parse(row['checked_at'] as String).toLocal(),
     );
   }
-}
-
-/// 개발 환경에서 MCP sidecar dist 경로를 자동 탐지한다.
-String? resolveMcpSidecarDistPath() {
-  final candidates = <String>[
-    p.normalize(p.join(Directory.current.path, '..', '..', 'mcp', 'sidecar', 'dist')),
-    p.normalize(p.join(Directory.current.path, '..', 'mcp', 'sidecar', 'dist')),
-    p.normalize(p.join(Directory.current.path, 'mcp', 'sidecar', 'dist')),
-  ];
-  for (final candidate in candidates) {
-    if (File(p.join(candidate, 'index.js')).existsSync()) {
-      return candidate;
-    }
-  }
-  for (final candidate in candidates) {
-    if (Directory(candidate).existsSync()) {
-      return candidate;
-    }
-  }
-  return candidates.isEmpty ? null : candidates.first;
 }

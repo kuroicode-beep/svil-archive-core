@@ -8,34 +8,43 @@ import '../../domain/models/work_queue.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/work_queue_service.dart';
+import '../../domain/utils/mcp_sidecar_path_resolver.dart';
 
 class McpBridgeStatusServiceImpl implements McpBridgeStatusService {
   final McpToolRegistryService _toolRegistry;
   final WorkQueueService _workQueue;
-  final String? sidecarDistPath;
+  final McpSidecarPathResolution sidecarResolution;
 
   McpBridgeStatusServiceImpl({
     required McpToolRegistryService toolRegistry,
     required WorkQueueService workQueue,
-    this.sidecarDistPath,
+    McpSidecarPathResolution? sidecarResolution,
+    String? sidecarDistPath,
   })  : _toolRegistry = toolRegistry,
-        _workQueue = workQueue;
+        _workQueue = workQueue,
+        sidecarResolution = sidecarResolution ??
+            McpSidecarPathResolution(
+              distPath: sidecarDistPath,
+              source: sidecarDistPath == null
+                  ? McpSidecarPathSource.notFound
+                  : McpSidecarPathSource.devFallback,
+            );
 
   @override
   Future<McpBridgeStatus> checkStatus() async {
-    final dist = sidecarDistPath;
+    final dist = sidecarResolution.distPath;
     if (dist == null) {
       return const McpBridgeStatus(
-        state: McpBridgeConnectionState.localReady,
-        label: '로컬 대기 (sidecar 경로 미설정)',
+        state: McpBridgeConnectionState.offline,
+        label: 'sidecar 빌드 없음',
         localOnly: true,
       );
     }
     final file = File(p.join(dist, 'index.js'));
     if (await file.exists()) {
-      return const McpBridgeStatus(
+      return McpBridgeStatus(
         state: McpBridgeConnectionState.localReady,
-        label: '로컬 준비됨',
+        label: mcpSidecarStatusLabel(sidecarResolution),
         localOnly: true,
       );
     }

@@ -426,11 +426,11 @@ class SacContainer {
       conflictGuard: _conflictGuardService!,
       permissionTokenService: _permissionTokenService!,
     );
-    final sidecarDist = resolveMcpSidecarDistPath();
+    final sidecarResolution = resolveMcpSidecarPath();
     _mcpBridgeStatusService = McpBridgeStatusServiceImpl(
       toolRegistry: _mcpToolRegistryService!,
       workQueue: _workQueueService!,
-      sidecarDistPath: sidecarDist,
+      sidecarResolution: sidecarResolution,
     );
     _fileInventoryService = WorkspaceFileInventoryServiceImpl(fileStore: fileStore);
     _reportConsistencyService = ReportConsistencyServiceImpl(
@@ -469,7 +469,7 @@ class SacContainer {
     _buildEnvironmentCheckService = BuildEnvironmentCheckServiceImpl(
       databaseService: databaseService,
       workspaceRoot: workspace.rootPath,
-      mcpSidecarDistPath: sidecarDist,
+      mcpSidecarDistPath: sidecarResolution.distPath,
     );
     _verificationPassRecordService = VerificationPassRecordServiceImpl(
       databaseService: databaseService,

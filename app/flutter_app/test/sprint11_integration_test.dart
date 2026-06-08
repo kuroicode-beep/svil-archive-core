@@ -44,7 +44,7 @@ void main() {
     await container.bindWorkspace(workspace);
   }
 
-  Future<void> recordVerificationSet({String sprintCommit = '2e2e4da', int testCount = 166}) async {
+  Future<void> recordVerificationSet({String sprintCommit = '2e2e4da', int testCount = 173}) async {
     final svc = container.verificationPassRecordService;
     await svc.recordPass(
       checkType: 'analyze',
@@ -133,7 +133,7 @@ void main() {
     final analyze = await container.verificationPassRecordService.getLatestForType('analyze');
     final test = await container.verificationPassRecordService.getLatestForType('test');
     expect(analyze?.verifiedSprintCommit, '2e2e4da');
-    expect(test?.testCount, 166);
+    expect(test?.testCount, 173);
     expect(await container.verificationPassRecordService.hasCompleteVerificationSet(), isTrue);
   });
 
