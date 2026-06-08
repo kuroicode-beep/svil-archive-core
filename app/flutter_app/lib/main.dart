@@ -15,7 +15,7 @@ Future<void> main() async {
     databaseFactory = databaseFactoryFfi;
   }
   final container = await SacContainer.create();
-  await container.desktopShell.initialize();
+  await container.desktopShell.initializeEarly();
   runApp(SacApp(container: container));
 }
 

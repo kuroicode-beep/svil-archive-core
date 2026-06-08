@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sac-archive": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": [
+        "dist/index.js"
+      ],
+      "cwd": "C:\\Projects\\svil-archive-core\\mcp\\sidecar",
+      "env": {
+        "SAC_WORKSPACE_ROOT": "C:\\Users\\kuroi\\OneDrive\\문서\\SAC DOCS"
+      }
+    }
+  }
+}

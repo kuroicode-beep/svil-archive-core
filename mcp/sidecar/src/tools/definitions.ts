@@ -1,16 +1,25 @@
-// MCP Tool 정의 — Phase 1 Stub
-// 실제 inputSchema는 Cursor Sprint 2에서 확정
+// definitions.ts — MCP tool 정의 (Sprint 14 read-only + queue-gated writes)
 
 export const toolDefinitions = [
   {
+    name: 'get_workspace_status',
+    description: 'SAC workspace 상태 (root, index, documentCount, source)',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'get_settings',
+    description: 'SAC workspace/MCP/privacy 설정 요약 (민감값 masking)',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
     name: 'list_documents',
-    description: '문서 목록 조회. 필터: project, type, status, limit, offset',
+    description: '문서 목록 조회. 필터: project, type/category, limit, offset',
     inputSchema: {
       type: 'object',
       properties: {
         project: { type: 'string' },
         type: { type: 'string' },
-        status: { type: 'string', enum: ['active', 'archived'] },
+        category: { type: 'string' },
         limit: { type: 'number', default: 20 },
         offset: { type: 'number', default: 0 },
       },
@@ -18,44 +27,53 @@ export const toolDefinitions = [
   },
   {
     name: 'get_document',
-    description: '단일 문서 조회 (메타데이터 + 본문 Markdown)',
+    description: '문서 metadata + preview (본문 전체 반환 금지)',
     inputSchema: {
       type: 'object',
       required: ['id'],
       properties: {
         id: { type: 'string', description: 'sac_id (UUID)' },
+        include_full_body: { type: 'boolean', default: false },
+      },
+    },
+  },
+  {
+    name: 'search_documents',
+    description: '문서 검색 (SQLite FTS 우선, 없으면 markdown scan fallback)',
+    inputSchema: {
+      type: 'object',
+      required: ['text'],
+      properties: {
+        text: { type: 'string' },
+        type: { type: 'string' },
+        category: { type: 'string' },
+        project: { type: 'string' },
+        limit: { type: 'number', default: 20 },
       },
     },
   },
   {
     name: 'create_document',
-    description: '문서 생성. write token 필요.',
+    description: '문서 생성 — Work Queue approval 필요',
     inputSchema: {
       type: 'object',
       required: ['title', 'relative_dir', 'token', 'agent_id'],
       properties: {
         title: { type: 'string' },
-        type: { type: 'string' },
-        project: { type: 'string' },
-        author: { type: 'string' },
         relative_dir: { type: 'string' },
-        initial_content: { type: 'string', default: '' },
-        tags: { type: 'array', items: { type: 'string' } },
-        token: { type: 'string', description: 'write PermissionToken ID' },
+        token: { type: 'string' },
         agent_id: { type: 'string' },
       },
     },
   },
   {
     name: 'update_document',
-    description: '문서 수정. write token + baseRevision 필요. revision 불일치 시 CONFLICT 에러.',
+    description: '문서 수정 — Work Queue approval 필요',
     inputSchema: {
       type: 'object',
       required: ['id', 'base_revision', 'token', 'agent_id'],
       properties: {
         id: { type: 'string' },
-        title: { type: 'string' },
-        content: { type: 'string' },
         base_revision: { type: 'number' },
         token: { type: 'string' },
         agent_id: { type: 'string' },
@@ -63,35 +81,21 @@ export const toolDefinitions = [
     },
   },
   {
-    name: 'search_documents',
-    description: 'FTS5 기반 전문 검색',
-    inputSchema: {
-      type: 'object',
-      required: ['text'],
-      properties: {
-        text: { type: 'string' },
-        type: { type: 'string' },
-        project: { type: 'string' },
-        limit: { type: 'number', default: 20 },
-      },
-    },
-  },
-  {
     name: 'move_document_to_trash',
-    description: '문서 휴지통 이동. destructive token 필요.',
+    description: '문서 휴지통 이동 — Work Queue approval 필요',
     inputSchema: {
       type: 'object',
       required: ['id', 'token', 'agent_id'],
       properties: {
         id: { type: 'string' },
-        token: { type: 'string', description: 'destructive PermissionToken ID' },
+        token: { type: 'string' },
         agent_id: { type: 'string' },
       },
     },
   },
   {
     name: 'restore_document_from_trash',
-    description: '휴지통에서 문서 복원. write token 필요.',
+    description: '휴지통 복원 — Work Queue approval 필요',
     inputSchema: {
       type: 'object',
       required: ['trash_item_id', 'token', 'agent_id'],
@@ -100,14 +104,6 @@ export const toolDefinitions = [
         token: { type: 'string' },
         agent_id: { type: 'string' },
       },
-    },
-  },
-  {
-    name: 'get_settings',
-    description: '앱 설정 조회 (읽기 전용)',
-    inputSchema: {
-      type: 'object',
-      properties: {},
     },
   },
 ];

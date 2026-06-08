@@ -595,6 +595,7 @@ class SacContainer {
       currentSettings.copyWith(workspaceId: workspace.id),
     );
     await themeController.load();
+    await desktopShell.activateFromSettings();
     return workspace;
   }
 

@@ -15,7 +15,9 @@ class SacDesktopShell with TrayListener, WindowListener {
   final SettingsService settingsService;
   final SidecarProcessManager sidecarProcessManager;
   final WindowsAutostartService windowsAutostartService;
-  bool _initialized = false;
+  bool _windowInitialized = false;
+  bool _settingsActivated = false;
+  bool _trayInitialized = false;
   bool _quitting = false;
 
   SacDesktopShell({
@@ -24,31 +26,51 @@ class SacDesktopShell with TrayListener, WindowListener {
     required this.windowsAutostartService,
   });
 
-  /// Desktop shell(tray/window/sidecar bootstrap)을 초기화한다.
-  Future<void> initialize() async {
-    if (_initialized || kIsWeb) return;
+  /// Workspace 바인딩 전 window close 방어만 초기화한다.
+  Future<void> initializeEarly() async {
+    if (_windowInitialized || kIsWeb) return;
     if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) return;
 
     await windowManager.ensureInitialized();
     windowManager.addListener(this);
+    await windowManager.setPreventClose(true);
+    _windowInitialized = true;
+  }
+
+  /// Workspace DB 준비 후 tray/sidecar 설정을 반영한다.
+  Future<void> activateFromSettings() async {
+    if (_settingsActivated || kIsWeb) return;
+    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) return;
 
     final settings = await settingsService.getSettings();
-    await windowManager.setPreventClose(true);
-
-    if (settings.closeToTray) {
-      await _initTray();
-    }
-
     await sidecarProcessManager.refresh();
     if (settings.autoStartSidecar) {
       await sidecarProcessManager.start();
     }
 
-    _initialized = true;
+    if (settings.closeToTray) {
+      await _tryInitTray();
+    }
+
+    _settingsActivated = true;
+  }
+
+  /// desktop plugin이 없는 테스트 환경에서는 tray 초기화를 건너뛴다.
+  Future<void> _tryInitTray() async {
+    if (!_windowInitialized) return;
+    try {
+      await _initTray();
+    } catch (_) {
+      // headless flutter test — tray_manager/window_manager 미등록
+    }
   }
 
   /// tray icon과 menu를 초기화한다.
   Future<void> _initTray() async {
+    if (_trayInitialized) {
+      await _refreshTrayMenu();
+      return;
+    }
     trayManager.addListener(this);
     final iconPath = await _resolveTrayIconPath();
     if (iconPath != null) {
@@ -56,6 +78,17 @@ class SacDesktopShell with TrayListener, WindowListener {
     }
     await trayManager.setToolTip('SAC — SVIL Archive Core');
     await _refreshTrayMenu();
+    _trayInitialized = true;
+  }
+
+  /// DB 미준비 시에도 안전한 closeToTray 기본값을 반환한다.
+  Future<bool> _shouldCloseToTray() async {
+    try {
+      final settings = await settingsService.getSettings();
+      return settings.closeToTray;
+    } catch (_) {
+      return true;
+    }
   }
 
   /// tray menu를 현재 sidecar 상태로 갱신한다.
@@ -170,12 +203,10 @@ class SacDesktopShell with TrayListener, WindowListener {
 
   @override
   void onWindowClose() async {
-    final settings = await settingsService.getSettings();
-    if (settings.closeToTray) {
+    if (await _shouldCloseToTray()) {
       await windowManager.hide();
-      if (!_initialized) {
-        await _initTray();
-        _initialized = true;
+      if (!_trayInitialized) {
+        await _tryInitTray();
       }
       return;
     }

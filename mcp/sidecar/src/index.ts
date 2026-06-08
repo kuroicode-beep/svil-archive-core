@@ -1,6 +1,5 @@
-// SAC MCP Sidecar 진입점 — Phase 1 Stub
+// SAC MCP Sidecar 진입점 — Sprint 14 archive read-only integration
 // Transport: stdio (JSON-RPC over stdin/stdout)
-// 구현체는 Cursor Sprint 2에서 완성
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -27,7 +26,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // stderr로 로그 (stdout은 JSON-RPC 전용)
-  console.error('[SAC MCP Sidecar] Started — Phase 1 Stub');
+  console.error('[SAC MCP Sidecar] Started — archive read-only integration');
 }
 
 main().catch((err) => {

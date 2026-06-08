@@ -4,7 +4,7 @@ author: "Cursor"
 created: "2026-06-08"
 sprint12b_base_commit: "c2e73a4"
 sprint13_implementation_commit: "efa97e2"
-sprint13_manifest_commit: "c44938a"
+sprint13_codex_pass_base_commit: "433ede5"
 ---
 
 # 완료 보고서 — SAC Sprint 13 Embedded Sidecar / Tray / Autostart
