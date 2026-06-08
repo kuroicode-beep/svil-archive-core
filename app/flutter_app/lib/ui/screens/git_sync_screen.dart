@@ -256,6 +256,8 @@ class _GitSyncScreenState extends State<GitSyncScreen> {
   }
 
   Widget _gitStatusCard(GitStatus? status) {
+    final repoUrl = _settings?.gitSync.repoUrl ?? '';
+    final branch = _settings?.gitSync.branch ?? 'main';
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -263,6 +265,12 @@ class _GitSyncScreenState extends State<GitSyncScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('Git 상태', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Text(
+              'repo URL: ${repoUrl.isEmpty ? "(미설정)" : repoUrl}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            Text('branch: $branch', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
             if (status == null)
               const Text('로딩 중...', style: TextStyle(fontSize: 16))

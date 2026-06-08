@@ -25,7 +25,8 @@ class _FileImportScreenState extends State<FileImportScreen> {
   bool _skipRegistered = true;
   bool _writeFrontmatter = false;
   bool _generateSacId = true;
-  bool _busy = false;
+  bool _dryRunInProgress = false;
+  bool _executeInProgress = false;
   ImportApprovedSnapshot? _approvedSnapshot;
   ImportExecutionResult? _lastResult;
   final List<String> _selectedPaths = [];
@@ -44,18 +45,30 @@ class _FileImportScreenState extends State<FileImportScreen> {
     _approvedSnapshot = null;
   }
 
-  /// 옵션 변경 시 snapshot을 지우고 UI를 갱신한다.
+  /// 옵션 변경 시 snapshot은 유지하고 실행 가능 여부만 갱신한다.
   void _onOptionsChanged(VoidCallback update) {
+    final hadValidSnapshot = _approvedSnapshot != null &&
+        _approvedSnapshot!.options.fingerprint == _options.fingerprint;
     setState(() {
       update();
-      _invalidateSnapshot();
       _lastResult = null;
     });
+    if (hadValidSnapshot && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('이전 dry-run 결과가 무효화되었습니다. 다시 dry-run 해주세요.'),
+        ),
+      );
+    }
   }
 
   /// dry-run preview를 실행하고 snapshot을 고정한다.
   Future<void> _runDryRun({bool workspaceOrphans = false}) async {
-    setState(() => _busy = true);
+    setState(() {
+      _dryRunInProgress = true;
+      _invalidateSnapshot();
+      _lastResult = null;
+    });
     try {
       final options = _options;
       final preview = workspaceOrphans
@@ -67,15 +80,15 @@ class _FileImportScreenState extends State<FileImportScreen> {
           options: options.copyWith(dryRunOnly: false),
           preview: preview,
         );
-        _lastResult = null;
       });
     } catch (e) {
       if (!mounted) return;
+      setState(_invalidateSnapshot);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('미리 검사 실패: $e')),
       );
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _dryRunInProgress = false);
     }
   }
 
@@ -112,7 +125,7 @@ class _FileImportScreenState extends State<FileImportScreen> {
     );
     if (confirmed != true) return;
 
-    setState(() => _busy = true);
+    setState(() => _executeInProgress = true);
     try {
       final result = await widget.importService.executeApprovedImport(snapshot);
       if (!mounted) return;
@@ -130,7 +143,7 @@ class _FileImportScreenState extends State<FileImportScreen> {
         SnackBar(content: Text('등록 실패: $e')),
       );
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) setState(() => _executeInProgress = false);
     }
   }
 
@@ -168,6 +181,7 @@ class _FileImportScreenState extends State<FileImportScreen> {
     final canExecute = snapshot != null &&
         snapshot.preview.readyCount > 0 &&
         snapshot.options.fingerprint == _options.fingerprint;
+    final actionLocked = _dryRunInProgress || _executeInProgress;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -190,16 +204,22 @@ class _FileImportScreenState extends State<FileImportScreen> {
             children: [
               SizedBox(
                 height: 50,
-                child: OutlinedButton(onPressed: _busy ? null : _pickFiles, child: const Text('파일 선택')),
+                child: OutlinedButton(
+                  onPressed: _executeInProgress ? null : _pickFiles,
+                  child: const Text('파일 선택'),
+                ),
               ),
               SizedBox(
                 height: 50,
-                child: OutlinedButton(onPressed: _busy ? null : _pickFolder, child: const Text('폴더 선택')),
+                child: OutlinedButton(
+                  onPressed: _executeInProgress ? null : _pickFolder,
+                  child: const Text('폴더 선택'),
+                ),
               ),
               SizedBox(
                 height: 50,
                 child: ElevatedButton(
-                  onPressed: _busy ? null : () => _runDryRun(workspaceOrphans: true),
+                  onPressed: actionLocked ? null : () => _runDryRun(workspaceOrphans: true),
                   child: const Text('Workspace orphan 스캔'),
                 ),
               ),
@@ -216,23 +236,31 @@ class _FileImportScreenState extends State<FileImportScreen> {
           SwitchListTile(
             title: const Text('하위 폴더 포함', style: TextStyle(fontSize: 16)),
             value: _includeSubfolders,
-            onChanged: _busy ? null : (v) => _onOptionsChanged(() => _includeSubfolders = v),
+            onChanged: _executeInProgress
+                ? null
+                : (v) => _onOptionsChanged(() => _includeSubfolders = v),
           ),
           SwitchListTile(
             title: const Text('이미 등록된 파일 skip', style: TextStyle(fontSize: 16)),
             value: _skipRegistered,
-            onChanged: _busy ? null : (v) => _onOptionsChanged(() => _skipRegistered = v),
+            onChanged: _executeInProgress
+                ? null
+                : (v) => _onOptionsChanged(() => _skipRegistered = v),
           ),
           SwitchListTile(
             title: const Text('sac_id 없으면 생성', style: TextStyle(fontSize: 16)),
             value: _generateSacId,
-            onChanged: _busy ? null : (v) => _onOptionsChanged(() => _generateSacId = v),
+            onChanged: _executeInProgress
+                ? null
+                : (v) => _onOptionsChanged(() => _generateSacId = v),
           ),
           SwitchListTile(
             title: const Text('frontmatter 보강 쓰기 (확인 후)', style: TextStyle(fontSize: 16)),
             subtitle: const Text('기존 frontmatter 자동 덮어쓰기 금지 — sac_id 없을 때만', style: TextStyle(fontSize: 16)),
             value: _writeFrontmatter,
-            onChanged: _busy ? null : (v) => _onOptionsChanged(() => _writeFrontmatter = v),
+            onChanged: _executeInProgress
+                ? null
+                : (v) => _onOptionsChanged(() => _writeFrontmatter = v),
           ),
           if (snapshot != null && !canExecute) ...[
             const SizedBox(height: 8),
@@ -248,8 +276,8 @@ class _FileImportScreenState extends State<FileImportScreen> {
                 child: SizedBox(
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _busy ? null : () => _runDryRun(),
-                    child: Text(_busy ? '처리 중...' : '미리 검사 (dry-run)'),
+                    onPressed: actionLocked ? null : () => _runDryRun(),
+                    child: Text(_dryRunInProgress ? '처리 중...' : '미리 검사 (dry-run)'),
                   ),
                 ),
               ),
@@ -258,7 +286,7 @@ class _FileImportScreenState extends State<FileImportScreen> {
                 child: SizedBox(
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: (_busy || !canExecute) ? null : _runExecute,
+                    onPressed: (actionLocked || !canExecute) ? null : _runExecute,
                     child: const Text('정식 등록 실행'),
                   ),
                 ),

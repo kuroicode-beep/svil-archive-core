@@ -113,6 +113,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _ollamaController = TextEditingController();
   final _gitRepoController = TextEditingController();
   final _gitBranchController = TextEditingController();
+  final _gitRepoFocus = FocusNode();
+  final _gitBranchFocus = FocusNode();
 
   @override
   void initState() {
@@ -126,6 +128,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _ollamaController.dispose();
     _gitRepoController.dispose();
     _gitBranchController.dispose();
+    _gitRepoFocus.dispose();
+    _gitBranchFocus.dispose();
     super.dispose();
   }
 
@@ -150,8 +154,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (!mounted) return;
     _ollamaController.text = settings.ollamaEndpoint;
-    _gitRepoController.text = settings.gitSync.repoUrl;
-    _gitBranchController.text = settings.gitSync.branch;
+    if (!_gitRepoFocus.hasFocus) {
+      _gitRepoController.text = settings.gitSync.repoUrl;
+    }
+    if (!_gitBranchFocus.hasFocus) {
+      _gitBranchController.text = settings.gitSync.branch;
+    }
     setState(() {
       _settings = settings;
       _localAi = localAi;
@@ -246,12 +254,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// Git Sync 입력 필드 값을 기존 설정과 병합한다.
+  GitSyncSettings _gitSyncFromControllers(GitSyncSettings base) {
+    final branchText = _gitBranchController.text.trim();
+    return base.copyWith(
+      repoUrl: _gitRepoController.text.trim(),
+      branch: branchText.isEmpty ? base.branch : branchText,
+    );
+  }
+
   /// Git Sync 설정을 저장한다.
   Future<void> _saveGitSync(GitSyncSettings gitSync) async {
     final current = _settings;
     if (current == null) return;
-    await widget.settingsService.saveSettings(current.copyWith(gitSync: gitSync));
-    await _refresh();
+    if (mounted) setState(() => _actionInProgress = true);
+    try {
+      await widget.settingsService.saveSettings(current.copyWith(gitSync: gitSync));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Git 설정이 저장되었습니다.')),
+      );
+      await _refresh();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Git 설정 저장 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _actionInProgress = false);
+    }
   }
 
   /// 다운로드 감시 설정을 저장한다.
@@ -796,10 +827,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           value: git.enabled,
           onChanged: _actionInProgress
               ? null
-              : (v) => _saveGitSync(git.copyWith(enabled: v)),
+              : (v) => _saveGitSync(_gitSyncFromControllers(git).copyWith(enabled: v)),
         ),
         TextField(
           controller: _gitRepoController,
+          focusNode: _gitRepoFocus,
           style: const TextStyle(fontSize: 16),
           decoration: const InputDecoration(
             labelText: 'Git repo URL (https:// 또는 git@...)',
@@ -809,11 +841,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: _gitBranchController,
+          focusNode: _gitBranchFocus,
           style: const TextStyle(fontSize: 16),
           decoration: const InputDecoration(
             labelText: 'branch (예: main)',
             labelStyle: TextStyle(fontSize: 16),
           ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'repo URL/branch는 Git 설정 저장 또는 다른 Git 토글 변경 시 함께 저장됩니다.',
+          style: TextStyle(fontSize: 16),
         ),
         const SizedBox(height: 8),
         Text('remote: ${git.remoteName}', style: const TextStyle(fontSize: 16)),
@@ -828,7 +866,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: _actionInProgress || git.syncIntervalMinutes <= 5
                   ? null
                   : () => _saveGitSync(
-                      git.copyWith(syncIntervalMinutes: git.syncIntervalMinutes - 5)),
+                      _gitSyncFromControllers(git)
+                          .copyWith(syncIntervalMinutes: git.syncIntervalMinutes - 5)),
               icon: const Icon(Icons.remove_circle_outline),
             ),
             IconButton(
@@ -836,7 +875,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onPressed: _actionInProgress
                   ? null
                   : () => _saveGitSync(
-                      git.copyWith(syncIntervalMinutes: git.syncIntervalMinutes + 5)),
+                      _gitSyncFromControllers(git)
+                          .copyWith(syncIntervalMinutes: git.syncIntervalMinutes + 5)),
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],
@@ -846,14 +886,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           value: git.autoCommit,
           onChanged: _actionInProgress
               ? null
-              : (v) => _saveGitSync(git.copyWith(autoCommit: v)),
+              : (v) => _saveGitSync(_gitSyncFromControllers(git).copyWith(autoCommit: v)),
         ),
         SwitchListTile(
           title: const Text('자동 push (기본 OFF)', style: TextStyle(fontSize: 16)),
           value: git.autoPush,
           onChanged: _actionInProgress
               ? null
-              : (v) => _saveGitSync(git.copyWith(autoPush: v)),
+              : (v) => _saveGitSync(_gitSyncFromControllers(git).copyWith(autoPush: v)),
         ),
         SizedBox(
           height: 50,
@@ -861,12 +901,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: ElevatedButton(
             onPressed: _actionInProgress
                 ? null
-                : () => _saveGitSync(git.copyWith(
-                      repoUrl: _gitRepoController.text.trim(),
-                      branch: _gitBranchController.text.trim().isEmpty
-                          ? git.branch
-                          : _gitBranchController.text.trim(),
-                    )),
+                : () => _saveGitSync(_gitSyncFromControllers(git)),
             child: const Text('Git 설정 저장'),
           ),
         ),
