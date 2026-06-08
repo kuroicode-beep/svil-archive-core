@@ -126,6 +126,7 @@ class AppSettings {
   final TtsSettings tts;
   final bool mcpEnabled;
   final String ollamaEndpoint;
+  final String ollamaModel;
   final bool externalApiEnabled;
   final bool autoStartSidecar;
   final bool closeToTray;
@@ -140,6 +141,7 @@ class AppSettings {
     required this.tts,
     this.mcpEnabled = false,
     this.ollamaEndpoint = 'http://127.0.0.1:11434',
+    this.ollamaModel = '',
     this.externalApiEnabled = false,
     this.autoStartSidecar = false,
     this.closeToTray = true,
@@ -155,6 +157,7 @@ class AppSettings {
     TtsSettings? tts,
     bool? mcpEnabled,
     String? ollamaEndpoint,
+    String? ollamaModel,
     bool? externalApiEnabled,
     bool? autoStartSidecar,
     bool? closeToTray,
@@ -170,6 +173,7 @@ class AppSettings {
       tts: tts ?? this.tts,
       mcpEnabled: mcpEnabled ?? this.mcpEnabled,
       ollamaEndpoint: ollamaEndpoint ?? this.ollamaEndpoint,
+      ollamaModel: ollamaModel ?? this.ollamaModel,
       externalApiEnabled: externalApiEnabled ?? this.externalApiEnabled,
       autoStartSidecar: autoStartSidecar ?? this.autoStartSidecar,
       closeToTray: closeToTray ?? this.closeToTray,

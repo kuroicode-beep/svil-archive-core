@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../application/sac_theme_controller.dart';
@@ -32,6 +33,7 @@ import '../../domain/services/settings_service.dart';
 import '../../domain/services/sidecar_process_manager.dart';
 import '../../domain/services/windows_autostart_service.dart';
 import '../../application/sac_desktop_shell.dart';
+import '../../data/services/download_watcher_service_impl.dart';
 import '../../domain/services/workspace_integrity_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -56,6 +58,7 @@ class SettingsScreen extends StatefulWidget {
   final SacDesktopShell desktopShell;
   final Workspace? workspace;
   final void Function(String endpoint)? onOllamaEndpointChanged;
+  final Future<void> Function(DownloadWatcherSettings settings)? onDownloadsChanged;
 
   const SettingsScreen({
     super.key,
@@ -80,6 +83,7 @@ class SettingsScreen extends StatefulWidget {
     required this.desktopShell,
     this.workspace,
     this.onOllamaEndpointChanged,
+    this.onDownloadsChanged,
   });
 
   @override
@@ -100,7 +104,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   SidecarLifecycleSnapshot? _sidecarSnapshot;
   WindowsAutostartStatus? _autostartStatus;
   bool _loading = true;
+  bool _initialLoad = true;
   bool _actionInProgress = false;
+  List<LocalAiModel> _ollamaModels = [];
+  bool _ollamaModelsLoading = false;
+  String? _ollamaModelsNotice;
+  final _scrollController = ScrollController();
   final _ollamaController = TextEditingController();
   final _gitRepoController = TextEditingController();
   final _gitBranchController = TextEditingController();
@@ -113,15 +122,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _ollamaController.dispose();
     _gitRepoController.dispose();
     _gitBranchController.dispose();
     super.dispose();
   }
 
-  /// Settings 데이터를 다시 로드한다.
-  Future<void> _refresh() async {
-    setState(() => _loading = true);
+  /// Settings 데이터를 다시 로드한다 (토글 저장 시 전체 로딩 스피너 생략).
+  Future<void> _refresh({bool showFullLoading = false}) async {
+    if (showFullLoading || _initialLoad) {
+      if (mounted) setState(() => _loading = true);
+    }
     final settings = await widget.settingsService.getSettings();
     final localAi = await widget.localAiService.checkStatus();
     final mcp = await widget.mcpBridgeService.checkStatus();
@@ -154,7 +166,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _sidecarSnapshot = sidecarSnapshot;
       _autostartStatus = autostartStatus;
       _loading = false;
+      _initialLoad = false;
     });
+    await _loadOllamaModels();
+  }
+
+  /// Ollama tags API로 설치 모델 목록을 로드한다.
+  Future<void> _loadOllamaModels() async {
+    if (!mounted) return;
+    setState(() {
+      _ollamaModelsLoading = true;
+      _ollamaModelsNotice = null;
+    });
+    try {
+      final models = await widget.localAiService.listModels();
+      if (!mounted) return;
+      String? notice;
+      if (models.isEmpty) {
+        final state = _localAi?.state ?? LocalAiConnectionState.offline;
+        notice = state == LocalAiConnectionState.connected
+            ? '설치된 모델이 없습니다'
+            : 'Ollama 연결 실패 — endpoint를 확인하세요';
+      }
+      setState(() {
+        _ollamaModels = models;
+        _ollamaModelsLoading = false;
+        _ollamaModelsNotice = notice;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _ollamaModelsLoading = false;
+        _ollamaModelsNotice = 'Ollama 모델 목록 로딩 실패';
+      });
+    }
   }
 
   /// startup/sidecar 설정을 저장한다.
@@ -214,7 +259,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final current = _settings;
     if (current == null) return;
     await widget.settingsService.saveSettings(current.copyWith(downloads: downloads));
+    await widget.onDownloadsChanged?.call(downloads);
     await _refresh();
+  }
+
+  /// 감시 폴더 경로가 유효한지 검사한다.
+  Future<String?> _validateWatchFolder(String path) async {
+    final dir = Directory(path);
+    if (!await dir.exists()) {
+      return '폴더가 존재하지 않습니다: $path';
+    }
+    try {
+      await dir.list(followLinks: false).first;
+    } catch (e) {
+      return '폴더에 접근할 수 없습니다: $path';
+    }
+    return null;
+  }
+
+  /// 폴더 선택 다이얼로그로 감시 폴더를 변경한다.
+  Future<void> _pickDownloadFolder() async {
+    final current = _settings;
+    if (current == null) return;
+    final selected = await FilePicker.platform.getDirectoryPath();
+    if (selected == null) return;
+    final error = await _validateWatchFolder(selected);
+    if (!mounted) return;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      return;
+    }
+    await _saveDownloads(current.downloads.copyWith(folderPath: selected));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('감시 폴더가 저장되었습니다')),
+    );
+  }
+
+  /// 감시 폴더를 OS 기본 Downloads로 복원한다.
+  Future<void> _resetDownloadFolder() async {
+    final current = _settings;
+    if (current == null) return;
+    await _saveDownloads(current.downloads.copyWith(folderPath: ''));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('기본 다운로드 폴더로 복원되었습니다')),
+    );
+  }
+
+  /// 선택한 Ollama 모델을 저장한다.
+  Future<void> _saveOllamaModel(String model) async {
+    final current = _settings;
+    if (current == null || model.isEmpty) return;
+    await widget.settingsService.saveSettings(current.copyWith(ollamaModel: model));
+    await _refresh();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Ollama 모델 저장됨: $model')),
+    );
   }
 
   /// RC readiness를 재평가한다.
@@ -354,8 +456,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final workspace = widget.workspace;
 
     return RefreshIndicator(
-      onRefresh: _refresh,
+      onRefresh: () => _refresh(showFullLoading: true),
       child: SingleChildScrollView(
+        key: const PageStorageKey<String>('sac_settings_scroll'),
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -387,32 +491,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Text('최소 폰트 16px / 터치 타겟 50px 이상', style: TextStyle(fontSize: 16)),
               ],
             ),
-            _sectionCard(
-              title: 'Local AI',
-              children: [
-                Text('상태: ${localAi.label}', style: const TextStyle(fontSize: 16)),
-                Text('endpoint: ${localAi.endpoint ?? settings.ollamaEndpoint}', style: const TextStyle(fontSize: 16)),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _ollamaController,
-                  decoration: const InputDecoration(
-                    labelText: 'Ollama endpoint',
-                    border: OutlineInputBorder(),
-                  ),
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _saveOllamaEndpoint,
-                    child: const Text('endpoint 저장'),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text('외부 API: 기본 OFF (자동 호출 없음)', style: TextStyle(fontSize: 16)),
-              ],
-            ),
+            _localAiSection(settings, localAi),
             _sectionCard(
               title: 'MCP',
               children: [
@@ -795,9 +874,93 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// 다운로드 감시 설정 섹션 (Sprint 16).
+  /// Local AI / Ollama 설정 섹션 (Sprint 16H).
+  Widget _localAiSection(AppSettings settings, LocalAiStatus localAi) {
+    final selectedModel = settings.ollamaModel;
+    final modelNames = _ollamaModels.map((m) => m.name).toList();
+    final selectedMissing = selectedModel.isNotEmpty && !modelNames.contains(selectedModel);
+    return _sectionCard(
+      title: 'Local AI',
+      children: [
+        Text('연결 상태: ${localAi.label}', style: const TextStyle(fontSize: 16)),
+        Text('endpoint: ${localAi.endpoint ?? settings.ollamaEndpoint}',
+            style: const TextStyle(fontSize: 16)),
+        if (selectedModel.isNotEmpty)
+          Text('선택 모델: $selectedModel', style: const TextStyle(fontSize: 16)),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _ollamaController,
+          decoration: const InputDecoration(
+            labelText: 'Ollama endpoint',
+            border: OutlineInputBorder(),
+          ),
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _saveOllamaEndpoint,
+                  child: const Text('endpoint 저장'),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SizedBox(
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: _ollamaModelsLoading ? null : _loadOllamaModels,
+                  child: Text(_ollamaModelsLoading ? '로딩 중...' : '모델 목록 새로고침'),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (_ollamaModelsLoading)
+          const Text('모델 목록 로딩 중...', style: TextStyle(fontSize: 16))
+        else if (_ollamaModelsNotice != null)
+          Text(_ollamaModelsNotice!, style: const TextStyle(fontSize: 16, color: Colors.orange))
+        else if (modelNames.isEmpty)
+          const Text('표시할 모델이 없습니다', style: TextStyle(fontSize: 16))
+        else
+          DropdownButtonFormField<String>(
+            initialValue: selectedMissing ? null : (selectedModel.isEmpty ? null : selectedModel),
+            decoration: const InputDecoration(
+              labelText: 'Ollama 모델 선택',
+              border: OutlineInputBorder(),
+            ),
+            style: const TextStyle(fontSize: 16),
+            items: modelNames
+                .map((name) => DropdownMenuItem(value: name, child: Text(name)))
+                .toList(),
+            onChanged: _actionInProgress
+                ? null
+                : (value) {
+                    if (value != null) _saveOllamaModel(value);
+                  },
+          ),
+        if (selectedMissing)
+          Text(
+            '경고: 저장된 모델 "$selectedModel"이(가) 현재 목록에 없습니다',
+            style: const TextStyle(fontSize: 16, color: Colors.orange),
+          ),
+        const SizedBox(height: 4),
+        const Text('외부 API: 기본 OFF (자동 호출 없음)', style: TextStyle(fontSize: 16)),
+      ],
+    );
+  }
+
+  /// 다운로드 감시 설정 섹션 (Sprint 16 / 16H).
   Widget _downloadsSection(AppSettings settings) {
     final dl = settings.downloads;
+    final resolvedFolder = dl.folderPath.isEmpty
+        ? DownloadWatcherServiceImpl.resolveDefaultDownloadsFolder()
+        : dl.folderPath;
     return _sectionCard(
       title: '다운로드 감시',
       children: [
@@ -831,8 +994,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ? null
               : (v) => _saveDownloads(dl.copyWith(includeSubfolders: v)),
         ),
-        Text('감시 폴더: ${dl.folderPath.isEmpty ? "기본 Downloads" : dl.folderPath}',
-            style: const TextStyle(fontSize: 16)),
+        Text(
+          '현재 감시 폴더: $resolvedFolder${dl.folderPath.isEmpty ? " (기본)" : ""}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _actionInProgress ? null : _pickDownloadFolder,
+                  child: const Text('감시 폴더 변경'),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SizedBox(
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: _actionInProgress ? null : _resetDownloadFolder,
+                  child: const Text('기본 다운로드 폴더로 복원'),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
         Text('scan interval: ${dl.scanIntervalMinutes}분', style: const TextStyle(fontSize: 16)),
         Text('prefix: ${dl.prefixes.join(", ")}', style: const TextStyle(fontSize: 16)),
       ],

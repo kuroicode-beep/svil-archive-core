@@ -54,7 +54,10 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
   }
 
   /// OS 기본 다운로드 폴더를 추정한다.
-  String _defaultDownloadsFolder() {
+  String _defaultDownloadsFolder() => resolveDefaultDownloadsFolder();
+
+  /// OS 기본 다운로드 폴더 경로를 반환한다 (설정 UI·복원용).
+  static String resolveDefaultDownloadsFolder() {
     final env = Platform.environment;
     final home = env['USERPROFILE'] ?? env['HOME'] ?? Directory.current.path;
     return p.normalize(p.join(home, 'Downloads'));

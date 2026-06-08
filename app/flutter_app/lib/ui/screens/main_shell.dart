@@ -313,6 +313,7 @@ class _MainShellState extends State<MainShell> {
           settingsService: widget.container.settingsService,
           workspaceRoot: widget.container.activeWorkspace?.rootPath ?? '',
           onImportCompleted: _refreshDocuments,
+          onDownloadsChanged: widget.container.applyDownloadWatcherSettings,
         );
       case SacSection.integrity:
         return IntegrityScreen(
@@ -344,6 +345,7 @@ class _MainShellState extends State<MainShell> {
           desktopShell: widget.container.desktopShell,
           workspace: widget.container.activeWorkspace,
           onOllamaEndpointChanged: widget.container.updateOllamaEndpoint,
+          onDownloadsChanged: widget.container.applyDownloadWatcherSettings,
         );
     }
   }

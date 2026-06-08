@@ -676,13 +676,16 @@ class SacContainer {
     return workspace;
   }
 
-  /// 설정 변경 후 다운로드 감시 상태를 재적용한다.
+  /// 설정 변경 후 다운로드 감시 상태를 재적용한다 (폴더 변경 시 재시작).
   Future<void> applyDownloadWatcherSettings(DownloadWatcherSettings settings) async {
     final watcher = _downloadWatcherService;
     if (watcher == null) return;
-    if (settings.enabled && !watcher.isRunning) {
+    if (settings.enabled) {
+      if (watcher.isRunning) {
+        await watcher.stop();
+      }
       await watcher.start();
-    } else if (!settings.enabled && watcher.isRunning) {
+    } else if (watcher.isRunning) {
       await watcher.stop();
     }
   }

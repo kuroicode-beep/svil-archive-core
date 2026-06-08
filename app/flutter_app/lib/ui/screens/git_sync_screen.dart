@@ -1,8 +1,12 @@
 // git_sync_screen.dart — Git Sync + Download Watcher Import Queue UI (Sprint 16)
 
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/platform/path_adapter.dart';
+import '../../data/services/download_watcher_service_impl.dart';
 import '../../data/services/download_import_coordinator.dart';
 import '../../domain/models/git_sync.dart';
 import '../../domain/models/import_queue_item.dart';
@@ -20,6 +24,7 @@ class GitSyncScreen extends StatefulWidget {
   final SettingsService settingsService;
   final String workspaceRoot;
   final VoidCallback? onImportCompleted;
+  final Future<void> Function(DownloadWatcherSettings settings)? onDownloadsChanged;
 
   const GitSyncScreen({
     super.key,
@@ -30,6 +35,7 @@ class GitSyncScreen extends StatefulWidget {
     required this.settingsService,
     required this.workspaceRoot,
     this.onImportCompleted,
+    this.onDownloadsChanged,
   });
 
   @override
@@ -237,6 +243,8 @@ class _GitSyncScreenState extends State<GitSyncScreen> {
           const SizedBox(height: 16),
           _gitStatusCard(status),
           const SizedBox(height: 16),
+          _downloadFolderCard(),
+          const SizedBox(height: 16),
           _actionsCard(),
           const SizedBox(height: 16),
           _queueCard(),
@@ -279,6 +287,90 @@ class _GitSyncScreenState extends State<GitSyncScreen> {
                     ),
               ],
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 감시 폴더 경로가 유효한지 검사한다.
+  Future<String?> _validateWatchFolder(String path) async {
+    final dir = Directory(path);
+    if (!await dir.exists()) {
+      return '폴더가 존재하지 않습니다: $path';
+    }
+    try {
+      await dir.list(followLinks: false).first;
+    } catch (e) {
+      return '폴더에 접근할 수 없습니다: $path';
+    }
+    return null;
+  }
+
+  /// 감시 폴더 설정을 저장하고 watcher를 재적용한다.
+  Future<void> _saveDownloadSettings(DownloadWatcherSettings downloads) async {
+    final current = _settings;
+    if (current == null) return;
+    await widget.settingsService.saveSettings(current.copyWith(downloads: downloads));
+    await widget.onDownloadsChanged?.call(downloads);
+    await _refreshAll();
+  }
+
+  /// 폴더 선택으로 감시 폴더를 변경한다.
+  Future<void> _pickDownloadFolder() async {
+    final current = _settings;
+    if (current == null) return;
+    final selected = await FilePicker.platform.getDirectoryPath();
+    if (selected == null) return;
+    final error = await _validateWatchFolder(selected);
+    if (!mounted) return;
+    if (error != null) {
+      _appendLog(error);
+      return;
+    }
+    await _saveDownloadSettings(current.downloads.copyWith(folderPath: selected));
+    _appendLog('감시 폴더 저장: $selected');
+  }
+
+  /// 감시 폴더를 기본 Downloads로 복원한다.
+  Future<void> _resetDownloadFolder() async {
+    final current = _settings;
+    if (current == null) return;
+    await _saveDownloadSettings(current.downloads.copyWith(folderPath: ''));
+    _appendLog('감시 폴더를 기본 Downloads로 복원');
+  }
+
+  Widget _downloadFolderCard() {
+    final settings = _settings;
+    final dl = settings?.downloads;
+    final resolved = dl == null
+        ? DownloadWatcherServiceImpl.resolveDefaultDownloadsFolder()
+        : (dl.folderPath.isEmpty
+            ? DownloadWatcherServiceImpl.resolveDefaultDownloadsFolder()
+            : dl.folderPath);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('다운로드 감시 폴더',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 8),
+            Text('현재 감시 폴더: $resolved', style: const TextStyle(fontSize: 16)),
+            Text(
+              '실행 중: ${widget.downloadWatcherService.isRunning ? "ON" : "OFF"}',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _btn('감시 폴더 변경', _busy ? null : _pickDownloadFolder),
+                _btn('기본 폴더 복원', _busy ? null : _resetDownloadFolder),
+              ],
+            ),
           ],
         ),
       ),

@@ -24,6 +24,7 @@ class SettingsServiceImpl implements SettingsService {
       tts: const TtsSettings(),
       mcpEnabled: map['mcp_enabled'] == 'true',
       ollamaEndpoint: map['ollama_endpoint'] ?? 'http://127.0.0.1:11434',
+      ollamaModel: map['ollama_model'] ?? '',
       externalApiEnabled: map['external_api_enabled'] == 'true',
       autoStartSidecar: map['auto_start_sidecar'] == 'true',
       closeToTray: map['close_to_tray'] != 'false',
@@ -98,6 +99,7 @@ class SettingsServiceImpl implements SettingsService {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    await _persistKey('ollama_model', settings.ollamaModel, now);
     await _db.insert(
       'app_settings',
       {
