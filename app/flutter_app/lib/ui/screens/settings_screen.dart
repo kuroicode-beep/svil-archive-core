@@ -1,5 +1,7 @@
 // settings_screen.dart — RC 기준 Settings 화면 (Sprint 11)
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import '../../application/sac_theme_controller.dart';
@@ -25,7 +27,11 @@ import '../../domain/services/release_finalization_export_service.dart';
 import '../../domain/services/release_readiness_service.dart';
 import '../../domain/services/smoke_approval_service.dart';
 import '../../domain/services/verification_pass_record_service.dart';
+import '../../domain/models/sidecar_lifecycle.dart';
 import '../../domain/services/settings_service.dart';
+import '../../domain/services/sidecar_process_manager.dart';
+import '../../domain/services/windows_autostart_service.dart';
+import '../../application/sac_desktop_shell.dart';
 import '../../domain/services/workspace_integrity_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -45,6 +51,9 @@ class SettingsScreen extends StatefulWidget {
   final RcBuildArtifactService rcBuildArtifactService;
   final RcTagReadinessService rcTagReadinessService;
   final FinalReleaseBundleExportService finalReleaseBundleExportService;
+  final SidecarProcessManager sidecarProcessManager;
+  final WindowsAutostartService windowsAutostartService;
+  final SacDesktopShell desktopShell;
   final Workspace? workspace;
   final void Function(String endpoint)? onOllamaEndpointChanged;
 
@@ -66,6 +75,9 @@ class SettingsScreen extends StatefulWidget {
     required this.rcBuildArtifactService,
     required this.rcTagReadinessService,
     required this.finalReleaseBundleExportService,
+    required this.sidecarProcessManager,
+    required this.windowsAutostartService,
+    required this.desktopShell,
     this.workspace,
     this.onOllamaEndpointChanged,
   });
@@ -85,6 +97,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   List<RcBuildArtifact> _artifacts = [];
   int _enabledToolCount = 0;
   int _disabledToolCount = 0;
+  SidecarLifecycleSnapshot? _sidecarSnapshot;
+  WindowsAutostartStatus? _autostartStatus;
   bool _loading = true;
   bool _actionInProgress = false;
   final _ollamaController = TextEditingController();
@@ -114,6 +128,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final artifacts = await widget.rcBuildArtifactService.listBuildArtifacts(limit: 5);
     final tools = await widget.toolRegistryService.listTools();
     final enabled = tools.where((t) => t.enabled).length;
+    final sidecarSnapshot = await widget.sidecarProcessManager.refresh();
+    final autostartStatus = await widget.windowsAutostartService.getStatus(
+      registeredExePath: settings.registeredAutostartExePath,
+    );
     if (!mounted) return;
     _ollamaController.text = settings.ollamaEndpoint;
     setState(() {
@@ -127,8 +145,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _artifacts = artifacts;
       _enabledToolCount = enabled;
       _disabledToolCount = tools.length - enabled;
+      _sidecarSnapshot = sidecarSnapshot;
+      _autostartStatus = autostartStatus;
       _loading = false;
     });
+  }
+
+  /// startup/sidecar 설정을 저장한다.
+  Future<void> _saveStartupSettings(AppSettings settings) async {
+    await widget.settingsService.saveSettings(settings);
+    await _refresh();
+  }
+
+  /// Windows autostart를 토글한다.
+  Future<void> _toggleStartWithWindows(bool enabled) async {
+    final settings = _settings;
+    if (settings == null) return;
+    setState(() => _actionInProgress = true);
+    try {
+      if (enabled) {
+        final exe = Platform.resolvedExecutable;
+        await widget.windowsAutostartService.enable(exePath: exe);
+        await _saveStartupSettings(
+          settings.copyWith(startWithWindows: true, registeredAutostartExePath: exe),
+        );
+      } else {
+        await widget.windowsAutostartService.disable();
+        await _saveStartupSettings(
+          settings.copyWith(startWithWindows: false, clearRegisteredAutostartExePath: true),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _actionInProgress = false);
+    }
   }
 
   /// Ollama endpoint를 저장한다.
@@ -350,6 +399,99 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Text('remote exposure: ${mcp.remoteExposureEnabled}', style: const TextStyle(fontSize: 16)),
                 Text('enabled tools: $_enabledToolCount / disabled: $_disabledToolCount', style: const TextStyle(fontSize: 16)),
                 Text('MCP enabled setting: ${settings.mcpEnabled}', style: const TextStyle(fontSize: 16)),
+              ],
+            ),
+            _sectionCard(
+              title: 'MCP / Startup',
+              children: [
+                if (_sidecarSnapshot != null) ...[
+                  Text(
+                    sidecarLifecycleStatusLabel(_sidecarSnapshot!.status),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'packaged path: ${_sidecarSnapshot!.maskedSidecarPath ?? 'n/a'}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  if (_sidecarSnapshot!.lastStartError != null)
+                    Text(
+                      'last error: ${_sidecarSnapshot!.lastStartError}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                ],
+                SwitchListTile(
+                  title: const Text('시작 시 MCP sidecar 자동 시작', style: TextStyle(fontSize: 16)),
+                  value: settings.autoStartSidecar,
+                  onChanged: _actionInProgress
+                      ? null
+                      : (value) => _saveStartupSettings(settings.copyWith(autoStartSidecar: value)),
+                ),
+                SwitchListTile(
+                  title: const Text('창 닫을 때 트레이에 유지', style: TextStyle(fontSize: 16)),
+                  value: settings.closeToTray,
+                  onChanged: _actionInProgress
+                      ? null
+                      : (value) => _saveStartupSettings(settings.copyWith(closeToTray: value)),
+                ),
+                if (Platform.isWindows)
+                  SwitchListTile(
+                    title: const Text('Windows 시작 시 SAC 자동 실행', style: TextStyle(fontSize: 16)),
+                    value: settings.startWithWindows,
+                    onChanged: _actionInProgress ? null : _toggleStartWithWindows,
+                  ),
+                if (_autostartStatus?.pathMismatch == true)
+                  const Text(
+                    'autostart 경로 불일치 — Settings에서 다시 등록하세요',
+                    style: TextStyle(fontSize: 16, color: Colors.orange),
+                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _actionInProgress
+                              ? null
+                              : () async {
+                                  setState(() => _actionInProgress = true);
+                                  await widget.sidecarProcessManager.restart();
+                                  await _refresh();
+                                  if (mounted) setState(() => _actionInProgress = false);
+                                },
+                          child: const Text('sidecar 재시작'),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: OutlinedButton(
+                          onPressed: _actionInProgress
+                              ? null
+                              : () async {
+                                  setState(() => _actionInProgress = true);
+                                  await widget.sidecarProcessManager.stop();
+                                  await _refresh();
+                                  if (mounted) setState(() => _actionInProgress = false);
+                                },
+                          child: const Text('sidecar 중지'),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _actionInProgress
+                        ? null
+                        : () => widget.desktopShell.quitCompletely(),
+                    child: const Text('SAC 완전 종료'),
+                  ),
+                ),
               ],
             ),
             _sectionCard(

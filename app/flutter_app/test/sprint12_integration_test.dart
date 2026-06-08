@@ -46,7 +46,7 @@ void main() {
     await container.bindWorkspace(workspace);
   }
 
-  Future<void> recordVerificationSet({int testCount = 175}) async {
+  Future<void> recordVerificationSet({int testCount = 183}) async {
     final svc = container.verificationPassRecordService;
     const sprintCommit = '2e2e4da';
     await svc.recordPass(

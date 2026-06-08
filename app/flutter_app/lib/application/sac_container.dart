@@ -39,6 +39,8 @@ import '../data/services/workspace_file_inventory_service_impl.dart';
 import '../data/services/workspace_integrity_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
+import '../data/services/sidecar_process_manager_impl.dart';
+import '../data/services/windows_autostart_service_impl.dart';
 import '../data/services/theme_service_impl.dart';
 import '../data/services/trash_service_impl.dart';
 import '../data/services/workspace_registry.dart';
@@ -78,8 +80,11 @@ import '../domain/services/work_queue_service.dart';
 import '../domain/services/workspace_file_inventory_service.dart';
 import '../domain/services/workspace_integrity_service.dart';
 import '../domain/services/search_service.dart';
+import '../domain/services/sidecar_process_manager.dart';
 import '../domain/services/sync_service.dart';
 import '../domain/services/trash_service.dart';
+import '../domain/services/windows_autostart_service.dart';
+import 'sac_desktop_shell.dart';
 
 class SacContainer {
   final DatabaseServiceImpl databaseService;
@@ -87,6 +92,9 @@ class SacContainer {
   final SettingsServiceImpl settingsService;
   final ThemeServiceImpl themeService;
   final SacThemeController themeController;
+  final SidecarProcessManager sidecarProcessManager;
+  final WindowsAutostartService windowsAutostartService;
+  final SacDesktopShell desktopShell;
 
   ArchiveService? _archiveService;
   SearchService? _searchService;
@@ -133,6 +141,9 @@ class SacContainer {
     required this.settingsService,
     required this.themeService,
     required this.themeController,
+    required this.sidecarProcessManager,
+    required this.windowsAutostartService,
+    required this.desktopShell,
     String? reportDocsRoot,
   }) : _reportDocsRoot = reportDocsRoot;
 
@@ -144,15 +155,26 @@ class SacContainer {
     final databaseService = DatabaseServiceImpl();
     final themeService = ThemeServiceImpl(databaseService: databaseService);
     final themeController = SacThemeController(themeService);
+    final settingsService = SettingsServiceImpl(databaseService: databaseService);
+    final sidecarProcessManager = SidecarProcessManagerImpl(settingsService: settingsService);
+    final windowsAutostartService = WindowsAutostartServiceImpl();
+    final desktopShell = SacDesktopShell(
+      settingsService: settingsService,
+      sidecarProcessManager: sidecarProcessManager,
+      windowsAutostartService: windowsAutostartService,
+    );
     return SacContainer._(
       databaseService: databaseService,
       workspaceService: WorkspaceServiceImpl(
         databaseService: databaseService,
         registry: WorkspaceRegistry(overrideDirectory: registryDirectory),
       ),
-      settingsService: SettingsServiceImpl(databaseService: databaseService),
+      settingsService: settingsService,
       themeService: themeService,
       themeController: themeController,
+      sidecarProcessManager: sidecarProcessManager,
+      windowsAutostartService: windowsAutostartService,
+      desktopShell: desktopShell,
       reportDocsRoot: reportDocsRoot ?? resolveReportDocsRoot(),
     );
   }
@@ -594,6 +616,7 @@ class SacContainer {
   /// 테스트 tearDown에서 file watcher와 DB를 순서대로 정리한다.
   Future<void> disposeForTest() async {
     await _fileWatcher?.stop();
+    await sidecarProcessManager.dispose();
     _syncService = null;
     _repository = null;
     await databaseService.close();

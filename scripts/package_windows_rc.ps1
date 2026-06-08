@@ -101,9 +101,14 @@ Platform: Windows x64
 - 문제가 있으면 Settings > MCP / Tool Permissions에서 상태를 확인합니다.
 - 포터블 폴더 전체를 이동할 때는 mcp/sidecar 폴더도 함께 유지해야 합니다.
 - sidecar 실행에는 Node.js 18+ 가 필요할 수 있습니다.
+- SAC는 트레이 상주를 지원합니다. 창 닫기는 tray로 숨김일 수 있습니다.
+- 완전 종료는 tray menu 또는 Settings 종료 버튼에서 수행합니다.
+- Windows 시작 시 자동 실행은 기본 OFF이며 사용자가 직접 켜야 합니다.
+- MCP sidecar 자동 시작은 별도 옵션입니다.
 
 ## 참고
 - 코드 서명 / MSI 인스톨러는 RC 범위 외입니다. ZIP/폴더 배포입니다.
+- sidecar lifecycle은 앱이 관리합니다.
 - 외부 API / remote MCP는 기본 비활성입니다.
 
 ## 제거
@@ -126,13 +131,38 @@ $manifest = [ordered]@{
     mcp_sidecar_node_modules_included = $nodeModulesIncluded
     external_api_enabled = $false
     remote_mcp_enabled = $false
+    sidecar_process_managed_by_app = $true
+    tray_resident_supported = $true
+    windows_autostart_supported = $true
 }
 $manifestJson = $manifest | ConvertTo-Json -Depth 4
 Set-Content -Path (Join-Path $dest "BUILD_MANIFEST.json") -Value $manifestJson -Encoding UTF8
 
 $zipPath = Join-Path $binRoot "$pkgName.zip"
 if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
-Compress-Archive -Path $dest -DestinationPath $zipPath -CompressionLevel Optimal
+
+# npm ci 직후 node_modules 잠금으로 Compress-Archive가 실패할 수 있어 retry 한다.
+function Invoke-PortableZipArchive {
+    param(
+        [string]$SourcePath,
+        [string]$DestinationPath,
+        [int]$MaxAttempts = 5,
+        [int]$DelaySeconds = 3
+    )
+    for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
+        try {
+            if (Test-Path $DestinationPath) { Remove-Item -Force $DestinationPath }
+            Compress-Archive -Path $SourcePath -DestinationPath $DestinationPath -CompressionLevel Optimal
+            return
+        } catch {
+            if ($attempt -eq $MaxAttempts) { throw }
+            Write-Host "Compress-Archive attempt $attempt failed (file lock?). Retrying in ${DelaySeconds}s..."
+            Start-Sleep -Seconds $DelaySeconds
+        }
+    }
+}
+
+Invoke-PortableZipArchive -SourcePath $dest -DestinationPath $zipPath
 $zipSizeMb = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
 
 Write-Host "==> Package ready"

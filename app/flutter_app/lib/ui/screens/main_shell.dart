@@ -321,6 +321,9 @@ class _MainShellState extends State<MainShell> {
           rcBuildArtifactService: widget.container.rcBuildArtifactService,
           rcTagReadinessService: widget.container.rcTagReadinessService,
           finalReleaseBundleExportService: widget.container.finalReleaseBundleExportService,
+          sidecarProcessManager: widget.container.sidecarProcessManager,
+          windowsAutostartService: widget.container.windowsAutostartService,
+          desktopShell: widget.container.desktopShell,
           workspace: widget.container.activeWorkspace,
           onOllamaEndpointChanged: widget.container.updateOllamaEndpoint,
         );

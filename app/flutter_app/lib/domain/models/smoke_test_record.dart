@@ -38,6 +38,9 @@ const List<String> kDefaultWindowsSmokeChecklist = [
   'Ollama 미실행 상태 offline 표시',
   '고대비 / 다크모드 가독성',
   '주요 버튼 50px 이상',
+  'MCP sidecar 자동 시작 옵션',
+  '트레이 상주 / 창 닫기 동작',
+  'Windows 시작 시 자동 실행 옵션',
 ];
 
 /// macOS smoke checklist 기본 항목.

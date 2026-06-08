@@ -47,6 +47,10 @@ class AppSettings {
   final bool mcpEnabled;
   final String ollamaEndpoint;
   final bool externalApiEnabled;
+  final bool autoStartSidecar;
+  final bool closeToTray;
+  final bool startWithWindows;
+  final String? registeredAutostartExePath;
 
   const AppSettings({
     required this.workspaceId,
@@ -55,6 +59,10 @@ class AppSettings {
     this.mcpEnabled = false,
     this.ollamaEndpoint = 'http://127.0.0.1:11434',
     this.externalApiEnabled = false,
+    this.autoStartSidecar = false,
+    this.closeToTray = true,
+    this.startWithWindows = false,
+    this.registeredAutostartExePath,
   });
 
   AppSettings copyWith({
@@ -64,6 +72,11 @@ class AppSettings {
     bool? mcpEnabled,
     String? ollamaEndpoint,
     bool? externalApiEnabled,
+    bool? autoStartSidecar,
+    bool? closeToTray,
+    bool? startWithWindows,
+    String? registeredAutostartExePath,
+    bool clearRegisteredAutostartExePath = false,
   }) {
     return AppSettings(
       workspaceId: workspaceId ?? this.workspaceId,
@@ -72,6 +85,12 @@ class AppSettings {
       mcpEnabled: mcpEnabled ?? this.mcpEnabled,
       ollamaEndpoint: ollamaEndpoint ?? this.ollamaEndpoint,
       externalApiEnabled: externalApiEnabled ?? this.externalApiEnabled,
+      autoStartSidecar: autoStartSidecar ?? this.autoStartSidecar,
+      closeToTray: closeToTray ?? this.closeToTray,
+      startWithWindows: startWithWindows ?? this.startWithWindows,
+      registeredAutostartExePath: clearRegisteredAutostartExePath
+          ? null
+          : (registeredAutostartExePath ?? this.registeredAutostartExePath),
     );
   }
 }

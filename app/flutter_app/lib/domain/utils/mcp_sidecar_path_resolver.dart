@@ -118,6 +118,15 @@ bool validatePortableBuildManifest(Map<String, dynamic> manifest) {
   return true;
 }
 
+/// Sprint 13 portable manifest 플래그를 검증한다.
+bool validatePortableBuildManifestSprint13(Map<String, dynamic> manifest) {
+  if (!validatePortableBuildManifest(manifest)) return false;
+  if (manifest['sidecar_process_managed_by_app'] != true) return false;
+  if (manifest['tray_resident_supported'] != true) return false;
+  if (manifest['windows_autostart_supported'] != true) return false;
+  return true;
+}
+
 /// dist/index.js 존재 여부를 확인한다.
 bool _distIndexExists(String distPath) {
   return File(p.join(distPath, 'index.js')).existsSync();
