@@ -100,9 +100,10 @@ Codex — 테스트 / 검증 / QA
 ```text
 Sprint 09: Integrity / Recovery / Smoke — Codex 최종 PASS (cd684a2)
 Sprint 10: RC / Smoke / Packaging — Codex Sprint 10B PASS (HEAD 9c47b7e)
-Sprint 11: RC Finalization — 구현 완료 (`2833494`), manifest 동기화·자체 검증 PASS, Codex 검증 대기
-작업지시문: https://app.notion.com/p/379864048e54818bbf46fd13a22a420e
-핸드오프: docs/handoff/Cursor_Handoff_Sprint_11.md
+Sprint 11: RC Finalization — Codex PASS (`5e02b31` HEAD)
+Sprint 12: RC Build Approval — 구현 완료 (미커밋), Notion 차단으로 로컬 WI/핸드오프
+작업지시문: 채팅 WI (2026.06.08, 루미) / Notion 복구 후 동기화
+핸드오프: docs/handoff/Cursor_Handoff_Sprint_12.md
 공식 프로토콜: Notion
 ```
 

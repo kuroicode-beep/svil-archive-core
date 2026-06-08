@@ -1,6 +1,7 @@
 // dashboard.dart — 대시보드 / 개인정보 / 로컬 AI 요약 모델
 
 import 'integrity_scan.dart';
+import 'rc_build_approval.dart';
 import 'rc_finalization.dart';
 import 'release_readiness.dart';
 import 'smoke_test_record.dart';
@@ -80,6 +81,7 @@ class DashboardSummary {
   final SmokeTestStatus? windowsSmokeStatus;
   final ReleaseReadinessSummary releaseReadiness;
   final RcFinalizationSummary rcFinalization;
+  final RcFinalStatusSummary rcFinalStatus;
 
   const DashboardSummary({
     required this.aiCollaboration,
@@ -102,6 +104,7 @@ class DashboardSummary {
     this.windowsSmokeStatus,
     required this.releaseReadiness,
     required this.rcFinalization,
+    required this.rcFinalStatus,
   });
 }
 

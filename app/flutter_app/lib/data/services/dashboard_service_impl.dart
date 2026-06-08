@@ -10,9 +10,15 @@ import '../../domain/services/dashboard_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/models/rc_build_approval.dart';
 import '../../domain/models/rc_finalization.dart';
+import '../../domain/services/final_release_bundle_export_service.dart';
+import '../../domain/services/rc_build_artifact_service.dart';
+import '../../domain/services/rc_tag_readiness_service.dart';
+import '../../domain/services/release_approval_service.dart';
 import '../../domain/services/release_finalization_export_service.dart';
 import '../../domain/services/release_readiness_service.dart';
+import 'report_consistency_service_impl.dart';
 import '../../domain/services/report_consistency_service.dart';
 import '../../domain/services/smoke_test_record_service.dart';
 import '../../domain/services/work_queue_service.dart';
@@ -30,6 +36,10 @@ class DashboardServiceImpl implements DashboardService {
   final SmokeTestRecordService _smokeTestRecordService;
   final ReleaseReadinessService _releaseReadinessService;
   final ReleaseFinalizationExportService _releaseFinalizationExportService;
+  final ReleaseApprovalService _releaseApprovalService;
+  final RcBuildArtifactService _rcBuildArtifactService;
+  final RcTagReadinessService _rcTagReadinessService;
+  final FinalReleaseBundleExportService _finalReleaseBundleExportService;
 
   DashboardServiceImpl({
     required DatabaseServiceImpl databaseService,
@@ -42,6 +52,10 @@ class DashboardServiceImpl implements DashboardService {
     required SmokeTestRecordService smokeTestRecordService,
     required ReleaseReadinessService releaseReadinessService,
     required ReleaseFinalizationExportService releaseFinalizationExportService,
+    required ReleaseApprovalService releaseApprovalService,
+    required RcBuildArtifactService rcBuildArtifactService,
+    required RcTagReadinessService rcTagReadinessService,
+    required FinalReleaseBundleExportService finalReleaseBundleExportService,
   })  : _databaseService = databaseService,
         _workQueueService = workQueueService,
         _mcpBridgeService = mcpBridgeService,
@@ -51,7 +65,11 @@ class DashboardServiceImpl implements DashboardService {
         _reportConsistencyService = reportConsistencyService,
         _smokeTestRecordService = smokeTestRecordService,
         _releaseReadinessService = releaseReadinessService,
-        _releaseFinalizationExportService = releaseFinalizationExportService;
+        _releaseFinalizationExportService = releaseFinalizationExportService,
+        _releaseApprovalService = releaseApprovalService,
+        _rcBuildArtifactService = rcBuildArtifactService,
+        _rcTagReadinessService = rcTagReadinessService,
+        _finalReleaseBundleExportService = finalReleaseBundleExportService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -90,6 +108,20 @@ class DashboardServiceImpl implements DashboardService {
       macSmokeStatus: macSmoke?.status,
       windowsSmokeStatus: winSmoke?.status,
     );
+    final approval = await _releaseApprovalService.evaluateAndPersist();
+    final artifacts = await _rcBuildArtifactService.listBuildArtifacts(limit: 100);
+    final tagReadiness = await _rcTagReadinessService.getLatestSummary();
+    final bundleGenerated = await _finalReleaseBundleExportService.hasFinalBundleExport();
+    final rcFinalStatus = RcFinalStatusSummary(
+      approvalStatus: approval.status,
+      approvalLabel: approval.statusLabel,
+      buildArtifactCount: artifacts.length,
+      tagReadinessReady: tagReadiness?.allPassed ?? false,
+      finalBundleGenerated: bundleGenerated,
+      macSmokeStatus: macSmoke?.status,
+      windowsSmokeStatus: winSmoke?.status,
+      rcCommitHash: kRcVerificationSprintCommit,
+    );
 
     return DashboardSummary(
       aiCollaboration: _buildAiCollaborationSummary(critical, queueSummary),
@@ -112,6 +144,7 @@ class DashboardServiceImpl implements DashboardService {
       windowsSmokeStatus: winSmoke?.status,
       releaseReadiness: releaseReadiness,
       rcFinalization: rcFinalization,
+      rcFinalStatus: rcFinalStatus,
     );
   }
 
@@ -125,7 +158,7 @@ class DashboardServiceImpl implements DashboardService {
       handoffPending: critical.pendingExtractionCount > 0 || queueSummary.pendingCount > 0 ? 1 : 0,
       verificationNeeded: queueSummary.conflictCount > 0 ? 1 : 0,
       criticalIssues: critical.hasCritical || queueSummary.blockedCount > 0 ? 1 : 0,
-      lastCompletedSprint: 'Sprint 11 RC Finalization',
+      lastCompletedSprint: 'Sprint 12 RC Build Approval',
     );
   }
 

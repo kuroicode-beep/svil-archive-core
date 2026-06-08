@@ -316,6 +316,11 @@ class _MainShellState extends State<MainShell> {
           releaseChecklistExportService: widget.container.releaseChecklistExportService,
           verificationPassRecordService: widget.container.verificationPassRecordService,
           releaseFinalizationExportService: widget.container.releaseFinalizationExportService,
+          releaseApprovalService: widget.container.releaseApprovalService,
+          smokeApprovalService: widget.container.smokeApprovalService,
+          rcBuildArtifactService: widget.container.rcBuildArtifactService,
+          rcTagReadinessService: widget.container.rcTagReadinessService,
+          finalReleaseBundleExportService: widget.container.finalReleaseBundleExportService,
           workspace: widget.container.activeWorkspace,
           onOllamaEndpointChanged: widget.container.updateOllamaEndpoint,
         );

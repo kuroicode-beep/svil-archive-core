@@ -22,8 +22,13 @@ import '../data/services/privacy_service_impl.dart';
 import '../data/services/build_environment_check_service_impl.dart';
 import '../data/services/execution_recovery_service_impl.dart';
 import '../data/services/release_checklist_export_service_impl.dart';
+import '../data/services/final_release_bundle_export_service_impl.dart';
+import '../data/services/rc_build_artifact_service_impl.dart';
+import '../data/services/rc_tag_readiness_service_impl.dart';
+import '../data/services/release_approval_service_impl.dart';
 import '../data/services/release_finalization_export_service_impl.dart';
 import '../data/services/release_readiness_service_impl.dart';
+import '../data/services/smoke_approval_service_impl.dart';
 import '../data/services/verification_pass_record_service_impl.dart';
 import '../data/services/queue_execution_service_impl.dart';
 import '../data/services/report_consistency_service_impl.dart';
@@ -58,8 +63,13 @@ import '../domain/services/privacy_service.dart';
 import '../domain/services/build_environment_check_service.dart';
 import '../domain/services/execution_recovery_service.dart';
 import '../domain/services/release_checklist_export_service.dart';
+import '../domain/services/final_release_bundle_export_service.dart';
+import '../domain/services/rc_build_artifact_service.dart';
+import '../domain/services/rc_tag_readiness_service.dart';
+import '../domain/services/release_approval_service.dart';
 import '../domain/services/release_finalization_export_service.dart';
 import '../domain/services/release_readiness_service.dart';
+import '../domain/services/smoke_approval_service.dart';
 import '../domain/services/verification_pass_record_service.dart';
 import '../domain/services/queue_execution_service.dart';
 import '../domain/services/report_consistency_service.dart';
@@ -102,6 +112,11 @@ class SacContainer {
   ReleaseChecklistExportService? _releaseChecklistExportService;
   VerificationPassRecordService? _verificationPassRecordService;
   ReleaseFinalizationExportService? _releaseFinalizationExportService;
+  RcBuildArtifactService? _rcBuildArtifactService;
+  SmokeApprovalService? _smokeApprovalService;
+  ReleaseApprovalService? _releaseApprovalService;
+  RcTagReadinessService? _rcTagReadinessService;
+  FinalReleaseBundleExportService? _finalReleaseBundleExportService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -307,6 +322,36 @@ class SacContainer {
     return service;
   }
 
+  RcBuildArtifactService get rcBuildArtifactService {
+    final service = _rcBuildArtifactService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  SmokeApprovalService get smokeApprovalService {
+    final service = _smokeApprovalService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ReleaseApprovalService get releaseApprovalService {
+    final service = _releaseApprovalService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  RcTagReadinessService get rcTagReadinessService {
+    final service = _rcTagReadinessService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  FinalReleaseBundleExportService get finalReleaseBundleExportService {
+    final service = _finalReleaseBundleExportService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -448,6 +493,37 @@ class SacContainer {
       verificationPassRecordService: _verificationPassRecordService!,
       smokeTestRecordService: _smokeTestRecordService!,
     );
+    _rcBuildArtifactService = RcBuildArtifactServiceImpl(databaseService: databaseService);
+    _smokeApprovalService = SmokeApprovalServiceImpl(
+      smokeTestRecordService: _smokeTestRecordService!,
+    );
+    _releaseApprovalService = ReleaseApprovalServiceImpl(
+      databaseService: databaseService,
+      releaseReadinessService: _releaseReadinessService!,
+      exportService: _releaseFinalizationExportService!,
+      verificationService: _verificationPassRecordService!,
+      smokeApprovalService: _smokeApprovalService!,
+      integrityService: _workspaceIntegrityService!,
+    );
+    _rcTagReadinessService = RcTagReadinessServiceImpl(
+      databaseService: databaseService,
+      releaseReadinessService: _releaseReadinessService!,
+      verificationService: _verificationPassRecordService!,
+      exportService: _releaseFinalizationExportService!,
+      smokeApprovalService: _smokeApprovalService!,
+      releaseApprovalService: _releaseApprovalService!,
+    );
+    _finalReleaseBundleExportService = FinalReleaseBundleExportServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+      releaseReadinessService: _releaseReadinessService!,
+      releaseApprovalService: _releaseApprovalService!,
+      smokeApprovalService: _smokeApprovalService!,
+      buildArtifactService: _rcBuildArtifactService!,
+      tagReadinessService: _rcTagReadinessService!,
+      finalizationExportService: _releaseFinalizationExportService!,
+      verificationService: _verificationPassRecordService!,
+    );
     _releaseChecklistExportService = ReleaseChecklistExportServiceImpl(
       databaseService: databaseService,
       workspaceRoot: workspace.rootPath,
@@ -466,6 +542,10 @@ class SacContainer {
       smokeTestRecordService: _smokeTestRecordService!,
       releaseReadinessService: _releaseReadinessService!,
       releaseFinalizationExportService: _releaseFinalizationExportService!,
+      releaseApprovalService: _releaseApprovalService!,
+      rcBuildArtifactService: _rcBuildArtifactService!,
+      rcTagReadinessService: _rcTagReadinessService!,
+      finalReleaseBundleExportService: _finalReleaseBundleExportService!,
     );
     _privacyService = PrivacyServiceImpl(
       databaseService: databaseService,

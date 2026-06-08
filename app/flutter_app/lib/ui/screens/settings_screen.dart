@@ -15,8 +15,15 @@ import '../../domain/services/local_ai_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/release_checklist_export_service.dart';
+import '../../data/services/report_consistency_service_impl.dart';
+import '../../domain/models/rc_build_approval.dart';
+import '../../domain/services/final_release_bundle_export_service.dart';
+import '../../domain/services/rc_build_artifact_service.dart';
+import '../../domain/services/rc_tag_readiness_service.dart';
+import '../../domain/services/release_approval_service.dart';
 import '../../domain/services/release_finalization_export_service.dart';
 import '../../domain/services/release_readiness_service.dart';
+import '../../domain/services/smoke_approval_service.dart';
 import '../../domain/services/verification_pass_record_service.dart';
 import '../../domain/services/settings_service.dart';
 import '../../domain/services/workspace_integrity_service.dart';
@@ -33,6 +40,11 @@ class SettingsScreen extends StatefulWidget {
   final ReleaseChecklistExportService releaseChecklistExportService;
   final VerificationPassRecordService verificationPassRecordService;
   final ReleaseFinalizationExportService releaseFinalizationExportService;
+  final ReleaseApprovalService releaseApprovalService;
+  final SmokeApprovalService smokeApprovalService;
+  final RcBuildArtifactService rcBuildArtifactService;
+  final RcTagReadinessService rcTagReadinessService;
+  final FinalReleaseBundleExportService finalReleaseBundleExportService;
   final Workspace? workspace;
   final void Function(String endpoint)? onOllamaEndpointChanged;
 
@@ -49,6 +61,11 @@ class SettingsScreen extends StatefulWidget {
     required this.releaseChecklistExportService,
     required this.verificationPassRecordService,
     required this.releaseFinalizationExportService,
+    required this.releaseApprovalService,
+    required this.smokeApprovalService,
+    required this.rcBuildArtifactService,
+    required this.rcTagReadinessService,
+    required this.finalReleaseBundleExportService,
     this.workspace,
     this.onOllamaEndpointChanged,
   });
@@ -63,6 +80,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   McpBridgeStatus? _mcpStatus;
   IntegritySummary? _integrity;
   ReleaseReadinessSummary? _readiness;
+  ReleaseApprovalSummary? _approval;
+  SmokeApprovalSummary? _smokeApproval;
+  List<RcBuildArtifact> _artifacts = [];
   int _enabledToolCount = 0;
   int _disabledToolCount = 0;
   bool _loading = true;
@@ -89,6 +109,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final mcp = await widget.mcpBridgeService.checkStatus();
     final integrity = await widget.integrityService.getLatestSummary();
     final readiness = await widget.releaseReadinessService.getLatestSummary();
+    final approval = await widget.releaseApprovalService.getLatestSummary();
+    final smokeApproval = await widget.smokeApprovalService.getSmokeApprovalSummary();
+    final artifacts = await widget.rcBuildArtifactService.listBuildArtifacts(limit: 5);
     final tools = await widget.toolRegistryService.listTools();
     final enabled = tools.where((t) => t.enabled).length;
     if (!mounted) return;
@@ -99,6 +122,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _mcpStatus = mcp;
       _integrity = integrity;
       _readiness = readiness;
+      _approval = approval;
+      _smokeApproval = smokeApproval;
+      _artifacts = artifacts;
       _enabledToolCount = enabled;
       _disabledToolCount = tools.length - enabled;
       _loading = false;
@@ -151,6 +177,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(content: Text('빌드 환경 점검 ${checks.length}항목 완료')),
       );
       await _evaluateReadiness();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = false);
+    }
+  }
+
+  /// RC tag readiness 체크를 실행한다.
+  Future<void> _runTagReadiness() async {
+    if (_actionInProgress) return;
+    setState(() => _actionInProgress = true);
+    try {
+      final summary = await widget.rcTagReadinessService.runRcTagReadinessChecks();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tag readiness ${summary.items.where((i) => i.passed).length}/${summary.items.length} pass')),
+      );
+      await _refresh();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = false);
+    }
+  }
+
+  /// Final release bundle을 export한다.
+  Future<void> _exportFinalBundle() async {
+    if (_actionInProgress) return;
+    setState(() => _actionInProgress = true);
+    try {
+      final result = await widget.finalReleaseBundleExportService.exportFinalReleaseBundle();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Final bundle 저장: ${result.relativePath}')),
+      );
+      await _refresh();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export 실패: $e')),
+      );
     } finally {
       if (mounted) setState(() => _actionInProgress = false);
     }
@@ -309,6 +372,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
             _sectionCard(
               title: 'Release',
               children: [
+                Text(
+                  'RC 기준 커밋: ${kRcVerificationSprintCommit.isEmpty ? 'n/a' : kRcVerificationSprintCommit}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                if (_approval != null) ...[
+                  Text(
+                    _approval!.statusLabel,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'approval status: ${_approval!.status.name}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+                if (_smokeApproval != null) ...[
+                  Text(
+                    'smoke macOS: ${_smokeApproval!.macStatus?.name ?? 'pending'}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  Text(
+                    'smoke Windows: ${_smokeApproval!.windowsStatus?.name ?? 'pending'}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ],
+                Text(
+                  'build artifacts: ${_artifacts.length}',
+                  style: const TextStyle(fontSize: 16),
+                ),
                 if (readiness != null) ...[
                   Text(
                     readiness.rcStatusLabel,
@@ -411,13 +502,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: const Text('v0.1 RC tag readiness checklist'),
                   ),
                 ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: _actionInProgress ? null : _runTagReadiness,
+                    child: const Text('Run RC tag readiness checks'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: _actionInProgress ? null : _exportFinalBundle,
+                    child: const Text('Final release bundle export'),
+                  ),
+                ),
               ],
             ),
             _sectionCard(
               title: 'About',
               children: const [
                 Text('SAC — SVIL Archive Core', style: TextStyle(fontSize: 16)),
-                Text('Sprint 11 — RC Finalization / Release Notes', style: TextStyle(fontSize: 16)),
+                Text('Sprint 12 — RC Build Approval / Tag Readiness', style: TextStyle(fontSize: 16)),
                 Text('자동 배포·코드 서명·notarization: 범위 외', style: TextStyle(fontSize: 16)),
               ],
             ),

@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 9;
+const int kSacSchemaVersion = 10;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -351,6 +351,11 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       await db.execute(sql);
     }
   }
+  if (fromVersion < 10) {
+    for (final sql in sprint12MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
 }
 
 /// Sprint 9 integrity / smoke migration SQL 목록을 반환한다.
@@ -444,5 +449,49 @@ List<String> sprint11MigrationSql() {
     ''',
     'CREATE INDEX IF NOT EXISTS idx_verification_pass_at ON verification_pass_records(passed_at)',
     'CREATE INDEX IF NOT EXISTS idx_verification_check_type ON verification_pass_records(check_type)',
+  ];
+}
+
+/// Sprint 12 RC build approval migration SQL 목록을 반환한다.
+List<String> sprint12MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS rc_build_artifacts (
+      id TEXT PRIMARY KEY,
+      platform TEXT NOT NULL,
+      build_type TEXT NOT NULL,
+      artifact_path_masked TEXT NOT NULL,
+      commit_hash TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      verified_at TEXT,
+      notes TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS release_approval_records (
+      id TEXT PRIMARY KEY,
+      status TEXT NOT NULL,
+      status_label TEXT NOT NULL,
+      rc_commit_hash TEXT NOT NULL,
+      notes TEXT,
+      approved_by TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS rc_tag_readiness_checks (
+      id TEXT PRIMARY KEY,
+      run_id TEXT NOT NULL,
+      check_label TEXT NOT NULL,
+      passed INTEGER NOT NULL,
+      detail TEXT,
+      checked_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_rc_build_created ON rc_build_artifacts(created_at)',
+    'CREATE INDEX IF NOT EXISTS idx_release_approval_updated ON release_approval_records(updated_at)',
+    'CREATE INDEX IF NOT EXISTS idx_rc_tag_run ON rc_tag_readiness_checks(run_id)',
   ];
 }

@@ -206,6 +206,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       '후보 태그: ${summary.rcFinalization.suggestedTag}',
                       style: const TextStyle(fontSize: 16),
                     ),
+                    const SizedBox(height: 8),
+                    const Text('RC Final Status (Sprint 12)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(
+                      summary.rcFinalStatus.approvalLabel,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'approval: ${summary.rcFinalStatus.approvalStatus.name}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'build artifacts: ${summary.rcFinalStatus.buildArtifactCount}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'tag readiness: ${summary.rcFinalStatus.tagReadinessReady ? 'ready' : 'pending'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'final bundle: ${summary.rcFinalStatus.finalBundleGenerated ? '생성됨' : '미생성'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'RC 커밋: ${summary.rcFinalStatus.rcCommitHash}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
                     if (summary.releaseReadiness.blockers.isNotEmpty) ...[
                       const SizedBox(height: 8),
                       const Text('RC 차단 항목', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
