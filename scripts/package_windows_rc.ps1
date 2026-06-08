@@ -2,7 +2,8 @@
 param(
     [string]$Version = "0.1.0-rc.1",
     [string]$Commit = "",
-    [switch]$SkipFlutterBuild
+    [switch]$SkipFlutterBuild,
+    [switch]$UseSprint12BImplementationCommit
 )
 
 $ErrorActionPreference = "Stop"
@@ -13,7 +14,11 @@ $binRoot = Join-Path $root "bin\windows"
 
 if (-not $Commit) {
     Push-Location $root
-    $Commit = (git rev-parse --short HEAD).Trim()
+    if ($UseSprint12BImplementationCommit) {
+        $Commit = "c2e73a4"
+    } else {
+        $Commit = (git rev-parse --short HEAD).Trim()
+    }
     Pop-Location
 }
 

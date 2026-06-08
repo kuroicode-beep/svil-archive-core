@@ -8,6 +8,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:sac_app/application/sac_container.dart';
+import 'package:sac_app/data/services/report_consistency_service_impl.dart';
 import 'package:sac_app/domain/models/rc_build_approval.dart';
 import 'package:sac_app/domain/utils/mcp_sidecar_path_resolver.dart';
 
@@ -97,26 +98,48 @@ void main() {
     expect(manifest.containsKey('token'), isFalse);
   });
 
-  test('portable package folder includes mcp/sidecar when built by script output', () {
+  test('report manifest includes Sprint 12B separate from Sprint 12', () {
+    expect(kSprintReportCommitManifest['Sprint 12'], '2e2e4da');
+    expect(kSprintReportCommitManifest['Sprint 12B'], 'c2e73a4');
+  });
+
+  test('report consistency accepts Sprint 12 and 12B docs without cross-mismatch', () async {
+    final docsRoot = p.normalize(p.join(Directory.current.path, '..', '..', 'docs'));
+    final docsContainer = await SacContainer.create(
+      registryDirectory: tempDir.path,
+      reportDocsRoot: docsRoot,
+    );
+    final workspace = await docsContainer.workspaceService.createWorkspace(
+      name: 'S12B Docs',
+      rootPath: p.join(tempDir.path, 'docs_ws'),
+    );
+    await docsContainer.bindWorkspace(workspace);
+    final report = await docsContainer.reportConsistencyService.checkReports();
+    expect(report.isConsistent, isTrue, reason: report.mismatches.map((m) => m.reason).join('; '));
+    await docsContainer.disposeForTest();
+  });
+
+  test('portable package folder includes mcp/sidecar with Sprint 12B implementation commit', () {
     final repoRoot = p.normalize(p.join(Directory.current.path, '..', '..'));
     final binRoot = Directory(p.join(repoRoot, 'bin', 'windows'));
     if (!binRoot.existsSync()) {
       return;
     }
 
+    final expectedCommit = kSprintReportCommitManifest['Sprint 12B']!;
     final packages = binRoot
         .listSync()
         .whereType<Directory>()
-        .where((d) => p.basename(d.path).contains('sac_v0.1.0-rc.1_windows_x64'))
+        .where((d) => p.basename(d.path).contains('sac_v0.1.0-rc.1_windows_x64_$expectedCommit'))
         .toList();
     if (packages.isEmpty) {
       return;
     }
 
-    final latest = packages.last;
-    final sidecarDist = File(p.join(latest.path, 'mcp', 'sidecar', 'dist', 'index.js'));
-    final manifestFile = File(p.join(latest.path, 'BUILD_MANIFEST.json'));
-    final installFile = File(p.join(latest.path, 'INSTALL.txt'));
+    final pkg = packages.last;
+    final sidecarDist = File(p.join(pkg.path, 'mcp', 'sidecar', 'dist', 'index.js'));
+    final manifestFile = File(p.join(pkg.path, 'BUILD_MANIFEST.json'));
+    final installFile = File(p.join(pkg.path, 'INSTALL.txt'));
 
     expect(sidecarDist.existsSync(), isTrue, reason: 'mcp/sidecar/dist/index.js missing');
     expect(manifestFile.existsSync(), isTrue);
@@ -124,6 +147,7 @@ void main() {
     final manifest =
         jsonDecode(manifestFile.readAsStringSync()) as Map<String, dynamic>;
     expect(validatePortableBuildManifest(manifest), isTrue);
+    expect(manifest['commit'], expectedCommit);
 
     final installText = installFile.readAsStringSync();
     expect(installText, contains('MCP sidecar'));

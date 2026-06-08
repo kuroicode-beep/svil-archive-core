@@ -20,8 +20,8 @@ sprint12b_implementation_commit: "c2e73a4"
 
 | 항목 | 값 |
 |------|-----|
-| 폴더 | `bin/windows/sac_v0.1.0-rc.1_windows_x64_9ec7e43/` |
-| ZIP | `bin/windows/sac_v0.1.0-rc.1_windows_x64_9ec7e43.zip` (~16.9 MB) |
+| 폴더 | `bin/windows/sac_v0.1.0-rc.1_windows_x64_c2e73a4/` |
+| ZIP | `bin/windows/sac_v0.1.0-rc.1_windows_x64_c2e73a4.zip` (~16.9 MB) |
 | sidecar 포함 | ✅ `mcp/sidecar/dist` + production `node_modules` |
 | manifest | `mcp_sidecar_included: true`, relative path only |
 
@@ -44,11 +44,17 @@ sprint12b_implementation_commit: "c2e73a4"
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | No issues |
-| `flutter test` | **173/173** PASS |
+| `flutter test` | **175/175** PASS |
 | MCP sidecar build | PASS |
 | Windows package 재생성 | PASS (sidecar 포함) |
 
-## 06. 핸드오프
+## 06. Codex 재작업 (2026.06.08)
+
+- `kSprintReportCommitManifest`에 `Sprint 12B: c2e73a4` 추가
+- `_fileMatchesSprintDoc` — `Sprint_12B`가 `Sprint 12`로 오분류되지 않도록 수정
+- Windows RC 패키지를 `c2e73a4` 기준으로 **flutter release 재빌드** 후 재생성
+
+## 07. 핸드오프
 
 - Codex: `docs/handoff/Codex_Verification_Request_Sprint_12B.md`
 - 소장님: ZIP 풀고 `sac_app.exe` 실행, Settings MCP 상태 확인

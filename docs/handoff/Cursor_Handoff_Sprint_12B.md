@@ -9,7 +9,7 @@
 - `resolveMcpSidecarPath()` — exe 기준 `mcp/sidecar/dist` 우선 탐지
 - MCP bridge UI — 패키지/fallback/not found 라벨 구분
 - `scripts/package_windows_rc.ps1` — sidecar + production node_modules 포함 패키징
-- `bin/windows/sac_v0.1.0-rc.1_windows_x64_9ec7e43/` 재생성 (sidecar 포함)
+- `bin/windows/sac_v0.1.0-rc.1_windows_x64_c2e73a4/` 재생성 (Sprint 12B 빌드 + sidecar)
 
 ## Codex에게
 

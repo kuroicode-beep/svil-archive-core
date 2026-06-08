@@ -17,6 +17,7 @@ const Map<String, String> kSprintReportCommitManifest = {
   'Sprint 10': '1db8bfd',
   'Sprint 11': '2833494',
   'Sprint 12': '2e2e4da',
+  'Sprint 12B': 'c2e73a4',
 };
 
 /// RC 자동 검증 기록이 대조하는 최신 Sprint 라벨.
@@ -99,9 +100,7 @@ class ReportConsistencyServiceImpl implements ReportConsistencyService {
 
     final mismatches = <ReportMismatch>[];
     for (final entry in kSprintReportCommitManifest.entries) {
-      final sprintToken = entry.key.replaceAll(' ', '_');
-      final sprintNum = entry.key.replaceAll('Sprint ', '');
-      final files = await _collectSprintDocFiles(rootDir, sprintToken, sprintNum);
+      final files = await _collectSprintDocFiles(rootDir, entry.key);
       if (files.isEmpty) continue;
 
       var foundExpected = false;
@@ -157,8 +156,7 @@ class ReportConsistencyServiceImpl implements ReportConsistencyService {
   /// Sprint 관련 docs 파일 경로를 수집한다.
   Future<List<String>> _collectSprintDocFiles(
     Directory docsRoot,
-    String sprintToken,
-    String sprintNum,
+    String sprintLabel,
   ) async {
     final results = <String>[];
     for (final sub in ['reports', 'handoff']) {
@@ -166,16 +164,32 @@ class ReportConsistencyServiceImpl implements ReportConsistencyService {
       if (!await dir.exists()) continue;
       await for (final entity in dir.list()) {
         if (entity is! File) continue;
-        final name = p.basename(entity.path).toLowerCase();
-        if (!name.endsWith('.md')) continue;
-        if (name.contains(sprintToken.toLowerCase()) ||
-            name.contains('sprint$sprintNum') ||
-            name.contains('sprint_$sprintNum')) {
+        final name = p.basename(entity.path);
+        if (!name.toLowerCase().endsWith('.md')) continue;
+        if (_fileMatchesSprintDoc(name, sprintLabel)) {
           results.add(entity.path);
         }
       }
     }
     return results;
+  }
+
+  /// Sprint 라벨과 docs 파일명이 정확히 대응하는지 확인한다.
+  bool _fileMatchesSprintDoc(String fileName, String sprintLabel) {
+    final lower = fileName.toLowerCase();
+    if (sprintLabel == 'Sprint 12B') {
+      return lower.contains('sprint_12b') || lower.contains('sprint12b');
+    }
+    if (sprintLabel == 'Sprint 12') {
+      final matches12 = lower.contains('sprint_12') || lower.contains('sprint12');
+      final matches12b = lower.contains('sprint_12b') || lower.contains('sprint12b');
+      return matches12 && !matches12b;
+    }
+    final token = sprintLabel.replaceAll(' ', '_').toLowerCase();
+    final sprintNum = sprintLabel.replaceAll('Sprint ', '');
+    return lower.contains(token) ||
+        lower.contains('sprint$sprintNum') ||
+        lower.contains('sprint_$sprintNum');
   }
 
   /// frontmatter에서 commit 해시를 파싱한다.

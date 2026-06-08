@@ -40,7 +40,14 @@ powershell -ExecutionPolicy Bypass -File scripts/package_windows_rc.ps1 -SkipFlu
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | No issues |
-| `flutter test` | **173/173** passed |
+| `flutter test` | **175/175** passed |
 | MCP sidecar build | PASS |
-| Package sidecar | `mcp/sidecar/dist/index.js` present |
+| Package | `sac_v0.1.0-rc.1_windows_x64_c2e73a4` |
+| manifest commit | `c2e73a4` (Sprint 12B 구현 커밋) |
 | ZIP size | ~16.9 MB (node_modules 포함) |
+
+## Codex 재작업 완료 (blocker 해소)
+
+- [x] Sprint 12B manifest 분리 + Sprint 12/12B docs 매칭 정밀화
+- [x] report consistency 회귀 175/175 PASS
+- [x] Windows RC 패키지 flutter release 재빌드 + commit `c2e73a4` 정합
