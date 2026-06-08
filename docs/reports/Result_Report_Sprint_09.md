@@ -68,9 +68,11 @@ sprint09_commit: "a15a4c1"
 
 ## 08. Codex 검증
 - **1차**: 부분완료 — B1/B2/I1/I2 → 재작업 (`a15a4c1`)
-- **재검증**: 부분완료 — B3 (`flutter analyze` warning) → 2차 재작업
-- **최종 재검증**: Codex 재실행 대기
-- `docs/reports/Rework_Report_Sprint_09.md` 참조
+- **재검증**: 부분완료 — B3 → 2차 재작업 (`6d2bc91`)
+- **최종 재검증**: **PASS / 배포 가능 YES** (2026.06.08)
+- [Codex 최종 재검증 보고서](https://app.notion.com/p/379864048e548197acb6c6f4c9bfa719)
 
 ## 09. Git 커밋
 - `a15a4c1` — Sprint 09 구현 + Codex B1/B2/I1/I2 재작업
+- `6d2bc91` — Codex B3 analyze warning 수정
+- `3d9e4ef` — B3 재작업 문서 동기화
