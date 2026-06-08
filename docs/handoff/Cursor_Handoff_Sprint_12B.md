@@ -1,6 +1,7 @@
 # Cursor Handoff — Sprint 12B Windows Portable MCP Sidecar
 
 > **Sprint 12 기준**: `9ec7e43`
+> **Sprint 12B 구현 커밋**: `c2e73a4`
 > **작업지시문**: [Sprint 12B WI](https://app.notion.com/p/379864048e548156954fe3603e3b864f)
 
 ## Sprint 12B 구현 요약

@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 12B
 
 > **Sprint 12 기준**: `9ec7e43`
-> **Sprint 12B 구현 커밋**: (구현 후 갱신)
+> **Sprint 12B 구현 커밋**: `c2e73a4`
 > **작업지시문**: [Sprint 12B](https://app.notion.com/p/379864048e548156954fe3603e3b864f)
 > **범위**: Windows portable MCP sidecar inclusion (기능 추가 최소, 패키징 보강)
 
