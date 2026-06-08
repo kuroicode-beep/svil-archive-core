@@ -1,10 +1,11 @@
-// settings_screen.dart — RC 기준 Settings 화면 (Sprint 10)
+// settings_screen.dart — RC 기준 Settings 화면 (Sprint 11)
 
 import 'package:flutter/material.dart';
 
 import '../../application/sac_theme_controller.dart';
 import '../../domain/models/dashboard.dart';
 import '../../domain/models/integrity_scan.dart';
+import '../../domain/models/rc_finalization.dart';
 import '../../domain/models/release_readiness.dart';
 import '../../domain/models/settings.dart';
 import '../../domain/models/work_queue.dart';
@@ -14,7 +15,9 @@ import '../../domain/services/local_ai_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/release_checklist_export_service.dart';
+import '../../domain/services/release_finalization_export_service.dart';
 import '../../domain/services/release_readiness_service.dart';
+import '../../domain/services/verification_pass_record_service.dart';
 import '../../domain/services/settings_service.dart';
 import '../../domain/services/workspace_integrity_service.dart';
 
@@ -28,6 +31,8 @@ class SettingsScreen extends StatefulWidget {
   final ReleaseReadinessService releaseReadinessService;
   final BuildEnvironmentCheckService buildEnvironmentCheckService;
   final ReleaseChecklistExportService releaseChecklistExportService;
+  final VerificationPassRecordService verificationPassRecordService;
+  final ReleaseFinalizationExportService releaseFinalizationExportService;
   final Workspace? workspace;
   final void Function(String endpoint)? onOllamaEndpointChanged;
 
@@ -42,6 +47,8 @@ class SettingsScreen extends StatefulWidget {
     required this.releaseReadinessService,
     required this.buildEnvironmentCheckService,
     required this.releaseChecklistExportService,
+    required this.verificationPassRecordService,
+    required this.releaseFinalizationExportService,
     this.workspace,
     this.onOllamaEndpointChanged,
   });
@@ -124,7 +131,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            summary.isReadyForRc ? 'RC 준비 완료' : 'RC 차단 항목 ${summary.failCount}건',
+            summary.rcStatusLabel,
           ),
         ),
       );
@@ -144,6 +151,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(content: Text('빌드 환경 점검 ${checks.length}항목 완료')),
       );
       await _evaluateReadiness();
+    } finally {
+      if (mounted) setState(() => _actionInProgress = false);
+    }
+  }
+
+  /// Sprint 11 Markdown export를 실행한다.
+  Future<void> _exportFinalization(String kind) async {
+    if (_actionInProgress) return;
+    setState(() => _actionInProgress = true);
+    try {
+      final ReleaseMarkdownExportResult result;
+      switch (kind) {
+        case 'notes':
+          result = await widget.releaseFinalizationExportService.exportReleaseNotes();
+        case 'issues':
+          result = await widget.releaseFinalizationExportService.exportKnownIssues();
+        case 'tag':
+          result = await widget.releaseFinalizationExportService.exportTagReadinessChecklist();
+        default:
+          return;
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export 저장: ${result.relativePath}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export 실패: $e')),
+      );
     } finally {
       if (mounted) setState(() => _actionInProgress = false);
     }
@@ -274,8 +311,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 if (readiness != null) ...[
                   Text(
-                    'RC ready: ${readiness.isReadyForRc ? 'YES' : 'NO'}',
+                    readiness.rcStatusLabel,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'RC 상태: ${readiness.rcFinalizationStatus.name}',
+                    style: const TextStyle(fontSize: 16),
                   ),
                   Text(
                     'pass ${readiness.passCount} / warn ${readiness.warnCount} / fail ${readiness.failCount}',
@@ -291,6 +332,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ] else
                   const Text('RC 평가 기록 없음 — 아래 버튼으로 실행', style: TextStyle(fontSize: 16)),
+                const SizedBox(height: 4),
+                FutureBuilder(
+                  future: Future.wait([
+                    widget.verificationPassRecordService.getLatestForType('analyze'),
+                    widget.verificationPassRecordService.getLatestForType('test'),
+                    widget.verificationPassRecordService.getLatestForType('sidecar_build'),
+                  ]),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text('검증 기록 로딩...', style: TextStyle(fontSize: 16));
+                    }
+                    final records = snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'analyze commit: ${records[0]?.verifiedSprintCommit ?? '없음'}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          'test commit: ${records[1]?.verifiedSprintCommit ?? '없음'} (${records[1]?.testCount ?? '-'} tests)',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          'sidecar commit: ${records[2]?.verifiedSprintCommit ?? '없음'}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    );
+                  },
+                ),
                 const SizedBox(height: 8),
                 SizedBox(
                   height: 50,
@@ -315,13 +387,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: const Text('Release checklist export'),
                   ),
                 ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: _actionInProgress ? null : () => _exportFinalization('notes'),
+                    child: const Text('Release notes export'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: _actionInProgress ? null : () => _exportFinalization('issues'),
+                    child: const Text('Known issues export'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: _actionInProgress ? null : () => _exportFinalization('tag'),
+                    child: const Text('v0.1 RC tag readiness checklist'),
+                  ),
+                ),
               ],
             ),
             _sectionCard(
               title: 'About',
               children: const [
                 Text('SAC — SVIL Archive Core', style: TextStyle(fontSize: 16)),
-                Text('Sprint 10 — RC / Smoke / Packaging Readiness', style: TextStyle(fontSize: 16)),
+                Text('Sprint 11 — RC Finalization / Release Notes', style: TextStyle(fontSize: 16)),
                 Text('자동 배포·코드 서명·notarization: 범위 외', style: TextStyle(fontSize: 16)),
               ],
             ),

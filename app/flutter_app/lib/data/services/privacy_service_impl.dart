@@ -3,6 +3,7 @@
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/dashboard.dart';
+import '../../domain/models/rc_finalization.dart';
 import '../../domain/models/work_queue.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
@@ -124,7 +125,11 @@ class PrivacyServiceImpl implements PrivacyService {
       integritySummary: integritySummary,
       reportConsistent: report.isConsistent,
       releaseReadiness: releaseReadiness,
-      releaseBlockingCount: releaseReadiness?.failCount ?? 0,
+      releaseBlockingCount: releaseReadiness?.rcFinalizationStatus == RcFinalizationStatus.blocked
+          ? (releaseReadiness?.failCount ?? 1)
+          : 0,
+      releaseExportPolicyLabel: 'release notes / known issues: 개인 본문·secret 미포함',
+      knownIssuesPolicyLabel: 'external API OFF / remote MCP OFF / active-only export 유지',
     );
   }
 }

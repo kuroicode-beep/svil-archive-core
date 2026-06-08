@@ -1,6 +1,7 @@
 // dashboard.dart — 대시보드 / 개인정보 / 로컬 AI 요약 모델
 
 import 'integrity_scan.dart';
+import 'rc_finalization.dart';
 import 'release_readiness.dart';
 import 'smoke_test_record.dart';
 import 'ticket_execution.dart';
@@ -78,6 +79,7 @@ class DashboardSummary {
   final SmokeTestStatus? macSmokeStatus;
   final SmokeTestStatus? windowsSmokeStatus;
   final ReleaseReadinessSummary releaseReadiness;
+  final RcFinalizationSummary rcFinalization;
 
   const DashboardSummary({
     required this.aiCollaboration,
@@ -99,6 +101,7 @@ class DashboardSummary {
     this.macSmokeStatus,
     this.windowsSmokeStatus,
     required this.releaseReadiness,
+    required this.rcFinalization,
   });
 }
 
@@ -117,6 +120,8 @@ class PrivacySummary {
   final bool reportConsistent;
   final ReleaseReadinessSummary? releaseReadiness;
   final int releaseBlockingCount;
+  final String releaseExportPolicyLabel;
+  final String knownIssuesPolicyLabel;
 
   const PrivacySummary({
     required this.localProcessingEnabled,
@@ -133,6 +138,8 @@ class PrivacySummary {
     required this.reportConsistent,
     this.releaseReadiness,
     this.releaseBlockingCount = 0,
+    this.releaseExportPolicyLabel = 'release notes: 개인 본문 미포함',
+    this.knownIssuesPolicyLabel = 'known issues: secret/token 미포함',
   });
 }
 

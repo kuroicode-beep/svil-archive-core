@@ -314,6 +314,8 @@ class _MainShellState extends State<MainShell> {
           releaseReadinessService: widget.container.releaseReadinessService,
           buildEnvironmentCheckService: widget.container.buildEnvironmentCheckService,
           releaseChecklistExportService: widget.container.releaseChecklistExportService,
+          verificationPassRecordService: widget.container.verificationPassRecordService,
+          releaseFinalizationExportService: widget.container.releaseFinalizationExportService,
           workspace: widget.container.activeWorkspace,
           onOllamaEndpointChanged: widget.container.updateOllamaEndpoint,
         );

@@ -79,6 +79,8 @@ class ReleaseChecklistExportServiceImpl implements ReleaseChecklistExportService
     buffer.writeln();
     buffer.writeln('- generated_at: ${readiness.checkedAt.toIso8601String()}');
     buffer.writeln('- rc_ready: ${readiness.isReadyForRc}');
+    buffer.writeln('- rc_finalization: ${readiness.rcFinalizationStatus.name}');
+    buffer.writeln('- rc_status_label: ${readiness.rcStatusLabel}');
     buffer.writeln('- pass: ${readiness.passCount} / warn: ${readiness.warnCount} / fail: ${readiness.failCount}');
     buffer.writeln();
     buffer.writeln('## RC Readiness');

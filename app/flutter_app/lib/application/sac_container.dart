@@ -22,7 +22,9 @@ import '../data/services/privacy_service_impl.dart';
 import '../data/services/build_environment_check_service_impl.dart';
 import '../data/services/execution_recovery_service_impl.dart';
 import '../data/services/release_checklist_export_service_impl.dart';
+import '../data/services/release_finalization_export_service_impl.dart';
 import '../data/services/release_readiness_service_impl.dart';
+import '../data/services/verification_pass_record_service_impl.dart';
 import '../data/services/queue_execution_service_impl.dart';
 import '../data/services/report_consistency_service_impl.dart';
 import '../data/services/safe_apply_service_impl.dart';
@@ -56,7 +58,9 @@ import '../domain/services/privacy_service.dart';
 import '../domain/services/build_environment_check_service.dart';
 import '../domain/services/execution_recovery_service.dart';
 import '../domain/services/release_checklist_export_service.dart';
+import '../domain/services/release_finalization_export_service.dart';
 import '../domain/services/release_readiness_service.dart';
+import '../domain/services/verification_pass_record_service.dart';
 import '../domain/services/queue_execution_service.dart';
 import '../domain/services/report_consistency_service.dart';
 import '../domain/services/smoke_test_record_service.dart';
@@ -96,6 +100,8 @@ class SacContainer {
   BuildEnvironmentCheckService? _buildEnvironmentCheckService;
   ReleaseReadinessService? _releaseReadinessService;
   ReleaseChecklistExportService? _releaseChecklistExportService;
+  VerificationPassRecordService? _verificationPassRecordService;
+  ReleaseFinalizationExportService? _releaseFinalizationExportService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -289,6 +295,18 @@ class SacContainer {
     return service;
   }
 
+  VerificationPassRecordService get verificationPassRecordService {
+    final service = _verificationPassRecordService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ReleaseFinalizationExportService get releaseFinalizationExportService {
+    final service = _releaseFinalizationExportService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -408,6 +426,9 @@ class SacContainer {
       workspaceRoot: workspace.rootPath,
       mcpSidecarDistPath: sidecarDist,
     );
+    _verificationPassRecordService = VerificationPassRecordServiceImpl(
+      databaseService: databaseService,
+    );
     _releaseReadinessService = ReleaseReadinessServiceImpl(
       databaseService: databaseService,
       integrityService: _workspaceIntegrityService!,
@@ -418,6 +439,14 @@ class SacContainer {
       queueExecutionService: _queueExecutionService!,
       settingsService: settingsService,
       buildEnvironmentCheckService: _buildEnvironmentCheckService!,
+      verificationPassRecordService: _verificationPassRecordService!,
+    );
+    _releaseFinalizationExportService = ReleaseFinalizationExportServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+      releaseReadinessService: _releaseReadinessService!,
+      verificationPassRecordService: _verificationPassRecordService!,
+      smokeTestRecordService: _smokeTestRecordService!,
     );
     _releaseChecklistExportService = ReleaseChecklistExportServiceImpl(
       databaseService: databaseService,
@@ -436,6 +465,7 @@ class SacContainer {
       reportConsistencyService: _reportConsistencyService!,
       smokeTestRecordService: _smokeTestRecordService!,
       releaseReadinessService: _releaseReadinessService!,
+      releaseFinalizationExportService: _releaseFinalizationExportService!,
     );
     _privacyService = PrivacyServiceImpl(
       databaseService: databaseService,

@@ -99,9 +99,10 @@ Codex — 테스트 / 검증 / QA
 
 ```text
 Sprint 09: Integrity / Recovery / Smoke — Codex 최종 PASS (cd684a2)
-Sprint 10: RC / Smoke / Packaging Readiness — 구현 완료 (1db8bfd), Codex 검증 대기
-작업지시문: https://app.notion.com/p/379864048e5481499f62ea09b10524a5
-핸드오프: docs/handoff/Cursor_Handoff_Sprint_10.md
+Sprint 10: RC / Smoke / Packaging — Codex Sprint 10B PASS (HEAD 9c47b7e)
+Sprint 11: RC Finalization — 구현 완료 (미커밋), Codex 검증 대기
+작업지시문: https://app.notion.com/p/379864048e54818bbf46fd13a22a420e
+핸드오프: docs/handoff/Cursor_Handoff_Sprint_11.md
 공식 프로토콜: Notion
 ```
 

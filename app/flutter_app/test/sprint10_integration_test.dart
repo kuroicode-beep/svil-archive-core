@@ -95,7 +95,13 @@ void main() {
     await bindWorkspace();
     final summary = await container.releaseReadinessService.evaluate();
     expect(summary.items, isNotEmpty);
-    expect(summary.passCount + summary.warnCount + summary.failCount, summary.items.length);
+    final unknownCount = summary.items
+        .where((i) => i.status == ReadinessItemStatus.unknown)
+        .length;
+    expect(
+      summary.passCount + summary.warnCount + summary.failCount + unknownCount,
+      summary.items.length,
+    );
     expect(summary.checkedAt, isNotNull);
   });
 

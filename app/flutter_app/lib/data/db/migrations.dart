@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 8;
+const int kSacSchemaVersion = 9;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -346,6 +346,11 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       await db.execute(sql);
     }
   }
+  if (fromVersion < 9) {
+    for (final sql in sprint11MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
 }
 
 /// Sprint 9 integrity / smoke migration SQL 목록을 반환한다.
@@ -419,5 +424,25 @@ List<String> sprint10MigrationSql() {
     ''',
     'CREATE INDEX IF NOT EXISTS idx_release_readiness_checked ON release_readiness_checks(checked_at)',
     'CREATE INDEX IF NOT EXISTS idx_build_env_checked ON build_environment_checks(checked_at)',
+  ];
+}
+
+/// Sprint 11 RC finalization migration SQL 목록을 반환한다.
+List<String> sprint11MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS verification_pass_records (
+      id TEXT PRIMARY KEY,
+      check_type TEXT NOT NULL,
+      source TEXT NOT NULL,
+      passed_at TEXT NOT NULL,
+      test_count INTEGER,
+      verified_head_commit TEXT,
+      verified_sprint_commit TEXT,
+      notes TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_verification_pass_at ON verification_pass_records(passed_at)',
+    'CREATE INDEX IF NOT EXISTS idx_verification_check_type ON verification_pass_records(check_type)',
   ];
 }

@@ -112,11 +112,20 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                       style: const TextStyle(fontSize: 16),
                     ),
                     Text(
-                      'RC ready: ${summary.releaseReadiness?.isReadyForRc == true ? 'YES' : 'NO / 미평가'}',
+                      summary.releaseReadiness?.rcStatusLabel ?? 'RC 미평가',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      summary.releaseExportPolicyLabel,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      summary.knownIssuesPolicyLabel,
                       style: const TextStyle(fontSize: 16),
                     ),
                     const Text('자동 배포·코드 서명: 범위 외', style: TextStyle(fontSize: 16)),
                     const Text('외부 API: 기본 OFF', style: TextStyle(fontSize: 16)),
+                    const Text('remote MCP: 비활성', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),

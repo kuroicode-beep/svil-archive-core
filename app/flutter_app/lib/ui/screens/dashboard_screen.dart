@@ -168,11 +168,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('RC Readiness', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('RC Finalization', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text(
-                      'RC ready: ${summary.releaseReadiness.isReadyForRc ? 'YES' : 'NO'}',
+                      summary.rcFinalization.statusLabel,
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'RC 상태: ${summary.rcFinalization.status.name}',
+                      style: const TextStyle(fontSize: 16),
                     ),
                     Text(
                       'pass ${summary.releaseReadiness.passCount} / warn ${summary.releaseReadiness.warnCount} / fail ${summary.releaseReadiness.failCount}',
@@ -184,6 +188,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     Text(
                       'Windows smoke: ${summary.windowsSmokeStatus?.name ?? '기록 없음'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'release notes: ${summary.rcFinalization.exportStatus.releaseNotesExported ? '생성됨' : '미생성'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'known issues: ${summary.rcFinalization.exportStatus.knownIssuesExported ? '생성됨' : '미생성'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'tag readiness: ${summary.rcFinalization.exportStatus.tagReadinessExported ? '생성됨' : '미생성'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '후보 태그: ${summary.rcFinalization.suggestedTag}',
                       style: const TextStyle(fontSize: 16),
                     ),
                     if (summary.releaseReadiness.blockers.isNotEmpty) ...[

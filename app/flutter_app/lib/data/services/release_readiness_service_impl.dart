@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../domain/models/build_environment_check.dart';
+import '../../domain/models/rc_finalization.dart';
 import '../../domain/models/release_readiness.dart';
 import '../../domain/models/smoke_test_record.dart';
 import '../../domain/services/build_environment_check_service.dart';
@@ -13,9 +14,13 @@ import '../../domain/services/release_readiness_service.dart';
 import '../../domain/services/report_consistency_service.dart';
 import '../../domain/services/settings_service.dart';
 import '../../domain/services/smoke_test_record_service.dart';
+import '../../domain/services/verification_pass_record_service.dart';
 import '../../domain/services/work_queue_service.dart';
 import '../../domain/services/workspace_integrity_service.dart';
+import '../../domain/utils/rc_finalization_policy.dart';
 import '../db/database_service_impl.dart';
+import 'report_consistency_service_impl.dart';
+import 'verification_pass_record_service_impl.dart';
 
 class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
   final DatabaseServiceImpl _databaseService;
@@ -27,6 +32,7 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
   final QueueExecutionService _queueExecutionService;
   final SettingsService _settingsService;
   final BuildEnvironmentCheckService _buildEnvironmentCheckService;
+  final VerificationPassRecordService _verificationPassRecordService;
   final Uuid _uuid = const Uuid();
 
   ReleaseReadinessServiceImpl({
@@ -39,6 +45,7 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
     required QueueExecutionService queueExecutionService,
     required SettingsService settingsService,
     required BuildEnvironmentCheckService buildEnvironmentCheckService,
+    required VerificationPassRecordService verificationPassRecordService,
   })  : _databaseService = databaseService,
         _integrityService = integrityService,
         _smokeTestRecordService = smokeTestRecordService,
@@ -47,7 +54,8 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
         _workQueueService = workQueueService,
         _queueExecutionService = queueExecutionService,
         _settingsService = settingsService,
-        _buildEnvironmentCheckService = buildEnvironmentCheckService;
+        _buildEnvironmentCheckService = buildEnvironmentCheckService,
+        _verificationPassRecordService = verificationPassRecordService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -138,8 +146,15 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
       );
     }
 
+    items.addAll(await _verificationItems());
+
     await _persistItems(items, checkedAt);
-    return _summarize(items, checkedAt);
+    return _summarize(
+      items: items,
+      checkedAt: checkedAt,
+      macSmoke: macSmoke,
+      winSmoke: winSmoke,
+    );
   }
 
   @override
@@ -154,7 +169,47 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
         .where((row) => row['checked_at'] == latestStamp)
         .map(_mapReadinessRow)
         .toList();
-    return _summarize(items, DateTime.parse(latestStamp).toLocal());
+    final macSmoke = await _smokeTestRecordService.getLatestForPlatform('macOS');
+    final winSmoke = await _smokeTestRecordService.getLatestForPlatform('Windows');
+    return _summarize(
+      items: items,
+      checkedAt: DateTime.parse(latestStamp).toLocal(),
+      macSmoke: macSmoke,
+      winSmoke: winSmoke,
+    );
+  }
+
+  /// verification 통과 기록을 readiness 항목으로 변환한다.
+  Future<List<ReadinessCheckItem>> _verificationItems() async {
+    final sprintCommit = kSprintReportCommitManifest['Sprint 10'] ?? '';
+    final mismatch = await _verificationPassRecordService.hasCommitMismatch(sprintCommit);
+    final items = <ReadinessCheckItem>[];
+    for (final type in kRequiredVerificationCheckTypes) {
+      final record = await _verificationPassRecordService.getLatestForType(type);
+      if (record == null) {
+        items.add(
+          ReadinessCheckItem(
+            category: 'verification',
+            label: type,
+            status: ReadinessItemStatus.unknown,
+            detail: 'no record',
+          ),
+        );
+        continue;
+      }
+      final status = mismatch
+          ? ReadinessItemStatus.warn
+          : ReadinessItemStatus.pass;
+      items.add(
+        ReadinessCheckItem(
+          category: 'verification',
+          label: type,
+          status: status,
+          detail: 'commit=${record.verifiedSprintCommit ?? "n/a"}',
+        ),
+      );
+    }
+    return items;
   }
 
   /// 무결성 카운트를 readiness 항목으로 변환한다.
@@ -249,17 +304,40 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
   }
 
   /// 항목 목록으로 ReleaseReadinessSummary를 구성한다.
-  ReleaseReadinessSummary _summarize(List<ReadinessCheckItem> items, DateTime checkedAt) {
+  ReleaseReadinessSummary _summarize({
+    required List<ReadinessCheckItem> items,
+    required DateTime checkedAt,
+    required SmokeTestRecord? macSmoke,
+    required SmokeTestRecord? winSmoke,
+  }) {
     final passCount = items.where((i) => i.status == ReadinessItemStatus.pass).length;
     final warnCount = items.where((i) => i.status == ReadinessItemStatus.warn).length;
     final failCount = items.where((i) => i.status == ReadinessItemStatus.fail).length;
+    final buildFailed = hasBuildFailure(items);
+    final verificationComplete = !items.any(
+      (i) => i.category == 'verification' && i.status == ReadinessItemStatus.unknown,
+    );
+    final verificationMismatch = items.any(
+      (i) => i.category == 'verification' && i.status == ReadinessItemStatus.warn,
+    );
+    final rcStatus = computeRcFinalizationStatus(
+      failCount: failCount,
+      buildFailed: buildFailed,
+      macSmokeStatus: macSmoke?.status,
+      winSmokeStatus: winSmoke?.status,
+      verificationComplete: verificationComplete,
+      verificationCommitMismatch: verificationMismatch,
+    );
     return ReleaseReadinessSummary(
-      isReadyForRc: failCount == 0,
+      isReadyForRc: rcStatus == RcFinalizationStatus.ready,
+      rcFinalizationStatus: rcStatus,
+      rcStatusLabel: rcFinalizationStatusLabel(rcStatus),
       passCount: passCount,
       warnCount: warnCount,
       failCount: failCount,
       items: items,
       checkedAt: checkedAt.toLocal(),
+      verificationCommitMismatch: verificationMismatch,
     );
   }
 
