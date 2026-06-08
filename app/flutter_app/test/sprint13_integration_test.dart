@@ -10,6 +10,7 @@ import 'package:sac_app/application/sac_container.dart';
 import 'package:sac_app/data/services/sidecar_process_manager_impl.dart';
 import 'package:sac_app/data/services/windows_autostart_service_impl.dart';
 import 'package:sac_app/domain/models/sidecar_lifecycle.dart';
+import 'package:sac_app/data/services/report_consistency_service_impl.dart';
 import 'package:sac_app/domain/utils/mcp_sidecar_path_resolver.dart';
 
 void main() {
@@ -171,6 +172,11 @@ void main() {
     await service.disable();
     final disabled = await service.getStatus();
     expect(disabled.enabled, isFalse);
+  });
+
+  test('report manifest includes Sprint 13 separate from Sprint 12B', () {
+    expect(kSprintReportCommitManifest['Sprint 12B'], 'c2e73a4');
+    expect(kSprintReportCommitManifest['Sprint 13'], 'efa97e2');
   });
 
   test('Sprint 13 manifest flags validate without secrets', () {

@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 13
 
 > **Sprint 12B 기준**: `c2e73a4`
-> **Sprint 13 구현 커밋**: `(commit after push)`
+> **Sprint 13 구현 커밋**: `efa97e2`
 > **작업지시문**: [Sprint 13](https://app.notion.com/p/379864048e54815cb6a8c594fc1e0b3d)
 > **범위**: Embedded sidecar process manager / tray resident / Windows autostart
 
@@ -16,7 +16,7 @@
 - [ ] `BUILD_MANIFEST.json` Sprint 13 flags
 - [ ] `remote_mcp_enabled: false`, `external_api_enabled: false` 유지
 - [ ] Sprint 05~12B 회귀
-- [ ] `flutter analyze` / `flutter test` (183)
+- [ ] `flutter analyze` / `flutter test` (184)
 - [ ] Windows portable package 재생성 (선택)
 - [ ] Git 커밋 / 로컬 완료보고서 정합
 
@@ -42,6 +42,6 @@ powershell -ExecutionPolicy Bypass -File scripts/package_windows_rc.ps1
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | No issues |
-| `flutter test` | **183/183** passed |
+| `flutter test` | **184/184** passed |
 | MCP sidecar build | PASS |
 | dispose tearDown 회귀 | PASS (DB 미초기화 시 dispose 안전) |

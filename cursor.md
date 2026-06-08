@@ -103,7 +103,7 @@ Sprint 10: RC / Smoke / Packaging — Codex Sprint 10B PASS (HEAD 9c47b7e)
 Sprint 11: RC Finalization — Codex PASS (`5e02b31` HEAD)
 Sprint 12: RC Build Approval — Codex 기능 PASS + manifest 동기화 (`9ec7e43`)
 Sprint 12B: Windows Portable MCP Sidecar — Codex 최종 PASS (`4d49a7a`)
-Sprint 13: Embedded Sidecar / Tray / Autostart — 구현 완료, Codex 검증 대기
+Sprint 13: Embedded Sidecar / Tray / Autostart — 구현 완료 (`efa97e2`), Codex 검증 대기
 작업지시문: [Sprint 13 WI](https://app.notion.com/p/379864048e54815cb6a8c594fc1e0b3d)
 핸드오프: docs/handoff/Cursor_Handoff_Sprint_13.md
 공식 프로토콜: Notion

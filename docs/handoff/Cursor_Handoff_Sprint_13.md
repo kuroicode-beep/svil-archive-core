@@ -1,7 +1,7 @@
 # Cursor Handoff — Sprint 13 Embedded Sidecar / Tray / Autostart
 
 > **Sprint 12B 기준**: `c2e73a4` / **재작업**: `4d49a7a`
-> **Sprint 13 구현 커밋**: `(commit after push)`
+> **Sprint 13 구현 커밋**: `efa97e2`
 > **작업지시문**: [Sprint 13 WI](https://app.notion.com/p/379864048e54815cb6a8c594fc1e0b3d)
 
 ## Sprint 13 구현 요약
@@ -21,7 +21,7 @@
 - tray/closeToTray/autostart 기본값 안전성 (기본 OFF / closeToTray ON)
 - sidecar dispose 시 DB 미초기화 tearDown 회귀 없음
 - remote MCP / external API 비활성 유지
-- `flutter test` **183/183** (175 + Sprint 13 8)
+- `flutter test` **184/184** (175 + Sprint 13 9)
 
 ## 소장님에게
 

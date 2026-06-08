@@ -3,7 +3,7 @@ title: "Result Report — SAC Sprint 13"
 author: "Cursor"
 created: "2026-06-08"
 sprint12b_base_commit: "c2e73a4"
-sprint13_implementation_commit: "(commit after push)"
+sprint13_implementation_commit: "efa97e2"
 ---
 
 # 완료 보고서 — SAC Sprint 13 Embedded Sidecar / Tray / Autostart
@@ -13,7 +13,7 @@ sprint13_implementation_commit: "(commit after push)"
 ## 01. 작업 요약
 
 - **목표**: 앱이 번들 sidecar 프로세스를 관리하고 tray 상주·Windows autostart 옵션 제공
-- **결과**: 구현 완료 — Codex 검증 대기
+- **결과**: 구현 완료 (`efa97e2`) — Codex 검증 대기
 
 ## 02. 구현 완료 항목
 
@@ -37,7 +37,7 @@ sprint13_implementation_commit: "(commit after push)"
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | No issues |
-| `flutter test` | **183/183** PASS |
+| `flutter test` | **184/184** PASS |
 | MCP sidecar build | PASS |
 
 ## 05. 미완료 / 소장님 수동
