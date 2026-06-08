@@ -22,7 +22,7 @@ alwaysApply: true
 
 1. `flutter analyze` — No issues
 2. `flutter test` — 전체 통과
-3. MCP sidecar 변경 시: `npm ci --ignore-scripts && npm run build`
+3. MCP sidecar 변경 시: `cd mcp/sidecar && npm ci && npm run build && npm run verify:native`
 4. Notion 완료보고서 + Codex 검증 요청 문서
 5. 테스트 없이 완료 주장 금지
 

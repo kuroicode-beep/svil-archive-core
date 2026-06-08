@@ -46,11 +46,16 @@ void main() {
 
   test('package_windows_rc rebuilds and verifies better-sqlite3 native binding', () async {
     final script = await File(p.join(repoRoot, 'scripts', 'package_windows_rc.ps1')).readAsString();
-    expect(script, contains('npm rebuild better-sqlite3'));
+    expect(script, contains("'rebuild', 'better-sqlite3'"));
     expect(script, contains('better_sqlite3.node'));
     expect(script, isNot(contains('npm ci --ignore-scripts')));
     expect(script, isNot(contains('npm ci --omit=dev --ignore-scripts')));
     expect(script, contains('mcp_sidecar_native_binding_included'));
+    expect(script, contains('Invoke-NpmSilently'));
+    expect(script, contains(r'> $null'));
+    expect(script, contains('Assert-ManifestBooleanFlags'));
+    expect(script, contains('BUILD_MANIFEST'));
+    expect(script, contains('must be boolean'));
   });
 
   test('Sprint 14 docs use native-safe sidecar install commands', () async {

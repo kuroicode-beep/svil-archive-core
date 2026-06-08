@@ -22,6 +22,11 @@
 - **sidecar**: `verify:native` 테스트 추가, `npm test`에 포함
 - **문서**: Codex/Cursor MCP setup에서 `--ignore-scripts` 제거
 
+## Codex 2차 재작업 (manifest boolean blocker)
+
+- **원인**: PowerShell 함수가 `npm ci` stdout을 반환값에 섞어 `mcp_sidecar_native_binding_included`가 배열로 기록
+- **수정**: npm 출력 `2>&1 | Out-Null`, native binding은 `Test-Path`로 boolean 확정, `Assert-ManifestBooleanFlags` 추가
+
 ## Codex에게
 
 - stub JSON 제거 여부

@@ -17,6 +17,20 @@ function Get-SidecarNativeBindingPath {
     return Join-Path $SidecarRoot "node_modules\better-sqlite3\build\Release\better_sqlite3.node"
 }
 
+function Invoke-NpmSilently {
+    param([string[]]$Arguments)
+    $previousErrorAction = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        & npm @Arguments *> $null
+        if ($LASTEXITCODE -ne 0) {
+            throw "npm $($Arguments -join ' ') failed with exit code $LASTEXITCODE"
+        }
+    } finally {
+        $ErrorActionPreference = $previousErrorAction
+    }
+}
+
 function Install-SidecarDependencies {
     param(
         [string]$SidecarRoot,
@@ -25,19 +39,38 @@ function Install-SidecarDependencies {
     Push-Location $SidecarRoot
     try {
         if ($ProductionOnly) {
-            npm ci --omit=dev
+            Invoke-NpmSilently -Arguments @('ci', '--omit=dev')
         } else {
-            npm ci
+            Invoke-NpmSilently -Arguments @('ci')
         }
-        npm rebuild better-sqlite3
+        Invoke-NpmSilently -Arguments @('rebuild', 'better-sqlite3')
         $nativeBinding = Get-SidecarNativeBindingPath -SidecarRoot $SidecarRoot
         if (-not (Test-Path $nativeBinding)) {
             throw "better_sqlite3.node not found after install: $nativeBinding"
         }
         Write-Host "Sidecar native binding OK: $nativeBinding"
-        return $true
     } finally {
         Pop-Location
+    }
+}
+
+function Assert-ManifestBooleanFlags {
+    param([hashtable]$Manifest)
+    $booleanKeys = @(
+        'mcp_sidecar_included',
+        'mcp_sidecar_node_modules_included',
+        'mcp_sidecar_native_binding_included',
+        'external_api_enabled',
+        'remote_mcp_enabled',
+        'sidecar_process_managed_by_app',
+        'tray_resident_supported',
+        'windows_autostart_supported'
+    )
+    foreach ($key in $booleanKeys) {
+        $value = $Manifest[$key]
+        if ($value -isnot [bool]) {
+            throw "BUILD_MANIFEST $key must be boolean, got $($value.GetType().Name)"
+        }
     }
 }
 
@@ -84,7 +117,8 @@ Copy-Item (Join-Path $sidecarRoot "package.json") $sidecarDest
 Copy-Item (Join-Path $sidecarRoot "package-lock.json") $sidecarDest
 
 Write-Host "==> Installing production node_modules in package sidecar"
-$nativeBindingIncluded = Install-SidecarDependencies -SidecarRoot $sidecarDest -ProductionOnly
+Install-SidecarDependencies -SidecarRoot $sidecarDest -ProductionOnly | Out-Null
+$nativeBindingIncluded = Test-Path (Get-SidecarNativeBindingPath -SidecarRoot $sidecarDest)
 
 $sidecarReadme = @"
 SAC MCP Sidecar (local stdio)
@@ -163,6 +197,7 @@ $manifest = [ordered]@{
     tray_resident_supported = $true
     windows_autostart_supported = $true
 }
+Assert-ManifestBooleanFlags -Manifest $manifest
 $manifestJson = $manifest | ConvertTo-Json -Depth 4
 Set-Content -Path (Join-Path $dest "BUILD_MANIFEST.json") -Value $manifestJson -Encoding UTF8
 
