@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 10
 
 > **Sprint 09 기준 커밋**: `cd684a2`
-> **Sprint 10 구현 커밋**: (미커밋 — Cursor 자체 검증 시점)
+> **Sprint 10 구현 커밋**: `1db8bfd`
 > **범위**: RC / Smoke / Packaging Readiness
 > **작업지시문**: [Notion Sprint 10](https://app.notion.com/p/379864048e5481499f62ea09b10524a5)
 > **Cursor 자체 검증**: 2026.06.08 — analyze/test/sidecar PASS
@@ -20,7 +20,7 @@
 - [ ] Integrity — Windows smoke + PASS/FAIL/SKIP
 - [ ] Privacy / Work Queue — RC blocking 요약
 - [ ] MCP sidecar dist 자동 탐지 (`resolveMcpSidecarDistPath`)
-- [ ] `kSprintReportCommitManifest` Sprint 09 (`cd684a2`)
+- [ ] `kSprintReportCommitManifest` Sprint 09 (`cd684a2`) + Sprint 10 (`1db8bfd`)
 - [ ] 구현 금지 — 자동 배포/코드서명/notarization/외부API/remote MCP 미포함
 - [ ] Sprint 05~09 회귀
 - [ ] 접근성 — 50px 버튼, 16px 폰트 (Settings/Integrity)
@@ -60,5 +60,5 @@ cd mcp/sidecar && npm ci --ignore-scripts && npm run build
 | `flutter analyze` | No issues |
 | `flutter test` | **126/126** passed (Sprint 10: 21항목) |
 | MCP sidecar build | PASS |
-| Git 커밋 | ⚠️ 미커밋 |
+| Git 커밋 | ✅ `1db8bfd` |
 | Notion 완료보고서 | ✅ [등록됨](https://app.notion.com/p/379864048e54812ebd56de656a0cd051) |

@@ -1,7 +1,7 @@
 # Cursor Handoff — Sprint 10 RC / Smoke / Packaging
 
 > **Sprint 09 기준**: `cd684a2`
-> **Sprint 10 구현 커밋**: (미커밋 — Git 커밋 후 갱신)
+> **Sprint 10 구현 커밋**: `1db8bfd`
 > **작업지시문**: [Notion Sprint 10](https://app.notion.com/p/379864048e5481499f62ea09b10524a5)
 > **Cursor 자체 검증**: 2026.06.08 — analyze/test/sidecar PASS
 
@@ -19,7 +19,7 @@
 
 - `docs/handoff/Codex_Verification_Request_Sprint_10.md` 기준 검증
 - `sprint10_integration_test.dart` 21항목 + 전체 126 tests
-- B1 Git 커밋 확인 필수
+- Sprint 10 커밋: `1db8bfd`
 - Notion 완료보고서: [등록됨](https://app.notion.com/p/379864048e54812ebd56de656a0cd051)
 
 ## 소장님에게
@@ -35,7 +35,7 @@
 
 ## 남은 작업
 
-- [ ] Git 커밋 (Sprint 10 구현 + 문서)
+- [x] Git 커밋 (Sprint 10 구현 + 문서) — `1db8bfd`
 - [x] Notion 완료보고서 등록
 - [ ] Codex Sprint 10 검증
 - [ ] 실기기 smoke PASS (소장님)

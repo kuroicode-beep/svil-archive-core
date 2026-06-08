@@ -14,6 +14,7 @@ const Map<String, String> kSprintReportCommitManifest = {
   'Sprint 07': '45d2b1f',
   'Sprint 08': '11b9454',
   'Sprint 09': 'cd684a2',
+  'Sprint 10': '1db8bfd',
 };
 
 /// 구현 커밋으로 취급하는 frontmatter 키 suffix.

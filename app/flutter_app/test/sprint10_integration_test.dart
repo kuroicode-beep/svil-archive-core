@@ -220,9 +220,11 @@ void main() {
     expect(privacy.releaseBlockingCount, privacy.releaseReadiness!.failCount);
   });
 
-  test('report manifest includes Sprint 09', () {
+  test('report manifest includes Sprint 09 and Sprint 10', () {
     expect(kSprintReportCommitManifest.containsKey('Sprint 09'), isTrue);
     expect(kSprintReportCommitManifest['Sprint 09'], 'cd684a2');
+    expect(kSprintReportCommitManifest.containsKey('Sprint 10'), isTrue);
+    expect(kSprintReportCommitManifest['Sprint 10'], '1db8bfd');
   });
 
   test('ollama endpoint update refreshes local AI service', () async {
