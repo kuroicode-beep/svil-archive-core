@@ -24,8 +24,8 @@
 - [ ] 구현 금지 — 자동 배포/코드서명/notarization/외부API/remote MCP 미포함
 - [ ] Sprint 05~09 회귀
 - [ ] 접근성 — 50px 버튼, 16px 폰트 (Settings/Integrity)
-- [ ] **Sprint 10 Git 커밋 존재**
-- [ ] **Notion Cursor 완료보고서 존재**
+- [x] **Sprint 10 Git 커밋 존재** (`1db8bfd` + `822f144`)
+- [x] **Notion Cursor 완료보고서 존재**
 - [ ] `flutter analyze` No issues
 - [ ] `flutter test` (126/126) / MCP sidecar build
 

@@ -468,12 +468,25 @@ class SacContainer {
 
   /// 파일 변경 이벤트를 sync + indexing에 연결한다.
   Future<void> _onFileChanged(String relativePath) async {
-    await _syncService?.onFileChanged(relativePath);
-    final doc = await _repository?.findByPath(relativePath);
-    if (doc != null) {
-      _indexingQueue?.queueDocument(doc.id);
+    if (_syncService == null || _fileWatcher?.isWatching != true) return;
+    try {
+      await _syncService!.onFileChanged(relativePath);
+      final doc = await _repository?.findByPath(relativePath);
+      if (doc != null) {
+        _indexingQueue?.queueDocument(doc.id);
+      }
+      onWorkspaceFileChanged?.call();
+    } catch (_) {
+      // tearDown 이후 debounce 콜백이 도착한 경우 무시한다.
     }
-    onWorkspaceFileChanged?.call();
+  }
+
+  /// 테스트 tearDown에서 file watcher와 DB를 순서대로 정리한다.
+  Future<void> disposeForTest() async {
+    await _fileWatcher?.stop();
+    _syncService = null;
+    _repository = null;
+    await databaseService.close();
   }
 
   /// 테스트/수동 트리거용 파일 변경 이벤트를 전달한다.

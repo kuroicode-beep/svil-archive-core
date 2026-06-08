@@ -33,7 +33,7 @@ void main() {
   });
 
   tearDown(() async {
-    await container.databaseService.close();
+    await container.disposeForTest();
     if (await tempDir.exists()) {
       await tempDir.delete(recursive: true);
     }
@@ -308,7 +308,7 @@ void main() {
     final report = await docsContainer.reportConsistencyService.checkReports();
     expect(report.isConsistent, isTrue);
     expect(report.mismatches, isEmpty);
-    await docsContainer.databaseService.close();
+    await docsContainer.disposeForTest();
   });
 
   test('report consistency detects wrong commit in local docs', () async {
@@ -331,7 +331,7 @@ void main() {
       report.mismatches.any((m) => m.sprintLabel == 'Sprint 08'),
       isTrue,
     );
-    await docsContainer.databaseService.close();
+    await docsContainer.disposeForTest();
   });
 
   test('report mismatch detected when stored hash differs', () async {

@@ -28,7 +28,7 @@ void main() {
   });
 
   tearDown(() async {
-    await container.databaseService.close();
+    await container.disposeForTest();
     if (await tempDir.exists()) {
       await tempDir.delete(recursive: true);
     }

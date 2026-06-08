@@ -79,6 +79,7 @@ class WorkspaceFileWatcher {
     _debounceTimers[relativePath]?.cancel();
     _debounceTimers[relativePath] = Timer(debounceDuration, () {
       _debounceTimers.remove(relativePath);
+      if (_workspaceRoot == null) return;
       onChanged(relativePath);
     });
   }
