@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 10;
+const int kSacSchemaVersion = 11;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -356,6 +356,35 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       await db.execute(sql);
     }
   }
+  if (fromVersion < 11) {
+    for (final sql in sprint16MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
+}
+
+/// Sprint 16 Import Queue (다운로드 감시) migration SQL 목록을 반환한다.
+List<String> sprint16MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS import_queue (
+      id TEXT PRIMARY KEY,
+      original_file_name TEXT NOT NULL,
+      source_absolute_path TEXT NOT NULL,
+      matched_prefix TEXT,
+      target_file_name TEXT NOT NULL,
+      source_ai TEXT NOT NULL,
+      file_size INTEGER NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'detected',
+      detected_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      imported_document_id TEXT,
+      error_message TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_import_queue_status ON import_queue(status)',
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_import_queue_source ON import_queue(source_absolute_path)',
+  ];
 }
 
 /// Sprint 9 integrity / smoke migration SQL 목록을 반환한다.

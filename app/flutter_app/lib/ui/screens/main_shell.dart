@@ -16,6 +16,7 @@ import 'extraction_queue_panel.dart';
 import 'personal_archive_panel.dart';
 import 'work_queue_panel.dart';
 import 'file_import_screen.dart';
+import 'git_sync_screen.dart';
 import 'integrity_screen.dart';
 import 'privacy_screen.dart';
 import 'settings_screen.dart';
@@ -301,6 +302,16 @@ class _MainShellState extends State<MainShell> {
       case SacSection.fileImport:
         return FileImportScreen(
           importService: widget.container.documentImportService,
+          onImportCompleted: _refreshDocuments,
+        );
+      case SacSection.gitSync:
+        return GitSyncScreen(
+          gitSyncService: widget.container.gitSyncService,
+          importQueueService: widget.container.importQueueService,
+          downloadWatcherService: widget.container.downloadWatcherService,
+          coordinator: widget.container.downloadImportCoordinator,
+          settingsService: widget.container.settingsService,
+          workspaceRoot: widget.container.activeWorkspace?.rootPath ?? '',
           onImportCompleted: _refreshDocuments,
         );
       case SacSection.integrity:

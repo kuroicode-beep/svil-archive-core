@@ -102,6 +102,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _loading = true;
   bool _actionInProgress = false;
   final _ollamaController = TextEditingController();
+  final _gitRepoController = TextEditingController();
+  final _gitBranchController = TextEditingController();
 
   @override
   void initState() {
@@ -112,6 +114,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void dispose() {
     _ollamaController.dispose();
+    _gitRepoController.dispose();
+    _gitBranchController.dispose();
     super.dispose();
   }
 
@@ -134,6 +138,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
     if (!mounted) return;
     _ollamaController.text = settings.ollamaEndpoint;
+    _gitRepoController.text = settings.gitSync.repoUrl;
+    _gitBranchController.text = settings.gitSync.branch;
     setState(() {
       _settings = settings;
       _localAi = localAi;
@@ -193,6 +199,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Ollama endpoint 저장됨')),
     );
+  }
+
+  /// Git Sync 설정을 저장한다.
+  Future<void> _saveGitSync(GitSyncSettings gitSync) async {
+    final current = _settings;
+    if (current == null) return;
+    await widget.settingsService.saveSettings(current.copyWith(gitSync: gitSync));
+    await _refresh();
+  }
+
+  /// 다운로드 감시 설정을 저장한다.
+  Future<void> _saveDownloads(DownloadWatcherSettings downloads) async {
+    final current = _settings;
+    if (current == null) return;
+    await widget.settingsService.saveSettings(current.copyWith(downloads: downloads));
+    await _refresh();
   }
 
   /// RC readiness를 재평가한다.
@@ -494,6 +516,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
+            _gitSyncSection(settings),
+            _downloadsSection(settings),
             _sectionCard(
               title: 'Privacy',
               children: const [
@@ -673,6 +697,142 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  /// Git Sync 설정 섹션 (Sprint 16).
+  Widget _gitSyncSection(AppSettings settings) {
+    final git = settings.gitSync;
+    return _sectionCard(
+      title: 'Git Sync',
+      children: [
+        const Text(
+          'SAC DOCS가 Git working tree일 때 동기화합니다. 토큰/비밀번호는 저장하지 않으며 '
+          'OS git credential을 사용합니다. 자동 commit/push는 기본 OFF입니다.',
+          style: TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        SwitchListTile(
+          title: const Text('Git Sync 사용', style: TextStyle(fontSize: 16)),
+          value: git.enabled,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveGitSync(git.copyWith(enabled: v)),
+        ),
+        TextField(
+          controller: _gitRepoController,
+          style: const TextStyle(fontSize: 16),
+          decoration: const InputDecoration(
+            labelText: 'Git repo URL (https:// 또는 git@...)',
+            labelStyle: TextStyle(fontSize: 16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _gitBranchController,
+          style: const TextStyle(fontSize: 16),
+          decoration: const InputDecoration(
+            labelText: 'branch (예: main)',
+            labelStyle: TextStyle(fontSize: 16),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text('remote: ${git.remoteName}', style: const TextStyle(fontSize: 16)),
+        Row(
+          children: [
+            Expanded(
+              child: Text('sync interval: ${git.syncIntervalMinutes}분',
+                  style: const TextStyle(fontSize: 16)),
+            ),
+            IconButton(
+              iconSize: 28,
+              onPressed: _actionInProgress || git.syncIntervalMinutes <= 5
+                  ? null
+                  : () => _saveGitSync(
+                      git.copyWith(syncIntervalMinutes: git.syncIntervalMinutes - 5)),
+              icon: const Icon(Icons.remove_circle_outline),
+            ),
+            IconButton(
+              iconSize: 28,
+              onPressed: _actionInProgress
+                  ? null
+                  : () => _saveGitSync(
+                      git.copyWith(syncIntervalMinutes: git.syncIntervalMinutes + 5)),
+              icon: const Icon(Icons.add_circle_outline),
+            ),
+          ],
+        ),
+        SwitchListTile(
+          title: const Text('자동 commit (기본 OFF)', style: TextStyle(fontSize: 16)),
+          value: git.autoCommit,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveGitSync(git.copyWith(autoCommit: v)),
+        ),
+        SwitchListTile(
+          title: const Text('자동 push (기본 OFF)', style: TextStyle(fontSize: 16)),
+          value: git.autoPush,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveGitSync(git.copyWith(autoPush: v)),
+        ),
+        SizedBox(
+          height: 50,
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: _actionInProgress
+                ? null
+                : () => _saveGitSync(git.copyWith(
+                      repoUrl: _gitRepoController.text.trim(),
+                      branch: _gitBranchController.text.trim().isEmpty
+                          ? git.branch
+                          : _gitBranchController.text.trim(),
+                    )),
+            child: const Text('Git 설정 저장'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 다운로드 감시 설정 섹션 (Sprint 16).
+  Widget _downloadsSection(AppSettings settings) {
+    final dl = settings.downloads;
+    return _sectionCard(
+      title: '다운로드 감시',
+      children: [
+        const Text(
+          '다운로드 폴더에서 ai_sync_* Markdown을 감지해 Import Queue에 등록합니다. '
+          '원본은 삭제하지 않으며 자동 import는 기본 OFF입니다.',
+          style: TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        SwitchListTile(
+          title: const Text('다운로드 폴더 감시 사용 (기본 OFF)', style: TextStyle(fontSize: 16)),
+          value: dl.enabled,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveDownloads(dl.copyWith(enabled: v)),
+        ),
+        SwitchListTile(
+          title: const Text('자동 import (기본 OFF)', style: TextStyle(fontSize: 16)),
+          value: dl.autoImport,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveDownloads(dl.copyWith(autoImport: v)),
+        ),
+        SwitchListTile(
+          title: const Text('하위 폴더 포함', style: TextStyle(fontSize: 16)),
+          value: dl.includeSubfolders,
+          onChanged: _actionInProgress
+              ? null
+              : (v) => _saveDownloads(dl.copyWith(includeSubfolders: v)),
+        ),
+        Text('감시 폴더: ${dl.folderPath.isEmpty ? "기본 Downloads" : dl.folderPath}',
+            style: const TextStyle(fontSize: 16)),
+        Text('scan interval: ${dl.scanIntervalMinutes}분', style: const TextStyle(fontSize: 16)),
+        Text('prefix: ${dl.prefixes.join(", ")}', style: const TextStyle(fontSize: 16)),
+      ],
     );
   }
 

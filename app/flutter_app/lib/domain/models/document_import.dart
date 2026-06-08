@@ -49,6 +49,10 @@ class DocumentImportOptions {
   final bool generateSacId;
   final bool dryRunOnly;
 
+  /// 외부 파일 import 시 source 절대경로별 등록 파일명 override.
+  /// (Sprint 16: 다운로드 파일의 ai_sync prefix 제거 결과를 전달)
+  final Map<String, String> targetFileNameOverrides;
+
   const DocumentImportOptions({
     this.absolutePaths = const [],
     this.includeSubfolders = true,
@@ -56,6 +60,7 @@ class DocumentImportOptions {
     this.writeFrontmatter = false,
     this.generateSacId = true,
     this.dryRunOnly = true,
+    this.targetFileNameOverrides = const {},
   });
 
   DocumentImportOptions copyWith({
@@ -65,6 +70,7 @@ class DocumentImportOptions {
     bool? writeFrontmatter,
     bool? generateSacId,
     bool? dryRunOnly,
+    Map<String, String>? targetFileNameOverrides,
   }) {
     return DocumentImportOptions(
       absolutePaths: absolutePaths ?? this.absolutePaths,
@@ -73,6 +79,7 @@ class DocumentImportOptions {
       writeFrontmatter: writeFrontmatter ?? this.writeFrontmatter,
       generateSacId: generateSacId ?? this.generateSacId,
       dryRunOnly: dryRunOnly ?? this.dryRunOnly,
+      targetFileNameOverrides: targetFileNameOverrides ?? this.targetFileNameOverrides,
     );
   }
 
@@ -83,12 +90,17 @@ class DocumentImportOptions {
 /// Import 옵션 fingerprint를 생성한다.
 String buildImportOptionsFingerprint(DocumentImportOptions options) {
   final paths = List<String>.from(options.absolutePaths)..sort();
+  final overrides = options.targetFileNameOverrides.entries
+      .map((e) => '${e.key}=${e.value}')
+      .toList()
+    ..sort();
   return [
     paths.join('|'),
     options.includeSubfolders,
     options.skipRegistered,
     options.writeFrontmatter,
     options.generateSacId,
+    overrides.join('|'),
   ].join('::');
 }
 

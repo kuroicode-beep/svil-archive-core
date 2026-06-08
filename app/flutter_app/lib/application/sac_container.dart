@@ -37,6 +37,10 @@ import '../data/services/smoke_test_record_service_impl.dart';
 import '../data/services/work_queue_service_impl.dart';
 import '../data/services/workspace_file_inventory_service_impl.dart';
 import '../data/services/document_import_service_impl.dart';
+import '../data/services/import_queue_service_impl.dart';
+import '../data/services/git_sync_service_impl.dart';
+import '../data/services/download_watcher_service_impl.dart';
+import '../data/services/download_import_coordinator.dart';
 import '../data/services/workspace_integrity_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
@@ -51,6 +55,7 @@ import '../data/sync/workspace_file_watcher.dart';
 import 'sac_theme_controller.dart';
 import '../data/sync/sync_service_impl.dart';
 import '../domain/models/workspace.dart';
+import '../domain/models/settings.dart';
 import '../domain/services/archive_service.dart';
 import '../domain/services/conflict_guard_service.dart';
 import '../domain/services/dashboard_service.dart';
@@ -80,6 +85,9 @@ import '../domain/services/smoke_test_record_service.dart';
 import '../domain/services/work_queue_service.dart';
 import '../domain/services/workspace_file_inventory_service.dart';
 import '../domain/services/document_import_service.dart';
+import '../domain/services/import_queue_service.dart';
+import '../domain/services/git_sync_service.dart';
+import '../domain/services/download_watcher_service.dart';
 import '../domain/services/workspace_integrity_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sidecar_process_manager.dart';
@@ -114,6 +122,10 @@ class SacContainer {
   QueueExecutionService? _queueExecutionService;
   WorkspaceIntegrityService? _workspaceIntegrityService;
   DocumentImportService? _documentImportService;
+  ImportQueueService? _importQueueService;
+  GitSyncService? _gitSyncService;
+  DownloadWatcherService? _downloadWatcherService;
+  DownloadImportCoordinator? _downloadImportCoordinator;
   WorkspaceFileInventoryService? _fileInventoryService;
   ExecutionRecoveryService? _executionRecoveryService;
   SmokeTestRecordService? _smokeTestRecordService;
@@ -295,6 +307,30 @@ class SacContainer {
 
   DocumentImportService get documentImportService {
     final service = _documentImportService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ImportQueueService get importQueueService {
+    final service = _importQueueService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  GitSyncService get gitSyncService {
+    final service = _gitSyncService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  DownloadWatcherService get downloadWatcherService {
+    final service = _downloadWatcherService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  DownloadImportCoordinator get downloadImportCoordinator {
+    final service = _downloadImportCoordinator;
     if (service == null) throw StateError('Workspace is not opened');
     return service;
   }
@@ -487,6 +523,11 @@ class SacContainer {
       workspaceId: workspace.id,
       workspaceRoot: workspace.rootPath,
     );
+    _importQueueService = ImportQueueServiceImpl(databaseService: databaseService);
+    _downloadImportCoordinator = DownloadImportCoordinator(
+      queueService: _importQueueService!,
+      importService: _documentImportService!,
+    );
     final safeApplyService = SafeApplyServiceImpl(
       archiveService: _archiveService!,
       repository: _repository!,
@@ -605,6 +646,17 @@ class SacContainer {
       workspaceRoot: workspace.rootPath,
     );
 
+    _gitSyncService = GitSyncServiceImpl(
+      workspaceRoot: workspace.rootPath,
+      defaultRemoteName: currentSettings.gitSync.remoteName,
+      defaultBranch: currentSettings.gitSync.branch,
+    );
+    _downloadWatcherService = DownloadWatcherServiceImpl(
+      queueService: _importQueueService!,
+      settingsProvider: () async => (await settingsService.getSettings()).downloads,
+      onQueueChanged: () => onWorkspaceFileChanged?.call(),
+    );
+
     _fileWatcher = WorkspaceFileWatcher(
       onChanged: _onFileChanged,
     );
@@ -615,7 +667,23 @@ class SacContainer {
     );
     await themeController.load();
     await desktopShell.activateFromSettings();
+
+    // 다운로드 감시는 설정에서 명시적으로 켰을 때만 시작한다 (기본 OFF).
+    if (currentSettings.downloads.enabled) {
+      await _downloadWatcherService!.start();
+    }
     return workspace;
+  }
+
+  /// 설정 변경 후 다운로드 감시 상태를 재적용한다.
+  Future<void> applyDownloadWatcherSettings(DownloadWatcherSettings settings) async {
+    final watcher = _downloadWatcherService;
+    if (watcher == null) return;
+    if (settings.enabled && !watcher.isRunning) {
+      await watcher.start();
+    } else if (!settings.enabled && watcher.isRunning) {
+      await watcher.stop();
+    }
   }
 
   /// 파일 변경 이벤트를 sync + indexing에 연결한다.
@@ -636,6 +704,7 @@ class SacContainer {
   /// 테스트 tearDown에서 file watcher와 DB를 순서대로 정리한다.
   Future<void> disposeForTest() async {
     await _fileWatcher?.stop();
+    await _downloadWatcherService?.stop();
     await sidecarProcessManager.dispose();
     _syncService = null;
     _repository = null;

@@ -258,7 +258,12 @@ class DocumentImportServiceImpl implements DocumentImportService {
     if (isPathInsideWorkspaceRoot(_workspaceRoot, absolutePath)) {
       relativePath = toRelativePath(_workspaceRoot, absolutePath);
     } else {
-      final fileName = sanitizeDocumentFileName(p.basename(absolutePath));
+      final overrideName = options.targetFileNameOverrides[p.normalize(absolutePath)] ??
+          options.targetFileNameOverrides[absolutePath];
+      final baseName = (overrideName != null && overrideName.trim().isNotEmpty)
+          ? overrideName
+          : p.basename(absolutePath);
+      final fileName = sanitizeDocumentFileName(baseName);
       relativePath = p.posix.join('documents', 'Import', fileName);
       sourceAbsolutePath = absolutePath;
       if (await _fileStore.exists(relativePath)) {

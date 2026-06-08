@@ -41,7 +41,12 @@ class DocumentIndexer {
     String body;
     try {
       final raw = await _fileStore.readContent(metadata.path);
-      body = parseMarkdownWithFrontmatter(raw).body;
+      try {
+        body = parseMarkdownWithFrontmatter(raw).body;
+      } on FrontmatterParseException {
+        // frontmatter가 없는 문서(외부 import/orphan)는 원문 전체를 인덱싱한다.
+        body = raw;
+      }
     } catch (_) {
       return;
     }
