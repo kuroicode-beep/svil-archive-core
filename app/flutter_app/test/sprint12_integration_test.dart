@@ -8,6 +8,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:sac_app/application/sac_container.dart';
 import 'package:sac_app/data/db/migrations.dart';
+import 'package:sac_app/data/services/report_consistency_service_impl.dart';
 import 'package:sac_app/domain/models/rc_build_approval.dart';
 import 'package:sac_app/domain/models/rc_finalization.dart';
 import 'package:sac_app/domain/models/smoke_test_record.dart';
@@ -45,26 +46,26 @@ void main() {
     await container.bindWorkspace(workspace);
   }
 
-  Future<void> recordVerificationSet({int testCount = 147}) async {
+  Future<void> recordVerificationSet({int testCount = 166}) async {
     final svc = container.verificationPassRecordService;
-    const sprintCommit = '2833494';
+    const sprintCommit = '2e2e4da';
     await svc.recordPass(
       checkType: 'analyze',
       source: 'auto',
-      verifiedHeadCommit: '5e02b31',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
     await svc.recordPass(
       checkType: 'test',
       source: 'auto',
       testCount: testCount,
-      verifiedHeadCommit: '5e02b31',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
     await svc.recordPass(
       checkType: 'sidecar_build',
       source: 'auto',
-      verifiedHeadCommit: '5e02b31',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
   }
@@ -263,6 +264,12 @@ void main() {
       integrityCritical: true,
     );
     expect(status, ReleaseApprovalStatus.blocked);
+  });
+
+  test('report manifest includes Sprint 12 and RC verification baseline', () {
+    expect(kSprintReportCommitManifest['Sprint 12'], '2e2e4da');
+    expect(kRcVerificationSprintCommit, '2e2e4da');
+    expect(kRcVerificationSprintLabel, 'Sprint 12');
   });
 
   test('Sprint 11 rc finalization regression still evaluates verification items', () async {

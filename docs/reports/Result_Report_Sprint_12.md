@@ -3,14 +3,15 @@ title: "Result Report — SAC Sprint 12"
 author: "Cursor"
 created: "2026-06-08"
 sprint11_base_commit: "5e02b31"
-sprint12_implementation_commit: "(미커밋)"
+sprint12_implementation_commit: "2e2e4da"
 ---
 
 # 완료 보고서 — SAC Sprint 12 RC Build Approval
 
 > **Sprint 11 기준**: `5e02b31`
+> **Sprint 12 구현 커밋**: `2e2e4da`
 > **작업지시문**: 채팅 WI (Notion 차단, 2026.06.08)
-> **Codex 검증**: 대기
+> **Codex 검증**: 기능 PASS / 문서·manifest 정합 재작업 후 재검증
 
 ## 01. 작업 요약
 
@@ -39,14 +40,21 @@ sprint12_implementation_commit: "(미커밋)"
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | No issues |
-| `flutter test` | 165/165 PASS (Sprint 12: 18항목) |
+| `flutter test` | 166/166 PASS (Sprint 12: 19항목) |
 | MCP sidecar build | PASS |
 
-## 05. Notion
+## 05. Codex 재작업 (문서·manifest 정합)
+
+- `kSprintReportCommitManifest` Sprint 12 (`2e2e4da`) 추가
+- `kRcVerificationSprintLabel` → Sprint 12
+- 완료보고서 / Codex 요청 / `cursor.md` 커밋 해시 갱신
+- sprint11/12 테스트 manifest·verification 기준 보강
+
+## 06. Notion
 
 Notion `token_expired`로 완료보고서 페이지는 로컬 문서에 기록. Notion 복구 후 동기화 필요.
 
-## 06. 핸드오프
+## 07. 핸드오프
 
 - Codex: `docs/handoff/Codex_Verification_Request_Sprint_12.md`
 - Cursor: `docs/handoff/Cursor_Handoff_Sprint_12.md`

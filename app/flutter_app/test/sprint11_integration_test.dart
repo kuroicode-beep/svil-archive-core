@@ -44,25 +44,25 @@ void main() {
     await container.bindWorkspace(workspace);
   }
 
-  Future<void> recordVerificationSet({String sprintCommit = '2833494', int testCount = 147}) async {
+  Future<void> recordVerificationSet({String sprintCommit = '2e2e4da', int testCount = 166}) async {
     final svc = container.verificationPassRecordService;
     await svc.recordPass(
       checkType: 'analyze',
       source: 'auto',
-      verifiedHeadCommit: '2833494',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
     await svc.recordPass(
       checkType: 'test',
       source: 'auto',
       testCount: testCount,
-      verifiedHeadCommit: '2833494',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
     await svc.recordPass(
       checkType: 'sidecar_build',
       source: 'auto',
-      verifiedHeadCommit: '2833494',
+      verifiedHeadCommit: '2e2e4da',
       verifiedSprintCommit: sprintCommit,
     );
   }
@@ -132,8 +132,8 @@ void main() {
     await recordVerificationSet();
     final analyze = await container.verificationPassRecordService.getLatestForType('analyze');
     final test = await container.verificationPassRecordService.getLatestForType('test');
-    expect(analyze?.verifiedSprintCommit, '2833494');
-    expect(test?.testCount, 147);
+    expect(analyze?.verifiedSprintCommit, '2e2e4da');
+    expect(test?.testCount, 166);
     expect(await container.verificationPassRecordService.hasCompleteVerificationSet(), isTrue);
   });
 
@@ -282,7 +282,8 @@ void main() {
   test('report manifest includes Sprint 10 and Sprint 11', () {
     expect(kSprintReportCommitManifest['Sprint 10'], '1db8bfd');
     expect(kSprintReportCommitManifest['Sprint 11'], '2833494');
-    expect(kRcVerificationSprintCommit, '2833494');
+    expect(kRcVerificationSprintCommit, '2e2e4da');
+    expect(kRcVerificationSprintLabel, 'Sprint 12');
   });
 
   test('Sprint 10 readiness evaluate still works after Sprint 11 changes', () async {

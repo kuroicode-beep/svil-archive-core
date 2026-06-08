@@ -1,7 +1,8 @@
 # Codex Verification Request — Sprint 12
 
 > **Sprint 11 기준**: `5e02b31`
-> **Sprint 12 구현 커밋**: (구현 후 갱신)
+> **Sprint 12 구현 커밋**: `2e2e4da`
+> **재작업 커밋**: (manifest·문서 동기화 후 갱신)
 > **범위**: RC Build Approval / Smoke Approval / Tag Readiness / Final Bundle
 > **작업지시문**: 채팅 WI (Notion 차단, 2026.06.08)
 
@@ -20,7 +21,11 @@
 - [ ] external API OFF / remote MCP OFF 유지
 - [ ] Sprint 05~11 회귀
 - [ ] `flutter analyze` / `flutter test` / MCP sidecar build
-- [ ] Git 커밋 / 완료보고서 (Notion 복구 시)
+- [x] Git 커밋 (`2e2e4da`)
+- [x] Cursor 자체 검증 — analyze / test 165 / sidecar build
+- [x] `kSprintReportCommitManifest` Sprint 12 (`2e2e4da`) + RC 기준 Sprint 12
+- [x] 완료보고서 / handoff / cursor.md 커밋 해시 정합 (재작업 후)
+- [ ] Notion 완료보고서 (token 복구 시)
 
 ## 핵심 파일
 

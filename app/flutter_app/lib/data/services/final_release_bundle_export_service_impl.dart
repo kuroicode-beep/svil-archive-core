@@ -72,7 +72,7 @@ class FinalReleaseBundleExportServiceImpl implements FinalReleaseBundleExportSer
     buffer.writeln();
     buffer.writeln('생성일: ${_humanDateTime(DateTime.now())}');
     buffer.writeln('RC 기준 커밋: `$rcCommit`');
-    buffer.writeln('Sprint 11 구현: `2833494` / 재작업: `5e02b31`');
+    buffer.writeln('Sprint 11 구현: `2833494` / 재작업: `5e02b31` / Sprint 12: `2e2e4da`');
     buffer.writeln('후보 태그: `v0.1.0-rc.1` (자동 생성 없음)');
     buffer.writeln();
     buffer.writeln('## 01. Sprint 01~11 완료 요약');

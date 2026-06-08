@@ -1,6 +1,7 @@
 # Cursor Handoff — Sprint 12 RC Build Approval
 
 > **Sprint 11 기준**: `5e02b31`
+> **Sprint 12 구현 커밋**: `2e2e4da`
 > **작업지시문**: Notion 차단 — 채팅 WI (2026.06.08, 루미)
 
 ## Sprint 12 구현 요약
