@@ -1,8 +1,15 @@
 # Codex Verification Request — Sprint 16 Git Sync + Download Watcher
 
-> **기준 HEAD**: (Sprint 16 commit 후 기록)
+> **기준 HEAD**: 재작업 commit (push 후 기록) / 초기 `17dea85`
 > **Sprint 15 PASS**: `d2021bd`
 > **작업지시문**: [Sprint 16 WI](https://app.notion.com/p/379864048e54818798e3ddb6ecf55f3b)
+
+## 재작업 (Codex blocker 대응 — `17dea85` 이후)
+
+- [ ] **Blocker**: `commitPaths()`가 서비스 레벨에서 금지 경로 제외 (`isExcludedFromCommit`) — `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups
+- [ ] **Important**: `autoImport` ON 시 watcher가 dry-run 후 안전 후보만 자동 import (conflict 자동 중단)
+- [ ] **Advisory**: `database_service_impl.dart` `reset()`에 `import_queue` 추가 커밋 포함
+- [ ] 재작업 테스트 23/23 (commit 제외 3건, autoImport 2건 추가)
 
 ## 검증 체크리스트 (작업지시문 §11, §15)
 

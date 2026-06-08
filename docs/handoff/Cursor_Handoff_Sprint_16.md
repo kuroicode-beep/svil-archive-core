@@ -46,10 +46,16 @@ Remote MCP 대신 Git Sync + Download Watcher + Import Queue로 현실적 연결
 4. Import + Commit → commit 대상에 `.md`/report만 포함 → Push → remote 반영
 5. Cursor MCP `get_workspace_status` documentCount 유지/증가
 
+## 재작업 (Codex blocker, `17dea85` 이후)
+
+- **Blocker**: `git_sync_service_impl.dart`에 `isExcludedFromCommit()` 추가. `commitPaths()`가 `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups를 stage에서 제거 (서비스 레벨 최종 방어선).
+- **Important**: `download_watcher_service_impl.dart`에 coordinator 주입. `autoImport` ON 시 `scanOnce`가 dry-run 후 안전 후보만 `executeApprovedImport`로 자동 등록 (conflict 자동 중단).
+- **Advisory**: `database_service_impl.dart` `reset()`에 `import_queue` 포함.
+
 ## 테스트
 
 - `flutter analyze`: PASS
-- `flutter test test/sprint16_integration_test.dart`: **18/18**
+- `flutter test test/sprint16_integration_test.dart`: **23/23** (재작업 5건 추가)
 - `mcp/sidecar` `npm ci && npm run build && npm test`: **10/10** (native 2/2)
 - full `flutter test`: sprint16 전부 통과. 기존 report-consistency 12건 실패는 미커밋 docs 의존 (Sprint 16 무관, Sprint 15 핸드오프에 기록됨)
 

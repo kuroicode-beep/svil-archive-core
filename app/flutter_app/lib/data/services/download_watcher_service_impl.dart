@@ -11,10 +11,12 @@ import '../../domain/models/settings.dart';
 import '../../domain/services/download_watcher_service.dart';
 import '../../domain/services/import_queue_service.dart';
 import '../import/ai_sync_prefix.dart';
+import 'download_import_coordinator.dart';
 
 class DownloadWatcherServiceImpl implements DownloadWatcherService {
   final ImportQueueService _queueService;
   final Future<DownloadWatcherSettings> Function() _settingsProvider;
+  final DownloadImportCoordinator? _coordinator;
   final void Function()? onQueueChanged;
 
   DirectoryWatcher? _watcher;
@@ -27,9 +29,11 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
   DownloadWatcherServiceImpl({
     required ImportQueueService queueService,
     required Future<DownloadWatcherSettings> Function() settingsProvider,
+    DownloadImportCoordinator? coordinator,
     this.onQueueChanged,
   })  : _queueService = queueService,
-        _settingsProvider = settingsProvider;
+        _settingsProvider = settingsProvider,
+        _coordinator = coordinator;
 
   @override
   bool get isRunning => _running;
@@ -91,6 +95,18 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
         enqueued.add(item);
       }
     }
+
+    // 자동 import ON이면 dry-run 후 안전한 후보만 등록한다 (conflict는 coordinator가 자동 중단).
+    if (settings.autoImport && _coordinator != null) {
+      for (final item in enqueued) {
+        try {
+          await _coordinator.importItem(item.id);
+        } catch (_) {
+          // 개별 항목 실패는 큐 상태에 기록되며 전체 스캔을 중단하지 않는다.
+        }
+      }
+    }
+
     if (enqueued.isNotEmpty) {
       onQueueChanged?.call();
     }

@@ -22,6 +22,38 @@ const List<String> kRequiredGitignoreRules = [
   '*.zip',
 ];
 
+/// commit 대상에서 항상 제외해야 하는 경로인지 판별한다 (작업지시문 06·10).
+/// 서비스 레벨 최종 방어선 — UI가 잘못된 경로를 넘겨도 차단한다.
+bool isExcludedFromCommit(String relativePath) {
+  final path = relativePath.replaceAll('\\', '/').trim();
+  if (path.isEmpty) return true;
+  final lower = path.toLowerCase();
+  final base = lower.split('/').last;
+
+  // SQLite 인덱스 산출물 (.sac 하위 어디든)
+  if (lower.endsWith('.sqlite') ||
+      lower.endsWith('.sqlite-wal') ||
+      lower.endsWith('.sqlite-shm')) {
+    return true;
+  }
+  // .sac 캐시/임시/로그/백업
+  if (lower.startsWith('.sac/cache/') ||
+      lower.startsWith('.sac/tmp/') ||
+      lower.startsWith('.sac/logs/') ||
+      lower.startsWith('.sac/backups/')) {
+    return true;
+  }
+  // 패키지/빌드 산출물
+  if (lower.startsWith('bin/windows/') || lower.endsWith('.zip')) {
+    return true;
+  }
+  // 비밀/환경 파일
+  if (base == '.env' || base.startsWith('.env.') || base.startsWith('secrets.')) {
+    return true;
+  }
+  return false;
+}
+
 class GitSyncServiceImpl implements GitSyncService {
   final String _workspaceRoot;
   final String _defaultRemoteName;
@@ -105,22 +137,36 @@ class GitSyncServiceImpl implements GitSyncService {
 
   @override
   Future<GitCommandResult> commitPaths(List<String> relativePaths, String message) async {
-    final paths = relativePaths.where((e) => e.trim().isNotEmpty).toList();
+    final requested = relativePaths.where((e) => e.trim().isNotEmpty).toList();
+    // 서비스 레벨 최종 방어선 — 금지 경로(.sqlite/zip/bin/secrets/.env/cache·logs)를 제거한다.
+    final excluded = requested.where(isExcludedFromCommit).toList();
+    final paths = requested.where((p) => !isExcludedFromCommit(p)).toList();
     if (paths.isEmpty) {
-      return const GitCommandResult(
+      return GitCommandResult(
         success: false,
         command: 'git commit',
         stdout: '',
-        stderr: 'commit 대상 경로가 없습니다.',
+        stderr: excluded.isNotEmpty
+            ? 'commit 대상이 모두 제외 규칙에 해당합니다: ${excluded.join(', ')}'
+            : 'commit 대상 경로가 없습니다.',
         exitCode: -1,
       );
     }
-    // commit 대상 제한 — 지정한 경로만 stage 한다.
+    // commit 대상 제한 — 허용된 경로만 stage 한다.
     final addResult = await _run(['add', '--', ...paths]);
     if (!addResult.success) {
       return addResult;
     }
-    return _run(['commit', '-m', message, '--', ...paths]);
+    final commitResult = await _run(['commit', '-m', message, '--', ...paths]);
+    if (excluded.isEmpty) return commitResult;
+    // 제외된 경로를 결과에 알린다.
+    return GitCommandResult(
+      success: commitResult.success,
+      command: commitResult.command,
+      stdout: commitResult.stdout,
+      stderr: '${commitResult.stderr}\n제외된 경로(${excluded.length}): ${excluded.join(', ')}'.trim(),
+      exitCode: commitResult.exitCode,
+    );
   }
 
   @override

@@ -75,6 +75,7 @@ class DatabaseServiceImpl implements DatabaseService {
         'sync_journal',
         'sync_state',
         'trash_items',
+        'import_queue',
         'documents',
         'workspaces',
         'app_settings',

@@ -393,4 +393,91 @@ void main() {
     final status = await service.status();
     expect(status.isRepository, isFalse);
   });
+
+  // ---- Rework: commit 제외 강제 (Blocker) ----
+
+  test('isExcludedFromCommit blocks index/build/secret paths', () {
+    expect(isExcludedFromCommit('.sac/sac.sqlite'), isTrue);
+    expect(isExcludedFromCommit('.sac/backups/x.sqlite'), isTrue);
+    expect(isExcludedFromCommit('.sac/logs/run.log'), isTrue);
+    expect(isExcludedFromCommit('bin/windows/sac_app.exe'), isTrue);
+    expect(isExcludedFromCommit('release.zip'), isTrue);
+    expect(isExcludedFromCommit('.env'), isTrue);
+    expect(isExcludedFromCommit('.env.local'), isTrue);
+    expect(isExcludedFromCommit('secrets.json'), isTrue);
+    // 허용: import된 markdown과 import report
+    expect(isExcludedFromCommit('documents/Import/note.md'), isFalse);
+    expect(isExcludedFromCommit('.sac/imports/import_report_x.md'), isFalse);
+  });
+
+  test('commitPaths excludes forbidden paths at service level', () async {
+    await bindWorkspace();
+    await initGitWorkspace();
+    final root = container.activeWorkspace!.rootPath;
+    final docDir = Directory(p.join(root, 'documents', 'Import'));
+    await docDir.create(recursive: true);
+    await File(p.join(docDir.path, 'safe_s16.md')).writeAsString('# safe\n\nbody');
+    // 금지 파일들도 워킹트리에 생성 (commit 되면 안 됨)
+    await File(p.join(root, 'leak.zip')).writeAsString('zip');
+    await File(p.join(root, '.env')).writeAsString('SECRET=1');
+
+    final result = await container.gitSyncService.commitPaths(
+      ['documents/Import/safe_s16.md', '.sac/sac.sqlite', 'leak.zip', '.env'],
+      'docs: import AI sync files',
+    );
+    expect(result.success, isTrue);
+
+    final tracked = await Process.run('git', ['ls-files'], workingDirectory: root);
+    final files = tracked.stdout.toString();
+    expect(files, contains('documents/Import/safe_s16.md'));
+    expect(files.contains('.sac/sac.sqlite'), isFalse);
+    expect(files.contains('leak.zip'), isFalse);
+    expect(files.contains('.env'), isFalse);
+  });
+
+  test('commitPaths fails when all paths are excluded', () async {
+    await bindWorkspace();
+    await initGitWorkspace();
+    final result = await container.gitSyncService.commitPaths(
+      ['.sac/sac.sqlite', 'build.zip'],
+      'docs: should not commit',
+    );
+    expect(result.success, isFalse);
+    expect(result.stderr, contains('제외'));
+  });
+
+  // ---- Rework: autoImport 동작 (Important) ----
+
+  test('autoImport ON imports detected files automatically', () async {
+    await bindWorkspace();
+    await saveDownloadSettings(folder: downloadsDir.path, autoImport: true);
+    await writeDownload(
+      'ai_sync_chatgpt_20260608_auto.md',
+      content: '# Auto\n\nauto import body',
+    );
+
+    final enqueued = await container.downloadWatcherService.scanOnce();
+    expect(enqueued.length, 1);
+
+    // 자동 import로 큐 항목이 imported 상태가 되고 문서가 등록된다.
+    final item = await container.importQueueService.findById(enqueued.first.id);
+    expect(item!.status, ImportQueueStatus.imported);
+
+    final docs = await container.archiveService.listDocuments();
+    expect(docs.any((d) => d.path == 'documents/Import/20260608_auto.md'), isTrue);
+  });
+
+  test('autoImport OFF only enqueues without importing', () async {
+    await bindWorkspace();
+    await saveDownloadSettings(folder: downloadsDir.path, autoImport: false);
+    await writeDownload('ai_sync_chatgpt_20260608_noauto.md');
+
+    final enqueued = await container.downloadWatcherService.scanOnce();
+    expect(enqueued.length, 1);
+    final item = await container.importQueueService.findById(enqueued.first.id);
+    expect(item!.status, ImportQueueStatus.detected);
+
+    final docs = await container.archiveService.listDocuments();
+    expect(docs.isEmpty, isTrue);
+  });
 }

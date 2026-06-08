@@ -12,8 +12,9 @@ sprint15_base_commit: "d2021bd"
 ## 01. 작업 요약
 
 - **목표**: 웹 AI 결과물(ai_sync_* Markdown)을 다운로드 폴더에서 회수하고 Git으로 동기화
-- **결과**: ✅ 완료 (Codex 검증 대기)
+- **결과**: ✅ 재작업 완료 (Codex 재검증 대기)
 - **Sprint 15 기준**: `d2021bd`
+- **초기 구현 커밋**: `17dea85` (Codex PASS 보류)
 
 ## 02. 구현 결과
 
@@ -41,12 +42,20 @@ sprint15_base_commit: "d2021bd"
 
 - `document_indexer.dart`: frontmatter 없는 문서(외부 import/orphan)가 이전엔 `parseMarkdownWithFrontmatter` 예외로 **silent skip**되어 검색 불가했음. fallback으로 원문 인덱싱하도록 수정. Sprint 16 다운로드 import(frontmatter OFF) 검색 가능의 전제.
 
+## 04-B. Codex blocker 재작업 (`17dea85` 이후)
+
+| 항목 | 조치 |
+|------|------|
+| **Blocker** — commit 제외가 서비스 레벨 미강제 | `isExcludedFromCommit()` 추가, `commitPaths()`가 `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups 경로를 stage에서 제거. 전부 제외면 commit 실패 |
+| **Important** — `autoImport` 미동작 | watcher에 coordinator 주입, `scanOnce`에서 `autoImport` ON 시 dry-run 후 안전 후보만 `executeApprovedImport`로 등록 (conflict 자동 중단) |
+| **Advisory** — `database_service_impl.dart` 미커밋 | `reset()`에 `import_queue` 추가 변경을 재작업 커밋에 포함 |
+
 ## 05. 테스트
 
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | PASS |
-| `flutter test sprint16` | 18/18 |
+| `flutter test sprint16` | 23/23 (재작업 5건 추가) |
 | `mcp/sidecar` build + test | 10/10 (native 2/2) |
 | full `flutter test` | sprint16 전부 통과 / 기존 report-consistency 12건 실패(미커밋 docs, Sprint 16 무관) |
 
@@ -75,5 +84,6 @@ sprint15_base_commit: "d2021bd"
 
 ## 09. Git 커밋
 
-- 구현 커밋: (push 후 기록)
-- Codex 검증: 대기
+- 초기 구현: `17dea85` (Codex PASS 보류)
+- 재작업 커밋: (push 후 기록)
+- Codex 검증: 재검증 대기

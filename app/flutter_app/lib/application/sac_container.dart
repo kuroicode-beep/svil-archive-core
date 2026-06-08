@@ -654,6 +654,7 @@ class SacContainer {
     _downloadWatcherService = DownloadWatcherServiceImpl(
       queueService: _importQueueService!,
       settingsProvider: () async => (await settingsService.getSettings()).downloads,
+      coordinator: _downloadImportCoordinator!,
       onQueueChanged: () => onWorkspaceFileChanged?.call(),
     );
 
