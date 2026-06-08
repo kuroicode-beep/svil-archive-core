@@ -25,6 +25,7 @@ alwaysApply: true
 3. MCP sidecar 변경 시: `cd mcp/sidecar && npm ci && npm run build && npm run verify:native`
 4. Notion 완료보고서 + Codex 검증 요청 문서
 5. 테스트 없이 완료 주장 금지
+6. **재작업/스프린트 완료 시 자동 `git commit` + `git push`** (관련 파일만 — `svil-auto-commit-rework` 규칙)
 
 ## 현재 프로젝트 (SAC)
 

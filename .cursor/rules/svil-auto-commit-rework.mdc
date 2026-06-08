@@ -1,0 +1,39 @@
+---
+description: 스프린트·재작업 완료 시 자동 git commit 및 push
+alwaysApply: true
+---
+
+# 재작업 완료 시 자동 커밋·푸시
+
+스프린트 구현, Codex blocker 재작업, 검증 PASS 문서화 등 **작업/재작업이 끝났을 때** 사용자가 `커밋 푸시`를 요청하지 않아도 자동으로 commit + push 한다.
+
+## 적용 시점
+
+- 구현 또는 재작업 완료 (테스트·analyze 통과 확인 후)
+- Codex PASS / 완료보고서·handoff 문서 반영 후
+- 해당 스프린트 범위 변경이 확정된 직후
+
+## 커밋 범위
+
+- **포함**: 해당 스프린트/재작업의 코드, 테스트, `docs/reports/`, `docs/handoff/` 관련 파일
+- **제외**: 무관한 스프린트 docs, `asset/design/`, `bin/`, 삭제된 Idea 문서, 비밀·`.env` 파일
+- 변경이 없으면 empty commit 금지
+
+## 절차
+
+1. `git status`, `git diff`, `git log`로 변경·메시지 스타일 확인
+2. 관련 파일만 `git add`
+3. why 중심 1–2문장 commit message
+4. `git push -u origin HEAD`
+5. 완료 보고에 커밋 해시 기록
+
+## Git 안전
+
+- `git config` 수정, force push, `--no-verify` 금지
+- pre-commit hook 실패 시 amend 대신 수정 후 **새 commit**
+- 이미 push된 commit amend 금지 (사용자 명시 요청 시만)
+
+## 예외
+
+- 사용자가 “커밋하지 마” / “push 보류”라고 명시한 경우
+- WIP·미완료·테스트 실패 상태
