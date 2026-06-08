@@ -12,7 +12,7 @@ sprint15_base_commit: "d2021bd"
 ## 01. 작업 요약
 
 - **목표**: 웹 AI 결과물(ai_sync_* Markdown)을 다운로드 폴더에서 회수하고 Git으로 동기화
-- **결과**: ✅ 재작업 완료 (Codex 재검증 대기)
+- **결과**: ✅ **Codex PASS** (`5a2d99b`) — 소장님 smoke 진행 가능
 - **Sprint 15 기준**: `d2021bd`
 - **초기 구현 커밋**: `17dea85` (Codex PASS 보류)
 
@@ -82,9 +82,21 @@ sprint15_base_commit: "d2021bd"
 - `executeImport(dryRunOnly:false)` 미사용(UI/coordinator는 approved snapshot만). MCP/API import 개방 전 deprecated 권장.
 - 작업지시문의 `npm ci --ignore-scripts`는 native binding 미빌드로 native 테스트 실패 → `npm ci`(scripts 포함) 사용 권장.
 
-## 09. Git 커밋
+## 09. Codex 재검증 (PASS)
 
-- 초기 구현: `17dea85` (Codex PASS 보류)
-- 재작업 1차: `021cb44` (commit 제외 강제, DB reset, autoImport 1차 wiring)
-- 재작업 2차 (Sprint 16R): (push 후 기록) — autoImport를 Experimental 비활성으로 확정
-- Codex 검증: 재검증 대기
+| 항목 | 결과 |
+|------|------|
+| HEAD / origin | `5a2d99b` |
+| `flutter analyze` | PASS |
+| `flutter test sprint16` | 24/24 |
+| `mcp/sidecar` build + test | 10/10 |
+| Blocker commit 제외 | 닫힘 |
+| Important autoImport | Experimental 비활성(의도) |
+| Sprint 14/15 MCP 회귀 | 없음 |
+
+## 10. Git 커밋
+
+- 초기 구현: `17dea85`
+- 재작업 1차: `021cb44`
+- Sprint 16R: `5a2d99b`
+- Codex 검증: **PASS**

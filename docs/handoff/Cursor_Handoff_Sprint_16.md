@@ -1,5 +1,6 @@
 # Cursor Handoff — Sprint 16 Git Sync + Download Watcher
 
+> **Sprint 16 PASS**: `5a2d99b` (Codex PASS)
 > **Sprint 15 PASS**: `d2021bd` (Codex PASS)
 > **작업지시문**: [Sprint 16 WI](https://app.notion.com/p/379864048e54818798e3ddb6ecf55f3b)
 

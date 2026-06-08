@@ -13,7 +13,7 @@ sprint16_base_commit: "17dea85"
 ## 01. 재작업 요약
 
 - **목표**: Codex PASS 보류 blocker/important/advisory 해소
-- **결과**: ✅ 완료 (Codex 재검증 대기)
+- **결과**: ✅ **Codex PASS** (`5a2d99b`)
 
 ## 02. 조치 내역
 
@@ -69,8 +69,8 @@ sprint16_base_commit: "17dea85"
 
 - 초기 구현: `17dea85`
 - 재작업 1차: `021cb44`
-- Sprint 16R: (push 후 기록)
-- Codex 검증: 재검증 대기
+- Sprint 16R: `5a2d99b`
+- Codex 검증: **PASS**
 
 ## 06. 핸드오프
 
