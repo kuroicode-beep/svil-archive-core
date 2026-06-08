@@ -17,4 +17,7 @@ abstract class DocumentImportService {
 
   /// 정식 등록을 실행한다 (dryRunOnly=false, backup 필수).
   Future<ImportExecutionResult> executeImport(DocumentImportOptions options);
+
+  /// dry-run snapshot에 고정된 후보만 등록한다.
+  Future<ImportExecutionResult> executeApprovedImport(ImportApprovedSnapshot snapshot);
 }

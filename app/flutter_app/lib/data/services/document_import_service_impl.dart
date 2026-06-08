@@ -81,13 +81,42 @@ class DocumentImportServiceImpl implements DocumentImportService {
         dryRun: true,
         registeredCount: 0,
         failedCount: 0,
-        skippedCount: preview.skipCount + preview.conflictCount + preview.duplicateCount + preview.invalidCount,
+        skippedCount: preview.skipCount +
+            preview.conflictCount +
+            preview.duplicateCount +
+            preview.invalidCount,
         preview: preview,
       );
     }
 
     final preview = await dryRun(options.copyWith(dryRunOnly: true));
-    final importable = preview.candidates.where((c) => c.isImportable).toList();
+    return _executeCandidates(
+      preview: preview,
+      options: options,
+      importable: preview.candidates.where((c) => c.isImportable).toList(),
+    );
+  }
+
+  @override
+  Future<ImportExecutionResult> executeApprovedImport(
+    ImportApprovedSnapshot snapshot,
+  ) async {
+    if (snapshot.options.dryRunOnly) {
+      throw StateError('Approved snapshot cannot use dryRunOnly options');
+    }
+    return _executeCandidates(
+      preview: snapshot.preview,
+      options: snapshot.options.copyWith(dryRunOnly: false),
+      importable: snapshot.importableCandidates,
+    );
+  }
+
+  /// snapshot 고정 후보를 실제 등록한다.
+  Future<ImportExecutionResult> _executeCandidates({
+    required ImportDryRunResult preview,
+    required DocumentImportOptions options,
+    required List<ImportCandidate> importable,
+  }) async {
     if (importable.isEmpty) {
       return ImportExecutionResult(
         dryRun: false,
@@ -181,6 +210,8 @@ class DocumentImportServiceImpl implements DocumentImportService {
     }
 
     final candidates = <ImportCandidate>[];
+    final pendingSacId = <String, String>{};
+    final pendingHash = <String, String>{};
     for (final absolute in absolutePaths) {
       candidates.add(
         await _buildCandidate(
@@ -189,6 +220,8 @@ class DocumentImportServiceImpl implements DocumentImportService {
           byPath: byPath,
           bySacId: bySacId,
           byHash: byHash,
+          pendingSacId: pendingSacId,
+          pendingHash: pendingHash,
         ),
       );
     }
@@ -203,6 +236,8 @@ class DocumentImportServiceImpl implements DocumentImportService {
     required Map<String, Map<String, Object?>> byPath,
     required Map<String, Map<String, Object?>> bySacId,
     required Map<String, List<Map<String, Object?>>> byHash,
+    Map<String, String>? pendingSacId,
+    Map<String, String>? pendingHash,
   }) async {
     if (!await File(absolutePath).exists()) {
       return ImportCandidate(
@@ -225,8 +260,19 @@ class DocumentImportServiceImpl implements DocumentImportService {
     } else {
       final fileName = sanitizeDocumentFileName(p.basename(absolutePath));
       relativePath = p.posix.join('documents', 'Import', fileName);
-      status = ImportCandidateStatus.copyRequired;
       sourceAbsolutePath = absolutePath;
+      if (await _fileStore.exists(relativePath)) {
+        return ImportCandidate(
+          relativePath: relativePath,
+          title: titleFromRelativePath(relativePath),
+          categoryPath: 'Import',
+          contentHash: '',
+          status: ImportCandidateStatus.conflictTargetPath,
+          sourceAbsolutePath: absolutePath,
+          message: 'Target path already exists in workspace — overwrite blocked',
+        );
+      }
+      status = ImportCandidateStatus.copyRequired;
     }
 
     if (!relativePath.startsWith('documents/') || !relativePath.toLowerCase().endsWith('.md')) {
@@ -263,9 +309,10 @@ class DocumentImportServiceImpl implements DocumentImportService {
         ? parsed.sacId!.trim()
         : (options.generateSacId ? generateImportSacId(parsed.contentHash) : null);
 
-    if (sacId != null && bySacId.containsKey(sacId)) {
-      final existingPath = bySacId[sacId]!['relative_path'] as String?;
-      if (existingPath != relativePath) {
+    if (sacId != null) {
+      final existingPath = bySacId[sacId]?['relative_path'] as String? ??
+          pendingSacId?[sacId];
+      if (existingPath != null && existingPath != relativePath) {
         return ImportCandidate(
           relativePath: relativePath,
           title: title,
@@ -281,8 +328,10 @@ class DocumentImportServiceImpl implements DocumentImportService {
     }
 
     final hashMatches = byHash[parsed.contentHash] ?? const [];
-    if (hashMatches.isNotEmpty &&
-        !hashMatches.any((row) => row['relative_path'] == relativePath)) {
+    final pendingHashPath = pendingHash?[parsed.contentHash];
+    if ((hashMatches.isNotEmpty &&
+            !hashMatches.any((row) => row['relative_path'] == relativePath)) ||
+        (pendingHashPath != null && pendingHashPath != relativePath)) {
       return ImportCandidate(
         relativePath: relativePath,
         title: title,
@@ -294,6 +343,14 @@ class DocumentImportServiceImpl implements DocumentImportService {
         sourceAbsolutePath: sourceAbsolutePath ?? absolutePath,
         message: 'Duplicate content hash candidate',
       );
+    }
+
+    if (status == ImportCandidateStatus.ready ||
+        status == ImportCandidateStatus.copyRequired) {
+      if (sacId != null) {
+        pendingSacId?[sacId] = relativePath;
+      }
+      pendingHash?[parsed.contentHash] = relativePath;
     }
 
     return ImportCandidate(
@@ -323,6 +380,7 @@ class DocumentImportServiceImpl implements DocumentImportService {
         case ImportCandidateStatus.skipRegistered:
           skip++;
         case ImportCandidateStatus.conflictSacId:
+        case ImportCandidateStatus.conflictTargetPath:
           conflict++;
         case ImportCandidateStatus.duplicateHash:
           duplicate++;
@@ -353,6 +411,11 @@ class DocumentImportServiceImpl implements DocumentImportService {
       final src = candidate.sourceAbsolutePath;
       if (src == null) {
         throw StateError('Missing source path for copy');
+      }
+      if (await _fileStore.exists(candidate.relativePath)) {
+        throw StateError(
+          'Refusing to overwrite existing file at ${candidate.relativePath}',
+        );
       }
       final targetAbs = toAbsolutePath(_workspaceRoot, candidate.relativePath);
       await Directory(p.dirname(targetAbs)).create(recursive: true);

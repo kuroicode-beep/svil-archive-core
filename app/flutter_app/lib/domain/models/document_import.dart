@@ -6,6 +6,7 @@ enum ImportCandidateStatus {
   skipRegistered,
   conflictSacId,
   duplicateHash,
+  conflictTargetPath,
   invalid,
   copyRequired,
 }
@@ -74,6 +75,37 @@ class DocumentImportOptions {
       dryRunOnly: dryRunOnly ?? this.dryRunOnly,
     );
   }
+
+  /// dry-run과 execute 일치 검증용 fingerprint.
+  String get fingerprint => buildImportOptionsFingerprint(this);
+}
+
+/// Import 옵션 fingerprint를 생성한다.
+String buildImportOptionsFingerprint(DocumentImportOptions options) {
+  final paths = List<String>.from(options.absolutePaths)..sort();
+  return [
+    paths.join('|'),
+    options.includeSubfolders,
+    options.skipRegistered,
+    options.writeFrontmatter,
+    options.generateSacId,
+  ].join('::');
+}
+
+/// 사용자가 확인한 dry-run snapshot.
+class ImportApprovedSnapshot {
+  final DocumentImportOptions options;
+  final ImportDryRunResult preview;
+
+  const ImportApprovedSnapshot({
+    required this.options,
+    required this.preview,
+  });
+
+  String get fingerprint => options.fingerprint;
+
+  List<ImportCandidate> get importableCandidates =>
+      preview.candidates.where((c) => c.isImportable).toList();
 }
 
 /// dry-run 결과.

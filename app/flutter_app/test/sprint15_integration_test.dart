@@ -198,4 +198,142 @@ void main() {
       isFalse,
     );
   });
+
+  test('executeApprovedImport uses snapshot candidates only', () async {
+    await bindWorkspace();
+    const relA = 'documents/Dev/snapshot_a_s15.md';
+    const relB = 'documents/Dev/snapshot_b_s15.md';
+    await writeOrphan(relA, content: '# A\n\nsnapshot-a-body');
+    await writeOrphan(relB, content: '# B\n\nsnapshot-b-body');
+    final root = container.activeWorkspace!.rootPath;
+    final absA = p.join(root, relA);
+
+    final preview = await container.documentImportService.scanPaths(
+      [absA],
+      const DocumentImportOptions(),
+    );
+    final snapshot = ImportApprovedSnapshot(
+      options: const DocumentImportOptions(dryRunOnly: false),
+      preview: preview,
+    );
+    final result = await container.documentImportService.executeApprovedImport(snapshot);
+    expect(result.registeredCount, 1);
+
+    final docs = await container.archiveService.listDocuments();
+    expect(docs.length, 1);
+    expect(docs.first.path, relA);
+    expect(docs.any((d) => d.path == relB), isFalse);
+  });
+
+  test('external copy blocks existing workspace target path', () async {
+    await bindWorkspace();
+    const targetRel = 'documents/Import/external_conflict_s15.md';
+    await writeOrphan(targetRel, content: '# existing orphan\n\nkeep');
+
+    final externalDir = await Directory(p.join(tempDir.path, 'external_src'))
+        .create(recursive: true);
+    final externalFile = File(p.join(externalDir.path, 'external_conflict_s15.md'));
+    await externalFile.writeAsString('# external\n\nnew content');
+
+    final preview = await container.documentImportService.scanPaths(
+      [externalFile.path],
+      const DocumentImportOptions(),
+    );
+    final match = preview.candidates
+        .where((c) => c.relativePath == targetRel)
+        .toList();
+    expect(match.length, 1);
+    expect(match.first.status, ImportCandidateStatus.conflictTargetPath);
+
+    final before = await File(p.join(container.activeWorkspace!.rootPath, targetRel))
+        .readAsString();
+    expect(before, contains('keep'));
+  });
+
+  test('dry-run detects sac_id conflict', () async {
+    await bindWorkspace();
+    const sharedSacId = 'sac_conflict_test_s15';
+    await writeOrphan(
+      'documents/Dev/existing_sac_s15.md',
+      content: '---\nsac_id: $sharedSacId\n---\n\nexisting',
+    );
+    await writeOrphan(
+      'documents/Dev/conflict_sac_s15.md',
+      content: '---\nsac_id: $sharedSacId\n---\n\nconflict',
+    );
+
+    final preview = await container.documentImportService.scanWorkspaceOrphans(
+      const DocumentImportOptions(),
+    );
+    expect(
+      preview.candidates.any((c) => c.status == ImportCandidateStatus.conflictSacId),
+      isTrue,
+    );
+  });
+
+  test('dry-run detects duplicate content hash', () async {
+    await bindWorkspace();
+    const body = '# Dup\n\nsame-body-token-s15';
+    await writeOrphan(
+      'documents/Dev/dup_a_s15.md',
+      content: '---\nsac_id: dup_a_sac_s15\n---\n$body',
+    );
+    await writeOrphan(
+      'documents/Dev/dup_b_s15.md',
+      content: '---\nsac_id: dup_b_sac_s15\n---\n$body',
+    );
+
+    final preview = await container.documentImportService.scanWorkspaceOrphans(
+      const DocumentImportOptions(),
+    );
+    expect(
+      preview.candidates.where((c) => c.status == ImportCandidateStatus.duplicateHash).length,
+      greaterThanOrEqualTo(1),
+    );
+  });
+
+  test('frontmatter write off keeps markdown without sac_id block', () async {
+    await bindWorkspace();
+    const rel = 'documents/Dev/no_fm_s15.md';
+    await writeOrphan(rel, content: '# No FM\n\nplain');
+    final abs = p.join(container.activeWorkspace!.rootPath, rel);
+    final preview = await container.documentImportService.scanPaths(
+      [abs],
+      const DocumentImportOptions(writeFrontmatter: false),
+    );
+    final snapshot = ImportApprovedSnapshot(
+      options: const DocumentImportOptions(
+        dryRunOnly: false,
+        writeFrontmatter: false,
+      ),
+      preview: preview,
+    );
+    await container.documentImportService.executeApprovedImport(snapshot);
+
+    final raw = await File(abs).readAsString();
+    expect(raw.startsWith('---'), isFalse);
+    expect(raw, contains('plain'));
+    final docs = await container.archiveService.listDocuments();
+    expect(docs.length, 1);
+  });
+
+  test('bulk import increases document count for MCP/UI parity', () async {
+    await bindWorkspace();
+    await writeOrphan('documents/Dev/count_1_s15.md', content: '# One\n\nbody-one-s15');
+    await writeOrphan('documents/Dev/count_2_s15.md', content: '# Two\n\nbody-two-s15');
+    await writeOrphan('documents/Dev/count_3_s15.md', content: '# Three\n\nbody-three-s15');
+
+    final preview = await container.documentImportService.scanWorkspaceOrphans(
+      const DocumentImportOptions(),
+    );
+    final snapshot = ImportApprovedSnapshot(
+      options: const DocumentImportOptions(dryRunOnly: false),
+      preview: preview,
+    );
+    final result = await container.documentImportService.executeApprovedImport(snapshot);
+    expect(result.registeredCount, greaterThanOrEqualTo(3));
+
+    final docs = await container.archiveService.listDocuments();
+    expect(docs.length, greaterThanOrEqualTo(3));
+  });
 }
