@@ -130,7 +130,7 @@ Sprint 14: MCP Archive Service Integration — 구현 완료, Codex 검증 대�
 작업 완료 전:
 - `flutter analyze` 실행
 - `flutter test` 실행
-- MCP sidecar 관련 변경이 있으면 `npm ci --ignore-scripts && npm run build` 실행
+- MCP sidecar 관련 변경이 있으면 `cd mcp/sidecar && npm ci && npm run build && npm run verify:native` 실행
 - 가능하면 macOS smoke test 기록
 - 완료보고서 작성
 - Codex 검증 요청 문서 작성

@@ -50,4 +50,7 @@
 
 - Node.js 18+
 - `SAC_WORKSPACE_ROOT` — SAC DOCS workspace 폴더
-- sidecar build: `cd mcp/sidecar && npm ci --ignore-scripts && npm run build`
+- sidecar build: `cd mcp/sidecar && npm ci && npm run build && npm run verify:native`
+
+`better-sqlite3`는 native binding이 필요합니다. install script를 건너뛰지 마세요.  
+clean install 검증: `npm ci && npm run build && npm test`

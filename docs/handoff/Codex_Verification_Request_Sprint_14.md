@@ -23,9 +23,12 @@
 ## 실행 명령
 
 ```bash
-cd mcp/sidecar && npm ci --ignore-scripts && npm run build && npm test
+cd mcp/sidecar && npm ci && npm run build && npm test
 cd app/flutter_app && flutter analyze && flutter test
 ```
+
+`npm test`는 `verify:native`로 `better_sqlite3.node` 존재와 in-memory DB open을 먼저 확인합니다.  
+Windows 패키징은 `scripts/package_windows_rc.ps1`이 `npm rebuild better-sqlite3`와 native binding 파일 검증을 수행합니다.
 
 ## 핵심 파일
 

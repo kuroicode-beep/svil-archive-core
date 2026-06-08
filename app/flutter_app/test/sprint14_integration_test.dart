@@ -43,4 +43,24 @@ void main() {
     expect(mainDart, contains('initializeEarly'));
     expect(mainDart, isNot(contains('desktopShell.initialize()')));
   });
+
+  test('package_windows_rc rebuilds and verifies better-sqlite3 native binding', () async {
+    final script = await File(p.join(repoRoot, 'scripts', 'package_windows_rc.ps1')).readAsString();
+    expect(script, contains('npm rebuild better-sqlite3'));
+    expect(script, contains('better_sqlite3.node'));
+    expect(script, isNot(contains('npm ci --ignore-scripts')));
+    expect(script, isNot(contains('npm ci --omit=dev --ignore-scripts')));
+    expect(script, contains('mcp_sidecar_native_binding_included'));
+  });
+
+  test('Sprint 14 docs use native-safe sidecar install commands', () async {
+    for (final name in [
+      'Codex_Verification_Request_Sprint_14.md',
+      'Cursor_MCP_Setup_Sprint_14.md',
+    ]) {
+      final content = await File(p.join(repoRoot, 'docs', 'handoff', name)).readAsString();
+      expect(content, isNot(contains('npm ci --ignore-scripts &&')));
+      expect(content, anyOf(contains('npm ci &&'), contains('verify:native')));
+    }
+  });
 }

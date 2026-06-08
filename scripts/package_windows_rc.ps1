@@ -12,6 +12,35 @@ $flutterApp = Join-Path $root "app\flutter_app"
 $sidecarRoot = Join-Path $root "mcp\sidecar"
 $binRoot = Join-Path $root "bin\windows"
 
+function Get-SidecarNativeBindingPath {
+    param([string]$SidecarRoot)
+    return Join-Path $SidecarRoot "node_modules\better-sqlite3\build\Release\better_sqlite3.node"
+}
+
+function Install-SidecarDependencies {
+    param(
+        [string]$SidecarRoot,
+        [switch]$ProductionOnly
+    )
+    Push-Location $SidecarRoot
+    try {
+        if ($ProductionOnly) {
+            npm ci --omit=dev
+        } else {
+            npm ci
+        }
+        npm rebuild better-sqlite3
+        $nativeBinding = Get-SidecarNativeBindingPath -SidecarRoot $SidecarRoot
+        if (-not (Test-Path $nativeBinding)) {
+            throw "better_sqlite3.node not found after install: $nativeBinding"
+        }
+        Write-Host "Sidecar native binding OK: $nativeBinding"
+        return $true
+    } finally {
+        Pop-Location
+    }
+}
+
 if (-not $Commit) {
     Push-Location $root
     if ($UseSprint12BImplementationCommit) {
@@ -27,8 +56,8 @@ $dest = Join-Path $binRoot $pkgName
 $releaseSrc = Join-Path $flutterApp "build\windows\x64\runner\Release"
 
 Write-Host "==> Building MCP sidecar"
+Install-SidecarDependencies -SidecarRoot $sidecarRoot | Out-Null
 Push-Location $sidecarRoot
-npm ci --ignore-scripts
 npm run build
 Pop-Location
 
@@ -55,9 +84,7 @@ Copy-Item (Join-Path $sidecarRoot "package.json") $sidecarDest
 Copy-Item (Join-Path $sidecarRoot "package-lock.json") $sidecarDest
 
 Write-Host "==> Installing production node_modules in package sidecar"
-Push-Location $sidecarDest
-npm ci --omit=dev --ignore-scripts
-Pop-Location
+$nativeBindingIncluded = Install-SidecarDependencies -SidecarRoot $sidecarDest -ProductionOnly
 
 $sidecarReadme = @"
 SAC MCP Sidecar (local stdio)
@@ -129,6 +156,7 @@ $manifest = [ordered]@{
     mcp_sidecar_build = "pass"
     mcp_sidecar_runtime = "local-stdio"
     mcp_sidecar_node_modules_included = $nodeModulesIncluded
+    mcp_sidecar_native_binding_included = $nativeBindingIncluded
     external_api_enabled = $false
     remote_mcp_enabled = $false
     sidecar_process_managed_by_app = $true
@@ -168,4 +196,4 @@ $zipSizeMb = [math]::Round((Get-Item $zipPath).Length / 1MB, 2)
 Write-Host "==> Package ready"
 Write-Host "Folder: $dest"
 Write-Host "ZIP:    $zipPath ($zipSizeMb MB)"
-Write-Host "Sidecar included: $nodeModulesIncluded"
+Write-Host "Sidecar included: $nodeModulesIncluded (native binding: $nativeBindingIncluded)"
