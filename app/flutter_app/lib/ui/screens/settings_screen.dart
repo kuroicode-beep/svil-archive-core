@@ -815,11 +815,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               : (v) => _saveDownloads(dl.copyWith(enabled: v)),
         ),
         SwitchListTile(
-          title: const Text('자동 import (기본 OFF)', style: TextStyle(fontSize: 16)),
-          value: dl.autoImport,
-          onChanged: _actionInProgress
-              ? null
-              : (v) => _saveDownloads(dl.copyWith(autoImport: v)),
+          title: const Text('자동 import (Experimental — 이번 버전 비활성화)',
+              style: TextStyle(fontSize: 16)),
+          subtitle: const Text(
+            'Coming Soon: 감지 파일은 큐에만 등록됩니다. 등록은 Git Sync 화면에서 수동으로 실행하세요.',
+            style: TextStyle(fontSize: 16),
+          ),
+          value: false,
+          onChanged: null,
         ),
         SwitchListTile(
           title: const Text('하위 폴더 포함', style: TextStyle(fontSize: 16)),

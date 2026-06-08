@@ -8,6 +8,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:sac_app/application/sac_container.dart';
 import 'package:sac_app/data/import/ai_sync_prefix.dart';
+import 'package:sac_app/data/services/download_watcher_service_impl.dart';
 import 'package:sac_app/data/services/git_sync_service_impl.dart';
 import 'package:sac_app/domain/models/import_queue_item.dart';
 import 'package:sac_app/domain/services/search_service.dart';
@@ -448,7 +449,11 @@ void main() {
 
   // ---- Rework: autoImport 동작 (Important) ----
 
-  test('autoImport ON imports detected files automatically', () async {
+  test('autoImport is disabled this sprint (Experimental flag OFF)', () {
+    expect(kDownloadAutoImportEnabled, isFalse);
+  });
+
+  test('autoImport ON still only enqueues (no auto import this sprint)', () async {
     await bindWorkspace();
     await saveDownloadSettings(folder: downloadsDir.path, autoImport: true);
     await writeDownload(
@@ -459,12 +464,12 @@ void main() {
     final enqueued = await container.downloadWatcherService.scanOnce();
     expect(enqueued.length, 1);
 
-    // 자동 import로 큐 항목이 imported 상태가 되고 문서가 등록된다.
+    // autoImport는 Experimental(비활성) — 설정 ON이어도 큐 등록만 하고 import하지 않는다.
     final item = await container.importQueueService.findById(enqueued.first.id);
-    expect(item!.status, ImportQueueStatus.imported);
+    expect(item!.status, ImportQueueStatus.detected);
 
     final docs = await container.archiveService.listDocuments();
-    expect(docs.any((d) => d.path == 'documents/Import/20260608_auto.md'), isTrue);
+    expect(docs.isEmpty, isTrue);
   });
 
   test('autoImport OFF only enqueues without importing', () async {

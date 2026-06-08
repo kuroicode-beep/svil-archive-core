@@ -42,20 +42,20 @@ sprint15_base_commit: "d2021bd"
 
 - `document_indexer.dart`: frontmatter 없는 문서(외부 import/orphan)가 이전엔 `parseMarkdownWithFrontmatter` 예외로 **silent skip**되어 검색 불가했음. fallback으로 원문 인덱싱하도록 수정. Sprint 16 다운로드 import(frontmatter OFF) 검색 가능의 전제.
 
-## 04-B. Codex blocker 재작업 (`17dea85` 이후)
+## 04-B. Codex blocker 재작업 (Sprint 16R)
 
 | 항목 | 조치 |
 |------|------|
-| **Blocker** — commit 제외가 서비스 레벨 미강제 | `isExcludedFromCommit()` 추가, `commitPaths()`가 `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups 경로를 stage에서 제거. 전부 제외면 commit 실패 |
-| **Important** — `autoImport` 미동작 | watcher에 coordinator 주입, `scanOnce`에서 `autoImport` ON 시 dry-run 후 안전 후보만 `executeApprovedImport`로 등록 (conflict 자동 중단) |
-| **Advisory** — `database_service_impl.dart` 미커밋 | `reset()`에 `import_queue` 추가 변경을 재작업 커밋에 포함 |
+| **Blocker** — commit 제외가 서비스 레벨 미강제 | `isExcludedFromCommit()` 추가, `commitPaths()`가 `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups 경로를 stage에서 제거. 제외 path를 결과(stderr)에 포함. 전부 제외면 add/commit 미실행 + 명확한 에러 |
+| **Important** — `autoImport` 미동작 | **소장님 결정**: 이번 스프린트에서는 autoImport를 **Experimental(비활성)** 로 명확히 처리. `kDownloadAutoImportEnabled = false` 하드 플래그로 watcher 자동 import 차단, Settings 토글 비활성화 + "Coming Soon" 안내. 감지 파일은 큐에만 등록, 등록은 수동 |
+| **Advisory** — `database_service_impl.dart` 미커밋 | `reset()`에 `import_queue` 추가 변경 커밋 포함 (`021cb44`) |
 
 ## 05. 테스트
 
 | 항목 | 결과 |
 |------|------|
 | `flutter analyze` | PASS |
-| `flutter test sprint16` | 23/23 (재작업 5건 추가) |
+| `flutter test sprint16` | 24/24 |
 | `mcp/sidecar` build + test | 10/10 (native 2/2) |
 | full `flutter test` | sprint16 전부 통과 / 기존 report-consistency 12건 실패(미커밋 docs, Sprint 16 무관) |
 
@@ -85,5 +85,6 @@ sprint15_base_commit: "d2021bd"
 ## 09. Git 커밋
 
 - 초기 구현: `17dea85` (Codex PASS 보류)
-- 재작업 커밋: (push 후 기록)
+- 재작업 1차: `021cb44` (commit 제외 강제, DB reset, autoImport 1차 wiring)
+- 재작업 2차 (Sprint 16R): (push 후 기록) — autoImport를 Experimental 비활성으로 확정
 - Codex 검증: 재검증 대기

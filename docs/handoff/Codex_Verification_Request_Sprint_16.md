@@ -4,12 +4,12 @@
 > **Sprint 15 PASS**: `d2021bd`
 > **작업지시문**: [Sprint 16 WI](https://app.notion.com/p/379864048e54818798e3ddb6ecf55f3b)
 
-## 재작업 (Codex blocker 대응 — `17dea85` 이후)
+## 재작업 (Codex blocker 대응 — Sprint 16R)
 
-- [ ] **Blocker**: `commitPaths()`가 서비스 레벨에서 금지 경로 제외 (`isExcludedFromCommit`) — `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups
-- [ ] **Important**: `autoImport` ON 시 watcher가 dry-run 후 안전 후보만 자동 import (conflict 자동 중단)
-- [ ] **Advisory**: `database_service_impl.dart` `reset()`에 `import_queue` 추가 커밋 포함
-- [ ] 재작업 테스트 23/23 (commit 제외 3건, autoImport 2건 추가)
+- [ ] **Blocker**: `commitPaths()`가 서비스 레벨에서 금지 경로 제외 (`isExcludedFromCommit`) — `.sqlite`/`*.zip`/`bin/windows/`/`.env`/`secrets.*`/`.sac` cache·logs·backups. 제외 path를 결과(stderr)에 포함, 전부 제외 시 add/commit 미실행 + 에러
+- [ ] **Important**: `autoImport`는 이번 스프린트 **Experimental(비활성)** — `kDownloadAutoImportEnabled = false`, Settings 토글 비활성 + Coming Soon. 설정 ON이어도 자동 import 미수행(큐 등록만)
+- [ ] **Advisory**: `database_service_impl.dart` `reset()`에 `import_queue` 추가 커밋 포함 (`021cb44`)
+- [ ] 재작업 테스트 24/24 (commit 제외 3건, autoImport 비활성 검증 등)
 
 ## 검증 체크리스트 (작업지시문 §11, §15)
 

@@ -13,6 +13,11 @@ import '../../domain/services/import_queue_service.dart';
 import '../import/ai_sync_prefix.dart';
 import 'download_import_coordinator.dart';
 
+/// 자동 import는 Sprint 16 범위에서 비활성화한다 (Experimental / Coming Soon).
+/// 안전상 다운로드 파일은 큐에만 등록하고, 등록은 사용자가 수동으로 실행한다.
+/// 향후 스프린트에서 dry-run 안전 검증 흐름을 정식화한 뒤 활성화한다.
+const bool kDownloadAutoImportEnabled = false;
+
 class DownloadWatcherServiceImpl implements DownloadWatcherService {
   final ImportQueueService _queueService;
   final Future<DownloadWatcherSettings> Function() _settingsProvider;
@@ -96,8 +101,9 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
       }
     }
 
-    // 자동 import ON이면 dry-run 후 안전한 후보만 등록한다 (conflict는 coordinator가 자동 중단).
-    if (settings.autoImport && _coordinator != null) {
+    // 자동 import는 이번 스프린트에서 Experimental(비활성)이다.
+    // 플래그가 켜지고 설정이 ON일 때만 dry-run 후 안전 후보를 등록한다 (conflict는 coordinator가 자동 중단).
+    if (kDownloadAutoImportEnabled && settings.autoImport && _coordinator != null) {
       for (final item in enqueued) {
         try {
           await _coordinator.importItem(item.id);
