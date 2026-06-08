@@ -1,5 +1,6 @@
 # Cursor Handoff — Sprint 14 MCP Archive Service Integration
 
+> **Sprint 14 구현 커밋**: `439a0bd`
 > **Sprint 13 기준**: `efa97e2` / HEAD `433ede5`
 > **작업지시문**: [Sprint 14 WI](https://app.notion.com/p/379864048e5481c19ca5c2a50e89bdb3)
 

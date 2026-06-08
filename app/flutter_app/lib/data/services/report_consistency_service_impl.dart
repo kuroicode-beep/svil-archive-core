@@ -19,6 +19,7 @@ const Map<String, String> kSprintReportCommitManifest = {
   'Sprint 12': '2e2e4da',
   'Sprint 12B': 'c2e73a4',
   'Sprint 13': 'efa97e2',
+  'Sprint 14': '439a0bd',
 };
 
 /// RC 자동 검증 기록이 대조하는 최신 Sprint 라벨.

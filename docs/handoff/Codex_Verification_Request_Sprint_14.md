@@ -1,5 +1,6 @@
 # Codex Verification Request — Sprint 14
 
+> **Sprint 14 구현 커밋**: `439a0bd`
 > **작업지시문**: [Sprint 14](https://app.notion.com/p/379864048e5481c19ca5c2a50e89bdb3)
 > **범위**: MCP sidecar → SAC Archive / SQLite read-only integration
 
