@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 enum SacSection {
   dashboard,
   archive,
+  fileImport,
   search,
   trash,
   personalArchive,
@@ -28,6 +29,7 @@ class LeftSidebar extends StatelessWidget {
   static const _items = <(SacSection, IconData, String)>[
     (SacSection.dashboard, Icons.dashboard_outlined, '대시보드'),
     (SacSection.archive, Icons.folder_open, '문서 아카이브'),
+    (SacSection.fileImport, Icons.file_download_outlined, '파일 Import'),
     (SacSection.personalArchive, Icons.person_outline, '개인 아카이브'),
     (SacSection.extractionQueue, Icons.pending_actions, '추출 대기열'),
     (SacSection.workQueue, Icons.confirmation_number_outlined, '작업큐'),

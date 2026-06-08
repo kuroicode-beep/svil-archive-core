@@ -2,7 +2,7 @@
 
 대상 에이전트: Cursor  
 프로젝트: SVIL / SAC — SVIL Archive Core  
-Updated: 2026.06.08 (Sprint 13)  
+Updated: 2026.06.08 (Sprint 14)  
 Encoding: UTF-8
 
 > **Cursor 규칙 적용**: `.cursor/rules/*.mdc` + `AGENTS.md` + 이 문서  
@@ -104,8 +104,9 @@ Sprint 11: RC Finalization — Codex PASS (`5e02b31` HEAD)
 Sprint 12: RC Build Approval — Codex 기능 PASS + manifest 동기화 (`9ec7e43`)
 Sprint 12B: Windows Portable MCP Sidecar — Codex 최종 PASS (`4d49a7a`)
 Sprint 13: Embedded Sidecar / Tray / Autostart — Codex 최종 PASS (`efa97e2` / HEAD `433ede5`)
-Sprint 14: MCP Archive Service Integration — 구현 완료, Codex 검증 대기
-작업지시문: [Sprint 14 WI](https://app.notion.com/p/379864048e5481c19ca5c2a50e89bdb3)
+Sprint 14: MCP Archive Service Integration — Codex 최종 PASS (`439a0bd` / HEAD `7d7fd5c`)
+Sprint 15: File Import Formal Registration — 구현 완료 (Codex 검증 대기)
+작업지시문: [Sprint 15 WI](https://app.notion.com/p/379864048e54816ab92dd88c8ad0d675)
 핸드오프: docs/handoff/Cursor_Handoff_Sprint_14.md
 공식 프로토콜: Notion
 ```
@@ -308,4 +309,4 @@ Cursor 구현 체크리스트 확인 완료
 
 ---
 
-*SVIL — Singularity Visual Intelligence Lab | Updated: 2026.06.08 (Sprint 13)*
+*SVIL — Singularity Visual Intelligence Lab | Updated: 2026.06.08 (Sprint 14)*

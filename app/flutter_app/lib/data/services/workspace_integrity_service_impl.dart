@@ -91,7 +91,12 @@ class WorkspaceIntegrityServiceImpl implements WorkspaceIntegrityService {
       for (final path in fileSet.intersection(dbPathSet)) {
         final row = dbPathMap[path]!;
         final dbCategory = row['category'] as String?;
-        final pathCategory = categoryFromRelativePath(path);
+        String pathCategory;
+        try {
+          pathCategory = categoryPathFromRelativePath(path);
+        } catch (_) {
+          continue;
+        }
         if (dbCategory != null && dbCategory != pathCategory) {
           await _insertItem(
             runId: runId,

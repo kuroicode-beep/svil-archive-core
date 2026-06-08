@@ -168,7 +168,7 @@ String llmSelfInfoExportDirectory(String workspaceRoot) {
   return p.join(sacDirectoryPath(workspaceRoot), 'exports');
 }
 
-/// relativePath에서 문서 category를 추출한다.
+/// relativePath에서 문서 category를 추출한다 (표준 createDocument 경로용).
 String categoryFromRelativePath(String relativePath) {
   assertSafeRelativePath(relativePath);
   final parts = p.posix.split(p.posix.normalize(relativePath));
@@ -176,6 +176,27 @@ String categoryFromRelativePath(String relativePath) {
     return sanitizeDocumentCategory(parts[1]);
   }
   throw WorkspacePathException('Cannot resolve category from path: $relativePath');
+}
+
+/// import/무결성용 category tree (커스텀 폴더 허용).
+String categoryPathFromRelativePath(String relativePath) {
+  assertSafeRelativePath(relativePath);
+  final parts = p.posix.split(p.posix.normalize(relativePath));
+  if (parts.isEmpty || parts[0] != 'documents') {
+    throw WorkspacePathException('Import path must start with documents/: $relativePath');
+  }
+  if (parts.length <= 2) return '';
+  return parts.sublist(1, parts.length - 1).join('/');
+}
+
+/// import 백업 디렉터리 절대경로를 반환한다.
+String importBackupDirectoryPath(String workspaceRoot) {
+  return p.join(sacDirectoryPath(workspaceRoot), 'backups');
+}
+
+/// import report 디렉터리 절대경로를 반환한다.
+String importReportDirectoryPath(String workspaceRoot) {
+  return p.join(sacDirectoryPath(workspaceRoot), 'imports');
 }
 
 /// 휴지통 내부 상대경로를 생성한다.

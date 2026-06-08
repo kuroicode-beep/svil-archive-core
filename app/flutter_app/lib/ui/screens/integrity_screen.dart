@@ -17,12 +17,14 @@ class IntegrityScreen extends StatefulWidget {
   final WorkspaceIntegrityService integrityService;
   final SmokeTestRecordService smokeTestRecordService;
   final ReportConsistencyService reportConsistencyService;
+  final VoidCallback? onOpenImport;
 
   const IntegrityScreen({
     super.key,
     required this.integrityService,
     required this.smokeTestRecordService,
     required this.reportConsistencyService,
+    this.onOpenImport,
   });
 
   @override
@@ -129,6 +131,16 @@ class _IntegrityScreenState extends State<IntegrityScreen> {
                 child: Text(_scanning ? '스캔 중...' : '무결성 스캔 실행'),
               ),
             ),
+            if (widget.onOpenImport != null) ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 50,
+                child: OutlinedButton(
+                  onPressed: widget.onOpenImport,
+                  child: const Text('Orphan Markdown 가져오기'),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             Card(
               child: Padding(

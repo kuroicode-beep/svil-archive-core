@@ -36,6 +36,7 @@ import '../data/services/safe_apply_service_impl.dart';
 import '../data/services/smoke_test_record_service_impl.dart';
 import '../data/services/work_queue_service_impl.dart';
 import '../data/services/workspace_file_inventory_service_impl.dart';
+import '../data/services/document_import_service_impl.dart';
 import '../data/services/workspace_integrity_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
@@ -78,6 +79,7 @@ import '../domain/services/report_consistency_service.dart';
 import '../domain/services/smoke_test_record_service.dart';
 import '../domain/services/work_queue_service.dart';
 import '../domain/services/workspace_file_inventory_service.dart';
+import '../domain/services/document_import_service.dart';
 import '../domain/services/workspace_integrity_service.dart';
 import '../domain/services/search_service.dart';
 import '../domain/services/sidecar_process_manager.dart';
@@ -111,6 +113,7 @@ class SacContainer {
   PermissionTokenService? _permissionTokenService;
   QueueExecutionService? _queueExecutionService;
   WorkspaceIntegrityService? _workspaceIntegrityService;
+  DocumentImportService? _documentImportService;
   WorkspaceFileInventoryService? _fileInventoryService;
   ExecutionRecoveryService? _executionRecoveryService;
   SmokeTestRecordService? _smokeTestRecordService;
@@ -286,6 +289,12 @@ class SacContainer {
 
   WorkspaceIntegrityService get workspaceIntegrityService {
     final service = _workspaceIntegrityService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  DocumentImportService get documentImportService {
+    final service = _documentImportService;
     if (service == null) throw StateError('Workspace is not opened');
     return service;
   }
@@ -467,6 +476,16 @@ class SacContainer {
       inventoryService: _fileInventoryService!,
       reportConsistencyService: _reportConsistencyService!,
       workspaceId: workspace.id,
+    );
+    _documentImportService = DocumentImportServiceImpl(
+      databaseService: databaseService,
+      repository: _repository!,
+      fileStore: fileStore,
+      inventoryService: _fileInventoryService!,
+      syncService: _syncService!,
+      indexingQueue: _indexingQueue!,
+      workspaceId: workspace.id,
+      workspaceRoot: workspace.rootPath,
     );
     final safeApplyService = SafeApplyServiceImpl(
       archiveService: _archiveService!,

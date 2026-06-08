@@ -15,6 +15,7 @@ import 'document_editor_panel.dart';
 import 'extraction_queue_panel.dart';
 import 'personal_archive_panel.dart';
 import 'work_queue_panel.dart';
+import 'file_import_screen.dart';
 import 'integrity_screen.dart';
 import 'privacy_screen.dart';
 import 'settings_screen.dart';
@@ -297,11 +298,17 @@ class _MainShellState extends State<MainShell> {
           executionRecoveryService: widget.container.executionRecoveryService,
           releaseReadinessService: widget.container.releaseReadinessService,
         );
+      case SacSection.fileImport:
+        return FileImportScreen(
+          importService: widget.container.documentImportService,
+          onImportCompleted: _refreshDocuments,
+        );
       case SacSection.integrity:
         return IntegrityScreen(
           integrityService: widget.container.workspaceIntegrityService,
           smokeTestRecordService: widget.container.smokeTestRecordService,
           reportConsistencyService: widget.container.reportConsistencyService,
+          onOpenImport: () => setState(() => _section = SacSection.fileImport),
         );
       case SacSection.settings:
         return SettingsScreen(

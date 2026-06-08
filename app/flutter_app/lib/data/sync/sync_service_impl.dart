@@ -21,8 +21,10 @@ class SyncServiceImpl implements SyncService {
 
   @override
   Future<void> fullRescan(String workspaceId) async {
-    // Sprint 3 IndexingQueue에서 구현
-    throw UnimplementedError('fullRescan is planned for Sprint 3');
+    // Sprint 15: orphan import는 DocumentImportService가 담당한다.
+    throw UnimplementedError(
+      'fullRescan is handled by DocumentImportService.scanWorkspaceOrphans',
+    );
   }
 
   @override
