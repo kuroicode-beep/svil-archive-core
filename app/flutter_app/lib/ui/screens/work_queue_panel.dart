@@ -7,18 +7,21 @@ import '../../domain/models/ticket_execution.dart';
 import '../../domain/models/work_queue.dart';
 import '../../domain/services/execution_recovery_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/services/release_readiness_service.dart';
 import '../../domain/services/work_queue_service.dart';
 
 class WorkQueuePanel extends StatefulWidget {
   final WorkQueueService workQueueService;
   final QueueExecutionService queueExecutionService;
   final ExecutionRecoveryService executionRecoveryService;
+  final ReleaseReadinessService? releaseReadinessService;
 
   const WorkQueuePanel({
     super.key,
     required this.workQueueService,
     required this.queueExecutionService,
     required this.executionRecoveryService,
+    this.releaseReadinessService,
   });
 
   @override
@@ -35,6 +38,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
   DryRunPreview? _dryRunPreview;
   RecoveryAssessment? _recoveryAssessment;
   List<TicketExecutionLog> _executionLogs = [];
+  int _releaseBlockingCount = 0;
 
   @override
   void initState() {
@@ -48,11 +52,13 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
     final summary = await widget.workQueueService.getSummary();
     final pending = await widget.workQueueService.listPendingTickets();
     final all = await widget.workQueueService.listAllTickets();
+    final readiness = await widget.releaseReadinessService?.getLatestSummary();
     if (!mounted) return;
     setState(() {
       _summary = summary;
       _pending = pending;
       _all = all;
+      _releaseBlockingCount = readiness?.failCount ?? 0;
       _loading = false;
     });
   }
@@ -274,6 +280,7 @@ class _WorkQueuePanelState extends State<WorkQueuePanel> {
             Text('상태: 승인됨 ${summary.approvedCount}건', style: const TextStyle(fontSize: 16)),
             Text('상태: 실행 중 ${summary.runningCount}건', style: const TextStyle(fontSize: 16)),
             Text('상태: 완료 ${summary.completedCount}건', style: const TextStyle(fontSize: 16)),
+            Text('RC 차단 항목: $_releaseBlockingCount건', style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),

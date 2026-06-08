@@ -19,7 +19,10 @@ import '../data/services/ollama_adapter.dart';
 import '../data/services/permission_token_service_impl.dart';
 import '../data/services/personal_archive_service_impl.dart';
 import '../data/services/privacy_service_impl.dart';
+import '../data/services/build_environment_check_service_impl.dart';
 import '../data/services/execution_recovery_service_impl.dart';
+import '../data/services/release_checklist_export_service_impl.dart';
+import '../data/services/release_readiness_service_impl.dart';
 import '../data/services/queue_execution_service_impl.dart';
 import '../data/services/report_consistency_service_impl.dart';
 import '../data/services/safe_apply_service_impl.dart';
@@ -37,7 +40,6 @@ import '../data/sync/sync_journal_writer.dart';
 import '../data/sync/workspace_file_watcher.dart';
 import 'sac_theme_controller.dart';
 import '../data/sync/sync_service_impl.dart';
-import '../domain/models/settings.dart';
 import '../domain/models/workspace.dart';
 import '../domain/services/archive_service.dart';
 import '../domain/services/conflict_guard_service.dart';
@@ -51,7 +53,10 @@ import '../domain/services/mcp_tool_registry_service.dart';
 import '../domain/services/permission_token_service.dart';
 import '../domain/services/personal_archive_service.dart';
 import '../domain/services/privacy_service.dart';
+import '../domain/services/build_environment_check_service.dart';
 import '../domain/services/execution_recovery_service.dart';
+import '../domain/services/release_checklist_export_service.dart';
+import '../domain/services/release_readiness_service.dart';
 import '../domain/services/queue_execution_service.dart';
 import '../domain/services/report_consistency_service.dart';
 import '../domain/services/smoke_test_record_service.dart';
@@ -88,6 +93,9 @@ class SacContainer {
   ExecutionRecoveryService? _executionRecoveryService;
   SmokeTestRecordService? _smokeTestRecordService;
   ReportConsistencyService? _reportConsistencyService;
+  BuildEnvironmentCheckService? _buildEnvironmentCheckService;
+  ReleaseReadinessService? _releaseReadinessService;
+  ReleaseChecklistExportService? _releaseChecklistExportService;
   LocalAiService? _localAiService;
   LlmSelfInfoExportService? _llmSelfInfoExportService;
   IndexingQueue? _indexingQueue;
@@ -263,6 +271,24 @@ class SacContainer {
     return service;
   }
 
+  BuildEnvironmentCheckService get buildEnvironmentCheckService {
+    final service = _buildEnvironmentCheckService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ReleaseReadinessService get releaseReadinessService {
+    final service = _releaseReadinessService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  ReleaseChecklistExportService get releaseChecklistExportService {
+    final service = _releaseChecklistExportService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   /// Workspace를 열고 관련 서비스를 초기화한다.
   Future<Workspace> bindWorkspace(Workspace workspace) async {
     _workspace = workspace;
@@ -337,9 +363,11 @@ class SacContainer {
       conflictGuard: _conflictGuardService!,
       permissionTokenService: _permissionTokenService!,
     );
+    final sidecarDist = resolveMcpSidecarDistPath();
     _mcpBridgeStatusService = McpBridgeStatusServiceImpl(
       toolRegistry: _mcpToolRegistryService!,
       workQueue: _workQueueService!,
+      sidecarDistPath: sidecarDist,
     );
     _fileInventoryService = WorkspaceFileInventoryServiceImpl(fileStore: fileStore);
     _reportConsistencyService = ReportConsistencyServiceImpl(
@@ -375,6 +403,29 @@ class SacContainer {
       databaseService: databaseService,
       workQueueService: _workQueueService!,
     );
+    _buildEnvironmentCheckService = BuildEnvironmentCheckServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+      mcpSidecarDistPath: sidecarDist,
+    );
+    _releaseReadinessService = ReleaseReadinessServiceImpl(
+      databaseService: databaseService,
+      integrityService: _workspaceIntegrityService!,
+      smokeTestRecordService: _smokeTestRecordService!,
+      reportConsistencyService: _reportConsistencyService!,
+      mcpBridgeService: _mcpBridgeStatusService!,
+      workQueueService: _workQueueService!,
+      queueExecutionService: _queueExecutionService!,
+      settingsService: settingsService,
+      buildEnvironmentCheckService: _buildEnvironmentCheckService!,
+    );
+    _releaseChecklistExportService = ReleaseChecklistExportServiceImpl(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+      releaseReadinessService: _releaseReadinessService!,
+      buildEnvironmentCheckService: _buildEnvironmentCheckService!,
+      smokeTestRecordService: _smokeTestRecordService!,
+    );
     _dashboardService = DashboardServiceImpl(
       databaseService: databaseService,
       workQueueService: _workQueueService!,
@@ -384,6 +435,7 @@ class SacContainer {
       integrityService: _workspaceIntegrityService!,
       reportConsistencyService: _reportConsistencyService!,
       smokeTestRecordService: _smokeTestRecordService!,
+      releaseReadinessService: _releaseReadinessService!,
     );
     _privacyService = PrivacyServiceImpl(
       databaseService: databaseService,
@@ -393,8 +445,10 @@ class SacContainer {
       queueExecutionService: _queueExecutionService!,
       integrityService: _workspaceIntegrityService!,
       reportConsistencyService: _reportConsistencyService!,
+      releaseReadinessService: _releaseReadinessService!,
     );
-    _localAiService = OllamaAdapter();
+    final currentSettings = await settingsService.getSettings();
+    _localAiService = OllamaAdapter(baseUrl: currentSettings.ollamaEndpoint);
     _llmSelfInfoExportService = LlmSelfInfoExportServiceImpl(
       databaseService: databaseService,
       workspaceRoot: workspace.rootPath,
@@ -405,14 +459,8 @@ class SacContainer {
     );
     await _fileWatcher!.start(workspace.rootPath);
 
-    final current = await settingsService.getSettings();
     await settingsService.saveSettings(
-      AppSettings(
-        workspaceId: workspace.id,
-        theme: current.theme,
-        tts: current.tts,
-        mcpEnabled: current.mcpEnabled,
-      ),
+      currentSettings.copyWith(workspaceId: workspace.id),
     );
     await themeController.load();
     return workspace;
@@ -431,5 +479,10 @@ class SacContainer {
   /// 테스트/수동 트리거용 파일 변경 이벤트를 전달한다.
   Future<void> notifyFileChangedForTest(String relativePath) async {
     await _fileWatcher?.notifyChanged(relativePath);
+  }
+
+  /// Ollama endpoint 변경 시 LocalAiService를 갱신한다.
+  void updateOllamaEndpoint(String endpoint) {
+    _localAiService = OllamaAdapter(baseUrl: endpoint);
   }
 }

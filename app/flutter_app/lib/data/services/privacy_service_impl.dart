@@ -9,6 +9,7 @@ import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/permission_token_service.dart';
 import '../../domain/services/privacy_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/services/release_readiness_service.dart';
 import '../../domain/services/report_consistency_service.dart';
 import '../../domain/services/workspace_integrity_service.dart';
 import '../db/database_service_impl.dart';
@@ -21,6 +22,7 @@ class PrivacyServiceImpl implements PrivacyService {
   final QueueExecutionService _queueExecutionService;
   final WorkspaceIntegrityService _integrityService;
   final ReportConsistencyService _reportConsistencyService;
+  final ReleaseReadinessService _releaseReadinessService;
 
   PrivacyServiceImpl({
     required DatabaseServiceImpl databaseService,
@@ -30,13 +32,15 @@ class PrivacyServiceImpl implements PrivacyService {
     required QueueExecutionService queueExecutionService,
     required WorkspaceIntegrityService integrityService,
     required ReportConsistencyService reportConsistencyService,
+    required ReleaseReadinessService releaseReadinessService,
   })  : _databaseService = databaseService,
         _permissionTokenService = permissionTokenService,
         _toolRegistryService = toolRegistryService,
         _mcpBridgeService = mcpBridgeService,
         _queueExecutionService = queueExecutionService,
         _integrityService = integrityService,
-        _reportConsistencyService = reportConsistencyService;
+        _reportConsistencyService = reportConsistencyService,
+        _releaseReadinessService = releaseReadinessService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -94,6 +98,7 @@ class PrivacyServiceImpl implements PrivacyService {
     final executionSummary = await _queueExecutionService.getExecutionSummary();
     final integritySummary = await _integrityService.getLatestSummary();
     final report = await _reportConsistencyService.checkReports();
+    final releaseReadiness = await _releaseReadinessService.getLatestSummary();
 
     return PrivacySummary(
       localProcessingEnabled: true,
@@ -118,6 +123,8 @@ class PrivacyServiceImpl implements PrivacyService {
       executionSummary: executionSummary,
       integritySummary: integritySummary,
       reportConsistent: report.isConsistent,
+      releaseReadiness: releaseReadiness,
+      releaseBlockingCount: releaseReadiness?.failCount ?? 0,
     );
   }
 }

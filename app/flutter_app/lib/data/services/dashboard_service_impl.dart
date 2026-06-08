@@ -10,6 +10,7 @@ import '../../domain/services/dashboard_service.dart';
 import '../../domain/services/mcp_bridge_status_service.dart';
 import '../../domain/services/mcp_tool_registry_service.dart';
 import '../../domain/services/queue_execution_service.dart';
+import '../../domain/services/release_readiness_service.dart';
 import '../../domain/services/report_consistency_service.dart';
 import '../../domain/services/smoke_test_record_service.dart';
 import '../../domain/services/work_queue_service.dart';
@@ -25,6 +26,7 @@ class DashboardServiceImpl implements DashboardService {
   final WorkspaceIntegrityService _integrityService;
   final ReportConsistencyService _reportConsistencyService;
   final SmokeTestRecordService _smokeTestRecordService;
+  final ReleaseReadinessService _releaseReadinessService;
 
   DashboardServiceImpl({
     required DatabaseServiceImpl databaseService,
@@ -35,6 +37,7 @@ class DashboardServiceImpl implements DashboardService {
     required WorkspaceIntegrityService integrityService,
     required ReportConsistencyService reportConsistencyService,
     required SmokeTestRecordService smokeTestRecordService,
+    required ReleaseReadinessService releaseReadinessService,
   })  : _databaseService = databaseService,
         _workQueueService = workQueueService,
         _mcpBridgeService = mcpBridgeService,
@@ -42,7 +45,8 @@ class DashboardServiceImpl implements DashboardService {
         _queueExecutionService = queueExecutionService,
         _integrityService = integrityService,
         _reportConsistencyService = reportConsistencyService,
-        _smokeTestRecordService = smokeTestRecordService;
+        _smokeTestRecordService = smokeTestRecordService,
+        _releaseReadinessService = releaseReadinessService;
 
   Database get _db => _databaseService.requireDatabase();
 
@@ -70,6 +74,8 @@ class DashboardServiceImpl implements DashboardService {
     final integritySummary = await _integrityService.getLatestSummary();
     final report = await _reportConsistencyService.checkReports();
     final macSmoke = await _smokeTestRecordService.getLatestForPlatform('macOS');
+    final winSmoke = await _smokeTestRecordService.getLatestForPlatform('Windows');
+    final releaseReadiness = await _releaseReadinessService.evaluate();
 
     return DashboardSummary(
       aiCollaboration: _buildAiCollaborationSummary(critical, queueSummary),
@@ -89,6 +95,8 @@ class DashboardServiceImpl implements DashboardService {
       integritySummary: integritySummary,
       reportConsistent: report.isConsistent,
       macSmokeStatus: macSmoke?.status,
+      windowsSmokeStatus: winSmoke?.status,
+      releaseReadiness: releaseReadiness,
     );
   }
 
@@ -102,7 +110,7 @@ class DashboardServiceImpl implements DashboardService {
       handoffPending: critical.pendingExtractionCount > 0 || queueSummary.pendingCount > 0 ? 1 : 0,
       verificationNeeded: queueSummary.conflictCount > 0 ? 1 : 0,
       criticalIssues: critical.hasCritical || queueSummary.blockedCount > 0 ? 1 : 0,
-      lastCompletedSprint: 'Sprint 09 Integrity Recovery',
+      lastCompletedSprint: 'Sprint 10 RC Readiness',
     );
   }
 

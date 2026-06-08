@@ -168,6 +168,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text('RC Readiness', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'RC ready: ${summary.releaseReadiness.isReadyForRc ? 'YES' : 'NO'}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'pass ${summary.releaseReadiness.passCount} / warn ${summary.releaseReadiness.warnCount} / fail ${summary.releaseReadiness.failCount}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'macOS smoke: ${summary.macSmokeStatus?.name ?? '기록 없음'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'Windows smoke: ${summary.windowsSmokeStatus?.name ?? '기록 없음'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    if (summary.releaseReadiness.blockers.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      const Text('RC 차단 항목', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                      ...summary.releaseReadiness.blockers.map(
+                        (b) => Text('• ${b.label}: ${b.detail ?? ''}', style: const TextStyle(fontSize: 16)),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const Text('무결성 / 복구', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     Text(

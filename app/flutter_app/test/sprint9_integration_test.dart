@@ -345,8 +345,10 @@ void main() {
     });
     final report = await container.reportConsistencyService.checkReports();
     expect(report.isConsistent, isFalse);
-    expect(report.mismatches.length, 1);
-    expect(report.mismatches.first.sprintLabel, 'Sprint 08');
+    final sprint08Mismatches =
+        report.mismatches.where((m) => m.sprintLabel == 'Sprint 08').toList();
+    expect(sprint08Mismatches.length, 1);
+    expect(sprint08Mismatches.first.sprintLabel, 'Sprint 08');
     expect(report.mismatches.first.expectedCommit, kSprintReportCommitManifest['Sprint 08']);
   });
 

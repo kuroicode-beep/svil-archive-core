@@ -1,0 +1,14 @@
+---
+description: SVIL 접근성 — 저시력·고대비·터치 타겟
+globs: app/flutter_app/lib/ui/**/*
+alwaysApply: true
+---
+
+# SVIL 접근성 (저시력 최우선)
+
+- 최소 본문 폰트 **16px**
+- 터치 타겟 **50px** 이상 (`minVerticalPadding`, `height: 50` 버튼)
+- 다크 배경 + 고대비 텍스트
+- 상태는 색상만 쓰지 말고 **텍스트 라벨** 병기
+- High Contrast 토글 유지 (footer)
+- 작업지시문에 다크모드 가독성 기준 반영

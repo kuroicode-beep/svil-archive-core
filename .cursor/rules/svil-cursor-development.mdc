@@ -1,0 +1,39 @@
+---
+description: Cursor 메인 개발 — SAC 구현 원칙·테스트·완료 체크리스트
+alwaysApply: true
+---
+
+# Cursor 메인 개발 (SAC)
+
+**상세**: `cursor.md` | **에이전트 설정**: `AGENTS.md`
+
+## 역할
+
+작업지시문 기반 구현·버그 수정·테스트·재작업·완료보고서. 스펙 임의 확장 금지.
+
+## SAC 핵심
+
+- Markdown = Source of Truth / SQLite = Index·Search·Queue
+- 사용자 수정 > AI 수정 / 외부 API 기본 OFF
+- 개인 데이터 후보 = 수동 승인만 / MCP write·destructive = 권한·승인 흐름
+- Workspace 상대경로 / path traversal 방어 (`..` 차단, root containment)
+
+## 작업 완료 전 필수
+
+1. `flutter analyze` — No issues
+2. `flutter test` — 전체 통과
+3. MCP sidecar 변경 시: `npm ci --ignore-scripts && npm run build`
+4. Notion 완료보고서 + Codex 검증 요청 문서
+5. 테스트 없이 완료 주장 금지
+
+## 현재 프로젝트 (SAC)
+
+- Sprint 09 기준 커밋: `cd684a2` (Codex 최종 PASS)
+- Sprint 10: RC / Smoke / Packaging Readiness — [작업지시문](https://app.notion.com/p/379864048e5481499f62ea09b10524a5)
+- 핸드오프: `docs/handoff/Cursor_Handoff_Sprint_10.md`
+
+## 완료 문구
+
+```
+Cursor 구현 체크리스트 확인 완료
+```

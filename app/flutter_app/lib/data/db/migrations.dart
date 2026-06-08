@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 7;
+const int kSacSchemaVersion = 8;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -341,6 +341,11 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       }
     }
   }
+  if (fromVersion < 8) {
+    for (final sql in sprint10MigrationSql()) {
+      await db.execute(sql);
+    }
+  }
 }
 
 /// Sprint 9 integrity / smoke migration SQL 목록을 반환한다.
@@ -387,5 +392,32 @@ List<String> sprint9MigrationSql() {
     ''',
     'CREATE INDEX IF NOT EXISTS idx_integrity_items_run ON integrity_scan_items(scan_run_id)',
     'CREATE INDEX IF NOT EXISTS idx_integrity_items_status ON integrity_scan_items(status)',
+  ];
+}
+
+/// Sprint 10 RC readiness migration SQL 목록을 반환한다.
+List<String> sprint10MigrationSql() {
+  return [
+    '''
+    CREATE TABLE IF NOT EXISTS release_readiness_checks (
+      id TEXT PRIMARY KEY,
+      category TEXT NOT NULL,
+      label TEXT NOT NULL,
+      status TEXT NOT NULL,
+      detail TEXT,
+      checked_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS build_environment_checks (
+      id TEXT PRIMARY KEY,
+      check_name TEXT NOT NULL,
+      status TEXT NOT NULL,
+      message TEXT NOT NULL,
+      checked_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_release_readiness_checked ON release_readiness_checks(checked_at)',
+    'CREATE INDEX IF NOT EXISTS idx_build_env_checked ON build_environment_checks(checked_at)',
   ];
 }

@@ -45,11 +45,33 @@ class AppSettings {
   final ThemeSettings theme;
   final TtsSettings tts;
   final bool mcpEnabled;
+  final String ollamaEndpoint;
+  final bool externalApiEnabled;
 
   const AppSettings({
     required this.workspaceId,
     required this.theme,
     required this.tts,
     this.mcpEnabled = false,
+    this.ollamaEndpoint = 'http://127.0.0.1:11434',
+    this.externalApiEnabled = false,
   });
+
+  AppSettings copyWith({
+    String? workspaceId,
+    ThemeSettings? theme,
+    TtsSettings? tts,
+    bool? mcpEnabled,
+    String? ollamaEndpoint,
+    bool? externalApiEnabled,
+  }) {
+    return AppSettings(
+      workspaceId: workspaceId ?? this.workspaceId,
+      theme: theme ?? this.theme,
+      tts: tts ?? this.tts,
+      mcpEnabled: mcpEnabled ?? this.mcpEnabled,
+      ollamaEndpoint: ollamaEndpoint ?? this.ollamaEndpoint,
+      externalApiEnabled: externalApiEnabled ?? this.externalApiEnabled,
+    );
+  }
 }

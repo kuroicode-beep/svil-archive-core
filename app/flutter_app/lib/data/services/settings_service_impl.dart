@@ -23,6 +23,8 @@ class SettingsServiceImpl implements SettingsService {
       theme: const ThemeSettings(),
       tts: const TtsSettings(),
       mcpEnabled: map['mcp_enabled'] == 'true',
+      ollamaEndpoint: map['ollama_endpoint'] ?? 'http://127.0.0.1:11434',
+      externalApiEnabled: map['external_api_enabled'] == 'true',
     );
   }
 
@@ -43,6 +45,24 @@ class SettingsServiceImpl implements SettingsService {
       {
         'key': 'mcp_enabled',
         'value': settings.mcpEnabled.toString(),
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    await _db.insert(
+      'app_settings',
+      {
+        'key': 'ollama_endpoint',
+        'value': settings.ollamaEndpoint,
+        'updated_at': now,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    await _db.insert(
+      'app_settings',
+      {
+        'key': 'external_api_enabled',
+        'value': settings.externalApiEnabled.toString(),
         'updated_at': now,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,

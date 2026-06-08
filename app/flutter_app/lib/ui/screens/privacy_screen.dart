@@ -100,6 +100,33 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Release / RC 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(
+                      'RC 차단 항목: ${summary.releaseBlockingCount}건',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      '보고서 정합성: ${summary.reportConsistent ? '일치' : '불일치'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'RC ready: ${summary.releaseReadiness?.isReadyForRc == true ? 'YES' : 'NO / 미평가'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Text('자동 배포·코드 서명: 범위 외', style: TextStyle(fontSize: 16)),
+                    const Text('외부 API: 기본 OFF', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: const [
                     Text('LLM용 문서 생성 정책', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),

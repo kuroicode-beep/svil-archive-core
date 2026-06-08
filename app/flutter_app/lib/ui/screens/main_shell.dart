@@ -17,6 +17,7 @@ import 'personal_archive_panel.dart';
 import 'work_queue_panel.dart';
 import 'integrity_screen.dart';
 import 'privacy_screen.dart';
+import 'settings_screen.dart';
 import 'search_panel.dart';
 import 'trash_panel.dart';
 
@@ -294,12 +295,27 @@ class _MainShellState extends State<MainShell> {
           workQueueService: widget.container.workQueueService,
           queueExecutionService: widget.container.queueExecutionService,
           executionRecoveryService: widget.container.executionRecoveryService,
+          releaseReadinessService: widget.container.releaseReadinessService,
         );
       case SacSection.integrity:
         return IntegrityScreen(
           integrityService: widget.container.workspaceIntegrityService,
           smokeTestRecordService: widget.container.smokeTestRecordService,
           reportConsistencyService: widget.container.reportConsistencyService,
+        );
+      case SacSection.settings:
+        return SettingsScreen(
+          settingsService: widget.container.settingsService,
+          themeController: widget.container.themeController,
+          localAiService: widget.container.localAiService,
+          mcpBridgeService: widget.container.mcpBridgeStatusService,
+          toolRegistryService: widget.container.mcpToolRegistryService,
+          integrityService: widget.container.workspaceIntegrityService,
+          releaseReadinessService: widget.container.releaseReadinessService,
+          buildEnvironmentCheckService: widget.container.buildEnvironmentCheckService,
+          releaseChecklistExportService: widget.container.releaseChecklistExportService,
+          workspace: widget.container.activeWorkspace,
+          onOllamaEndpointChanged: widget.container.updateOllamaEndpoint,
         );
     }
   }

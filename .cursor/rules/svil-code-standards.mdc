@@ -1,0 +1,31 @@
+---
+description: SVIL 코드 규칙 — Dart/TypeScript
+globs: app/flutter_app/**/*.dart,mcp/**/*.ts
+alwaysApply: true
+---
+
+# SVIL 코드 규칙
+
+- UTF-8 인코딩
+- 파일 최상단: 경로 주석 (예: `// foo.dart — 설명`)
+- 모든 함수/메서드 상단: 한 줄 주석
+- DRY / 에러 핸들링 필수
+- 하드코딩·민감 정보 노출 금지
+- Windows 절대경로 하드코딩 금지 — workspace 상대경로 우선
+
+```dart
+// ❌ 경로 주석 없음, 에러 무시
+Future<void> load() async {
+  try { await db.query('x'); } catch (_) {}
+}
+
+// ✅ 경로 주석 + 명시적 에러
+// data_service_impl.dart — 데이터 로드
+Future<void> load() async {
+  try {
+    await db.query('x');
+  } catch (e) {
+    throw StateError('load failed: $e');
+  }
+}
+```
