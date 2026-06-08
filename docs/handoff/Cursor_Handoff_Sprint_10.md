@@ -37,5 +37,5 @@
 
 - [x] Git 커밋 (Sprint 10 구현 + 문서) — `1db8bfd`
 - [x] Notion 완료보고서 등록
-- [ ] Codex Sprint 10 검증
+- [ ] Codex Sprint 10 검증 (HEAD: `51810b7`)
 - [ ] 실기기 smoke PASS (소장님)

@@ -10,7 +10,7 @@ sprint10_commit: "1db8bfd"
 
 > **Sprint 09 기준**: `cd684a2`
 > **작업지시문**: [Notion Sprint 10](https://app.notion.com/p/379864048e5481499f62ea09b10524a5)
-> **Codex 검증**: 대기 (자체 검증 PASS)
+> **Codex 검증**: 대기 (자체 검증 PASS, HEAD `51810b7`)
 
 ## 01. 작업 요약
 
