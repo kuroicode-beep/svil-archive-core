@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 11
 
 > **Sprint 10B 기준**: `9c47b7e`
-> **Sprint 11 구현 커밋**: (구현 후 갱신)
+> **Sprint 11 구현 커밋**: `2833494`
 > **범위**: RC Finalization / Smoke Confirmation / Release Notes
 > **작업지시문**: [Notion Sprint 11](https://app.notion.com/p/379864048e54818bbf46fd13a22a420e)
 
@@ -20,7 +20,9 @@
 - [ ] external API OFF / remote MCP OFF 유지
 - [ ] Sprint 05~10B 회귀
 - [ ] `flutter analyze` / `flutter test` / MCP sidecar build
-- [ ] Git 커밋 / Notion 완료보고서
+- [x] Git 커밋 (`2833494`) / Notion 완료보고서
+- [x] `kSprintReportCommitManifest` Sprint 11 (`2833494`)
+- [x] Cursor 자체 검증 — analyze / test 147 / sidecar build
 
 ## 핵심 파일
 

@@ -40,7 +40,7 @@ class ReleaseFinalizationExportServiceImpl implements ReleaseFinalizationExportS
   @override
   Future<ReleaseMarkdownExportResult> exportReleaseNotes() async {
     final readiness = await _releaseReadinessService.evaluate();
-    final sprintCommit = kSprintReportCommitManifest['Sprint 10'] ?? 'unknown';
+    final sprintCommit = kRcVerificationSprintCommit.isEmpty ? 'unknown' : kRcVerificationSprintCommit;
     final analyze = await _verificationPassRecordService.getLatestForType('analyze');
     final test = await _verificationPassRecordService.getLatestForType('test');
     final sidecar = await _verificationPassRecordService.getLatestForType('sidecar_build');

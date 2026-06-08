@@ -1,6 +1,7 @@
 # Cursor Handoff — Sprint 11 RC Finalization
 
 > **Sprint 10B 기준**: `9c47b7e`
+> **Sprint 11 구현 커밋**: `2833494`
 > **작업지시문**: [Notion Sprint 11](https://app.notion.com/p/379864048e54818bbf46fd13a22a420e)
 
 ## Sprint 11 구현 요약

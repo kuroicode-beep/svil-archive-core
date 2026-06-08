@@ -181,7 +181,7 @@ class ReleaseReadinessServiceImpl implements ReleaseReadinessService {
 
   /// verification 통과 기록을 readiness 항목으로 변환한다.
   Future<List<ReadinessCheckItem>> _verificationItems() async {
-    final sprintCommit = kSprintReportCommitManifest['Sprint 10'] ?? '';
+    final sprintCommit = kRcVerificationSprintCommit;
     final mismatch = await _verificationPassRecordService.hasCommitMismatch(sprintCommit);
     final items = <ReadinessCheckItem>[];
     for (final type in kRequiredVerificationCheckTypes) {

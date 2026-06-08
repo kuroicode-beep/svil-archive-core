@@ -15,7 +15,15 @@ const Map<String, String> kSprintReportCommitManifest = {
   'Sprint 08': '11b9454',
   'Sprint 09': 'cd684a2',
   'Sprint 10': '1db8bfd',
+  'Sprint 11': '2833494',
 };
+
+/// RC 자동 검증 기록이 대조하는 최신 Sprint 라벨.
+const String kRcVerificationSprintLabel = 'Sprint 11';
+
+/// RC 자동 검증 기록에 기대되는 Sprint 구현 커밋.
+String get kRcVerificationSprintCommit =>
+    kSprintReportCommitManifest[kRcVerificationSprintLabel] ?? '';
 
 /// 구현 커밋으로 취급하는 frontmatter 키 suffix.
 const Set<String> kImplementationCommitKeySuffixes = {
