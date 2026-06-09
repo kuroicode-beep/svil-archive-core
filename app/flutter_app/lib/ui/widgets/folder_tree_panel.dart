@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../../domain/models/document.dart';
 import '../../domain/models/sync_state.dart';
 import '../../data/platform/path_adapter.dart'
-    show categoryFromRelativePath, kAllowedDocumentCategories;
+    show folderCategoryFromRelativePath, kAllowedDocumentCategories;
 import 'sync_status_badge.dart';
 
 class FolderTreeNode {
@@ -28,8 +28,8 @@ class FolderTreeNode {
 List<FolderTreeNode> buildFolderTree(List<DocumentMetadata> documents) {
   final grouped = <String, List<DocumentMetadata>>{};
   for (final doc in documents) {
-    // category 단일 source = relative path (DB type과 불일치 방지)
-    final category = categoryFromRelativePath(doc.path);
+    // Import·커스텀 폴더 포함 표시용 category
+    final category = folderCategoryFromRelativePath(doc.path);
     grouped.putIfAbsent(category, () => []).add(doc);
   }
 
@@ -133,10 +133,14 @@ class _FolderTreePanelState extends State<FolderTreePanel> {
         const Divider(height: 1),
         Expanded(
           child: tree.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    '문서가 없습니다.',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    '등록된 문서가 없습니다.\n파일 Import에서 문서를 등록하세요.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 )
               : ListView(

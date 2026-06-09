@@ -178,6 +178,20 @@ String categoryFromRelativePath(String relativePath) {
   throw WorkspacePathException('Cannot resolve category from path: $relativePath');
 }
 
+/// 폴더 트리 표시용 category (Import·커스텀 폴더 허용).
+String folderCategoryFromRelativePath(String relativePath) {
+  assertSafeRelativePath(relativePath);
+  final parts = p.posix.split(p.posix.normalize(relativePath));
+  if (parts.length >= 2 && parts[0] == 'documents') {
+    final category = parts[1].trim();
+    if (category.isEmpty) {
+      throw WorkspacePathException('Cannot resolve category from path: $relativePath');
+    }
+    return category;
+  }
+  throw WorkspacePathException('Cannot resolve category from path: $relativePath');
+}
+
 /// import/무결성용 category tree (커스텀 폴더 허용).
 String categoryPathFromRelativePath(String relativePath) {
   assertSafeRelativePath(relativePath);

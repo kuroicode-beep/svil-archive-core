@@ -127,14 +127,14 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('미리 검사 (dry-run)'));
+      await tester.tap(find.text('Workspace orphan 스캔'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
       await tester.pumpAndSettle();
 
       final switches = tester.widgetList<SwitchListTile>(find.byType(SwitchListTile));
       expect(switches.every((tile) => tile.onChanged != null), isTrue);
-      expect(find.text('미리 검사 결과 (실행 가능)'), findsOneWidget);
+      expect(find.textContaining('Dry-run 결과: 후보 1'), findsOneWidget);
     });
 
     testWidgets('dry-run failure restores option switches', (tester) async {
@@ -147,14 +147,14 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('미리 검사 (dry-run)'));
+      await tester.tap(find.text('Workspace orphan 스캔'));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 50));
       await tester.pumpAndSettle();
 
       final switches = tester.widgetList<SwitchListTile>(find.byType(SwitchListTile));
       expect(switches.every((tile) => tile.onChanged != null), isTrue);
-      expect(find.textContaining('미리 검사 실패'), findsOneWidget);
+      expect(find.text('Dry-run 오류'), findsOneWidget);
     });
 
     testWidgets('dry-run failure after prior success clears stale execute snapshot', (tester) async {
@@ -167,17 +167,22 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('미리 검사 (dry-run)'));
+      await tester.tap(find.text('Workspace orphan 스캔'));
       await tester.pumpAndSettle();
-      expect(find.text('미리 검사 결과 (실행 가능)'), findsOneWidget);
+      expect(find.textContaining('Dry-run 결과: 후보 1'), findsOneWidget);
 
-      await tester.tap(find.text('미리 검사 (dry-run)'));
+      await tester.scrollUntilVisible(
+        find.text('Workspace orphan 스캔'),
+        100,
+        scrollable: find.byType(Scrollable),
+      );
+      await tester.tap(find.text('Workspace orphan 스캔'));
       await tester.pumpAndSettle();
 
       final executeButton = find.widgetWithText(ElevatedButton, '정식 등록 실행');
       expect(tester.widget<ElevatedButton>(executeButton).onPressed, isNull);
-      expect(find.text('미리 검사 결과 (실행 가능)'), findsNothing);
-      expect(find.textContaining('미리 검사 실패'), findsOneWidget);
+      expect(find.textContaining('등록 가능 1'), findsNothing);
+      expect(find.text('Dry-run 오류'), findsOneWidget);
     });
 
     testWidgets('option change after dry-run disables execute until re-run', (tester) async {
@@ -190,7 +195,7 @@ void main() {
         ),
       );
 
-      await tester.tap(find.text('미리 검사 (dry-run)'));
+      await tester.tap(find.text('Workspace orphan 스캔'));
       await tester.pumpAndSettle();
 
       final executeButton = find.widgetWithText(ElevatedButton, '정식 등록 실행');
@@ -203,7 +208,7 @@ void main() {
 
       final executeAfter = tester.widget<ElevatedButton>(executeButton);
       expect(executeAfter.onPressed, isNull);
-      expect(find.text('미리 검사 결과 (재검사 필요)'), findsOneWidget);
+      expect(find.text('Dry-run 결과 (재검사 필요)'), findsOneWidget);
       expect(
         find.text('옵션 또는 경로가 변경되었습니다. 미리 검사를 다시 실행하세요.'),
         findsOneWidget,

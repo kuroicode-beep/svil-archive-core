@@ -1,7 +1,10 @@
-// file_import_screen.dart — 파일 Import dry-run / 정식 등록 (Sprint 15)
+// file_import_screen.dart — 파일 Import dry-run / 정식 등록 (Sprint 15, 16H-3)
+
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 import '../../domain/models/document_import.dart';
 import '../../domain/services/document_import_service.dart';
@@ -29,7 +32,10 @@ class _FileImportScreenState extends State<FileImportScreen> {
   bool _executeInProgress = false;
   ImportApprovedSnapshot? _approvedSnapshot;
   ImportExecutionResult? _lastResult;
+  String? _lastDryRunError;
   final List<String> _selectedPaths = [];
+  final _scrollController = ScrollController();
+  final _resultSectionKey = GlobalKey();
 
   DocumentImportOptions get _options => DocumentImportOptions(
         absolutePaths: List<String>.from(_selectedPaths),
@@ -62,10 +68,60 @@ class _FileImportScreenState extends State<FileImportScreen> {
     }
   }
 
+  /// 선택 경로가 읽을 수 있는지 검사한다.
+  Future<String?> _validateSelectedPaths() async {
+    if (_selectedPaths.isEmpty) {
+      return '파일 또는 폴더를 먼저 선택하세요.';
+    }
+    for (final raw in _selectedPaths) {
+      final path = p.normalize(raw);
+      final type = await FileSystemEntity.type(path, followLinks: false);
+      if (type == FileSystemEntityType.notFound) {
+        return '경로를 찾을 수 없습니다: $path';
+      }
+      if (type == FileSystemEntityType.directory) {
+        try {
+          await Directory(path).list(followLinks: false).first;
+        } catch (e) {
+          return '폴더를 읽을 수 없습니다: $path ($e)';
+        }
+      }
+    }
+    return null;
+  }
+
+  /// dry-run 결과 영역으로 스크롤한다.
+  void _scrollToResults() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final target = _resultSectionKey.currentContext;
+      if (target != null) {
+        Scrollable.ensureVisible(
+          target,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
   /// dry-run preview를 실행하고 snapshot을 고정한다.
   Future<void> _runDryRun({bool workspaceOrphans = false}) async {
+    if (!workspaceOrphans) {
+      final pathError = await _validateSelectedPaths();
+      if (pathError != null) {
+        setState(() {
+          _lastDryRunError = pathError;
+          _invalidateSnapshot();
+          _lastResult = null;
+        });
+        _scrollToResults();
+        return;
+      }
+    }
+
     setState(() {
       _dryRunInProgress = true;
+      _lastDryRunError = null;
       _invalidateSnapshot();
       _lastResult = null;
     });
@@ -81,12 +137,14 @@ class _FileImportScreenState extends State<FileImportScreen> {
           preview: preview,
         );
       });
+      _scrollToResults();
     } catch (e) {
       if (!mounted) return;
-      setState(_invalidateSnapshot);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('미리 검사 실패: $e')),
-      );
+      setState(() {
+        _invalidateSnapshot();
+        _lastDryRunError = e.toString();
+      });
+      _scrollToResults();
     } finally {
       if (mounted) setState(() => _dryRunInProgress = false);
     }
@@ -159,6 +217,7 @@ class _FileImportScreenState extends State<FileImportScreen> {
       _selectedPaths
         ..clear()
         ..addAll(result.paths.whereType<String>());
+      _lastDryRunError = null;
     });
   }
 
@@ -170,7 +229,150 @@ class _FileImportScreenState extends State<FileImportScreen> {
       _selectedPaths
         ..clear()
         ..add(path);
+      _lastDryRunError = null;
     });
+  }
+
+  /// dry-run 결과 안내 문구를 반환한다.
+  String? _resultGuidance(ImportDryRunResult preview) {
+    final total = preview.candidates.length;
+    if (total == 0) {
+      return 'Markdown 파일을 찾지 못했습니다. .md 파일이 있는 폴더인지 확인하세요.';
+    }
+    if (preview.readyCount == 0) {
+      if (preview.skipCount == total) {
+        return '등록 가능한 새 파일이 없습니다. 이미 모두 등록된 파일입니다.';
+      }
+      if (preview.conflictCount > 0 || preview.invalidCount > 0) {
+        return '등록 가능한 새 파일이 없습니다. conflict/error 항목을 확인하세요.';
+      }
+      return '등록 가능한 새 파일이 없습니다.';
+    }
+    return null;
+  }
+
+  /// 상단 요약 카드를 구성한다.
+  Widget _buildSummaryCard({
+    required ImportDryRunResult? preview,
+    required bool canExecute,
+    required bool approved,
+  }) {
+    final theme = Theme.of(context);
+    if (_dryRunInProgress) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Dry-run 진행 중... 선택 경로를 스캔하고 있습니다.',
+                style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_lastDryRunError != null) {
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Dry-run 오류',
+                style: theme.textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                _lastDryRunError!,
+                style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (preview == null) {
+      if (_selectedPaths.isEmpty) {
+        return Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              '파일 또는 폴더를 선택한 뒤 미리 검사(dry-run)를 실행하세요.',
+              style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+            ),
+          ),
+        );
+      }
+      return Card(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            '선택 경로가 준비되었습니다. 미리 검사(dry-run)를 실행하면 결과가 여기에 표시됩니다.',
+            style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+          ),
+        ),
+      );
+    }
+
+    final total = preview.candidates.length;
+    final guidance = _resultGuidance(preview);
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              approved
+                  ? 'Dry-run 결과 (정식 등록 가능)'
+                  : 'Dry-run 결과 (재검사 필요)',
+              style: theme.textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Dry-run 결과: 후보 $total / 등록 가능 ${preview.readyCount} / '
+              'skip ${preview.skipCount} / conflict ${preview.conflictCount} / '
+              'error ${preview.invalidCount}',
+              style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+            ),
+            if (guidance != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                guidance,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+            if (!canExecute && preview.readyCount > 0) ...[
+              const SizedBox(height: 8),
+              Text(
+                '옵션 또는 경로가 변경되었습니다. 미리 검사를 다시 실행하세요.',
+                style: theme.textTheme.bodyLarge?.copyWith(fontSize: 16),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -182,8 +384,10 @@ class _FileImportScreenState extends State<FileImportScreen> {
         snapshot.preview.readyCount > 0 &&
         snapshot.options.fingerprint == _options.fingerprint;
     final actionLocked = _dryRunInProgress || _executeInProgress;
+    final approved = snapshot != null && canExecute;
 
     return SingleChildScrollView(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -233,6 +437,8 @@ class _FileImportScreenState extends State<FileImportScreen> {
               Text('외 ${_selectedPaths.length - 5}개', style: const TextStyle(fontSize: 16)),
           ],
           const SizedBox(height: 12),
+          _buildSummaryCard(preview: preview, canExecute: canExecute, approved: approved),
+          const SizedBox(height: 12),
           SwitchListTile(
             title: const Text('하위 폴더 포함', style: TextStyle(fontSize: 16)),
             value: _includeSubfolders,
@@ -262,13 +468,6 @@ class _FileImportScreenState extends State<FileImportScreen> {
                 ? null
                 : (v) => _onOptionsChanged(() => _writeFrontmatter = v),
           ),
-          if (snapshot != null && !canExecute) ...[
-            const SizedBox(height: 8),
-            const Text(
-              '옵션 또는 경로가 변경되었습니다. 미리 검사를 다시 실행하세요.',
-              style: TextStyle(fontSize: 16, color: Colors.orange),
-            ),
-          ],
           const SizedBox(height: 8),
           Row(
             children: [
@@ -294,15 +493,24 @@ class _FileImportScreenState extends State<FileImportScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          if (preview != null) _buildPreviewCard(preview, approved: canExecute),
-          if (result != null && !result.dryRun) _buildResultCard(result),
+          KeyedSubtree(
+            key: _resultSectionKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (preview != null) _buildPreviewCard(preview, approved: approved),
+                if (result != null && !result.dryRun) _buildResultCard(result),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  /// dry-run 요약 카드를 구성한다.
+  /// dry-run 상세 카드를 구성한다.
   Widget _buildPreviewCard(ImportDryRunResult preview, {required bool approved}) {
+    final theme = Theme.of(context);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -310,28 +518,29 @@ class _FileImportScreenState extends State<FileImportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              approved ? '미리 검사 결과 (실행 가능)' : '미리 검사 결과 (재검사 필요)',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              approved ? '미리 검사 상세 (실행 가능)' : '미리 검사 상세 (재검사 필요)',
+              style: theme.textTheme.titleMedium?.copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
+            Text('후보 파일: ${preview.candidates.length}건', style: const TextStyle(fontSize: 16)),
             Text('등록 가능: ${preview.readyCount}건', style: const TextStyle(fontSize: 16)),
             Text('skip: ${preview.skipCount}건', style: const TextStyle(fontSize: 16)),
             Text('conflict: ${preview.conflictCount}건', style: const TextStyle(fontSize: 16)),
             Text('duplicate: ${preview.duplicateCount}건', style: const TextStyle(fontSize: 16)),
-            Text('invalid: ${preview.invalidCount}건', style: const TextStyle(fontSize: 16)),
+            Text('error: ${preview.invalidCount}건', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 8),
-            ...preview.candidates.where((c) => c.isImportable).take(8).map(
+            ...preview.candidates.take(12).map(
                   (c) => ListTile(
                     dense: true,
                     title: Text(c.relativePath, style: const TextStyle(fontSize: 16)),
                     subtitle: Text(
-                      '${c.status.name} · ${c.categoryPath.isEmpty ? "(root)" : c.categoryPath}',
+                      '${c.status.name}${c.message == null ? '' : ' — ${c.message}'}',
                       style: const TextStyle(fontSize: 16),
                     ),
                   ),
                 ),
-            if (preview.readyCount > 8)
-              Text('외 ${preview.readyCount - 8}건', style: const TextStyle(fontSize: 16)),
+            if (preview.candidates.length > 12)
+              Text('외 ${preview.candidates.length - 12}건', style: const TextStyle(fontSize: 16)),
           ],
         ),
       ),

@@ -6,7 +6,7 @@ import '../../application/sac_container.dart';
 import '../../domain/models/document.dart';
 import '../../domain/models/sync_state.dart';
 import '../../domain/services/archive_service.dart';
-import '../widgets/folder_tree_panel.dart';
+import '../widgets/archive_list_panel.dart';
 import '../widgets/footer_bar.dart';
 import '../widgets/left_sidebar.dart';
 import '../widgets/right_context_panel.dart';
@@ -39,6 +39,7 @@ class _MainShellState extends State<MainShell> {
   Document? _selectedDocument;
   SyncState? _selectedSyncState;
   bool _loading = true;
+  String? _documentsLoadError;
 
   ArchiveService get _archive => widget.container.archiveService;
 
@@ -67,7 +68,10 @@ class _MainShellState extends State<MainShell> {
 
   /// 문서 목록과 sync 상태를 다시 로드한다.
   Future<void> _refreshDocuments() async {
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _documentsLoadError = null;
+    });
     try {
       final docs = await _archive.listDocuments();
       final syncStates = await widget.container.syncService.listSyncStates();
@@ -76,15 +80,24 @@ class _MainShellState extends State<MainShell> {
         _documents = docs;
         _syncStates = syncStates;
         _loading = false;
+        _documentsLoadError = null;
       });
     } catch (e) {
       if (mounted) {
-        setState(() => _loading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('문서 목록 로드 실패: $e')),
-        );
+        setState(() {
+          _loading = false;
+          _documentsLoadError = e.toString();
+        });
       }
     }
+  }
+
+  /// 아카이브 목록 패널 상태를 반환한다.
+  ArchiveListPanelState _archiveListState() {
+    if (_loading) return ArchiveListPanelState.loading;
+    if (_documentsLoadError != null) return ArchiveListPanelState.error;
+    if (_documents.isEmpty) return ArchiveListPanelState.empty;
+    return ArchiveListPanelState.ready;
   }
 
   /// sync 상태 맵만 갱신한다.
@@ -214,21 +227,20 @@ class _MainShellState extends State<MainShell> {
 
   /// 아카이브 섹션 중앙 패널을 구성한다.
   Widget _buildArchivePanel() {
-    if (_loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(
-          width: 260,
-          child: FolderTreePanel(
+          width: 340,
+          child: ArchiveListPanel(
+            state: _archiveListState(),
             documents: _documents,
             syncStates: _syncStates,
             selectedId: _selectedDocument?.metadata.id,
+            errorMessage: _documentsLoadError,
             onSelect: _selectDocument,
             onCreateDocument: _createSampleDocument,
+            onRefresh: _refreshDocuments,
           ),
         ),
         const VerticalDivider(width: 1),

@@ -90,10 +90,17 @@ class _DocumentEditorPanelState extends State<DocumentEditorPanel> {
   @override
   Widget build(BuildContext context) {
     if (widget.document == null) {
-      return const Center(
-        child: Text(
-          '문서를 선택하거나 새로 만드세요.',
-          style: TextStyle(fontSize: 16, color: Colors.grey),
+      return ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              '문서를 선택하면 메타데이터를 편집할 수 있습니다.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: 16),
+            ),
+          ),
         ),
       );
     }
