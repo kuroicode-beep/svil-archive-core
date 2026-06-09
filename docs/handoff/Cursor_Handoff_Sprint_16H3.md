@@ -1,6 +1,6 @@
 # Cursor Handoff — Sprint 16H-3 Archive / Import Blocker UI Fix
 
-> **Sprint 16H-2 기준**: `1b5080d` / docs `9628406`
+> **Sprint 16H-3 커밋**: `582355a` / Sprint 16H-2 `1b5080d`
 > **작업지시문**: [Sprint 16H-3 WI](https://app.notion.com/p/37a864048e548173871cd7da89cc75e4)
 
 ## Sprint 16H-3 구현 요약 (Hotfix)
