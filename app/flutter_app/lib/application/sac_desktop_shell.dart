@@ -43,6 +43,19 @@ class SacDesktopShell with TrayListener, WindowListener {
     if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) return;
 
     final settings = await settingsService.getSettings();
+    if (Platform.isWindows) {
+      final currentExe = Platform.resolvedExecutable;
+      await windowsAutostartService.syncWithSettings(
+        startWithWindows: settings.startWithWindows,
+        currentExePath: currentExe,
+      );
+      if (settings.startWithWindows &&
+          settings.registeredAutostartExePath != currentExe) {
+        await settingsService.saveSettings(
+          settings.copyWith(registeredAutostartExePath: currentExe),
+        );
+      }
+    }
     await sidecarProcessManager.refresh();
     if (settings.autoStartSidecar) {
       await sidecarProcessManager.start();

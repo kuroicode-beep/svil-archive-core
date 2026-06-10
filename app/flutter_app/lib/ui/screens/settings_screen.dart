@@ -571,9 +571,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: settings.startWithWindows,
                     onChanged: _actionInProgress ? null : _toggleStartWithWindows,
                   ),
+                if (_autostartStatus?.targetMissing == true)
+                  const Text(
+                    'autostart 대상 exe가 없습니다 — 앱 실행 시 자동 갱신됩니다',
+                    style: TextStyle(fontSize: 16, color: Colors.orange),
+                  ),
                 if (_autostartStatus?.pathMismatch == true)
                   const Text(
-                    'autostart 경로 불일치 — Settings에서 다시 등록하세요',
+                    'autostart 경로 불일치 — 앱 실행 시 현재 빌드로 갱신됩니다',
                     style: TextStyle(fontSize: 16, color: Colors.orange),
                   ),
                 Row(

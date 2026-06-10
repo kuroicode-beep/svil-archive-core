@@ -19,19 +19,49 @@ class WindowsAutostartServiceImpl implements WindowsAutostartService {
   Future<WindowsAutostartStatus> getStatus({String? registeredExePath}) async {
     final currentExe = Platform.resolvedExecutable;
     final startupFile = _startupFilePath();
-    final enabled = startupFile != null && File(startupFile).existsSync();
+    if (startupFile == null) {
+      final registered = registeredExePath?.trim();
+      return WindowsAutostartStatus(
+        enabled: false,
+        pathMismatch: false,
+        registeredExePathMasked:
+            registered == null || registered.isEmpty ? null : maskArtifactPath(registered),
+        currentExePathMasked: maskArtifactPath(currentExe),
+      );
+    }
+    final enabled = File(startupFile).existsSync();
+    final startupTarget = enabled ? _readStartupExePath(startupFile) : null;
     final registered = registeredExePath?.trim();
     final mismatch = enabled &&
-        registered != null &&
-        registered.isNotEmpty &&
-        p.normalize(registered) != p.normalize(currentExe);
+        ((registered != null &&
+                registered.isNotEmpty &&
+                p.normalize(registered) != p.normalize(currentExe)) ||
+            (startupTarget != null &&
+                p.normalize(startupTarget) != p.normalize(currentExe)));
+    final targetMissing = enabled &&
+        startupTarget != null &&
+        !File(startupTarget).existsSync();
     return WindowsAutostartStatus(
       enabled: enabled,
       pathMismatch: mismatch,
+      targetMissing: targetMissing,
       registeredExePathMasked:
           registered == null || registered.isEmpty ? null : maskArtifactPath(registered),
       currentExePathMasked: maskArtifactPath(currentExe),
     );
+  }
+
+  @override
+  Future<void> syncWithSettings({
+    required bool startWithWindows,
+    required String currentExePath,
+  }) async {
+    if (!Platform.isWindows) return;
+    if (startWithWindows) {
+      await enable(exePath: currentExePath);
+      return;
+    }
+    await disable();
   }
 
   @override
@@ -55,6 +85,17 @@ class WindowsAutostartServiceImpl implements WindowsAutostartService {
     final file = File(startupFile);
     if (await file.exists()) {
       await file.delete();
+    }
+  }
+
+  /// startup cmd에 기록된 exe 경로를 읽는다.
+  String? _readStartupExePath(String startupFile) {
+    try {
+      final content = File(startupFile).readAsStringSync();
+      final match = RegExp(r'start\s+""\s+"([^"]+)"', caseSensitive: false).firstMatch(content);
+      return match?.group(1)?.trim();
+    } catch (_) {
+      return null;
     }
   }
 

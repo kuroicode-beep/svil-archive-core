@@ -174,6 +174,29 @@ void main() {
     expect(disabled.enabled, isFalse);
   });
 
+  test('windows autostart syncWithSettings refreshes stale cmd target', () async {
+    if (!Platform.isWindows) return;
+
+    final startupRoot = Directory(
+      p.join(tempDir.path, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Startup'),
+    );
+    await startupRoot.create(recursive: true);
+    final service = WindowsAutostartServiceImpl(appDataResolver: () => tempDir.path);
+    final staleExe = p.join(tempDir.path, 'stale_build', 'sac_app.exe');
+    await service.enable(exePath: staleExe);
+
+    final staleStatus = await service.getStatus(registeredExePath: staleExe);
+    expect(staleStatus.targetMissing, isTrue);
+
+    final currentExe = Platform.resolvedExecutable;
+    await service.syncWithSettings(startWithWindows: true, currentExePath: currentExe);
+
+    final refreshed = await service.getStatus(registeredExePath: currentExe);
+    expect(refreshed.enabled, isTrue);
+    expect(refreshed.pathMismatch, isFalse);
+    expect(refreshed.targetMissing, isFalse);
+  });
+
   test('report manifest includes Sprint 13 separate from Sprint 12B', () {
     expect(kSprintReportCommitManifest['Sprint 12B'], 'c2e73a4');
     expect(kSprintReportCommitManifest['Sprint 13'], 'efa97e2');
