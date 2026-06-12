@@ -2,6 +2,7 @@
 
 > **작업지시문**: [Dev_20260613_SAC_v0.2.0_Sprint01_Work_Instruction_v1_Lumi](https://app.notion.com/p/37d864048e5481edab77e22d45e7b405)
 > **작업 계획서**: `docs/handoff/Cursor_Plan_Sprint_v020_Sprint01.md`
+> **Sprint 01 커밋**: `f6ea16e` (Codex 재검증 PASS_WITH_ADVISORY)
 > **기준 HEAD**: `a9e0ee1`
 
 ## Sprint 01 구현 요약
