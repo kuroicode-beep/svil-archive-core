@@ -2,7 +2,7 @@
 
 import 'package:sqflite/sqflite.dart';
 
-const int kSacSchemaVersion = 11;
+const int kSacSchemaVersion = 12;
 
 /// Sprint 2 초기 스키마 migration SQL 목록을 반환한다.
 List<String> sprint2MigrationSql() {
@@ -361,6 +361,99 @@ Future<void> applySacMigrations(Database db, int fromVersion, int toVersion) asy
       await db.execute(sql);
     }
   }
+  if (fromVersion < 12) {
+    for (final sql in sprintV020Sprint01MigrationSql()) {
+      try {
+        await db.execute(sql);
+      } catch (e) {
+        final msg = e.toString().toLowerCase();
+        if (!msg.contains('duplicate column')) {
+          rethrow;
+        }
+      }
+    }
+  }
+}
+
+/// SAC v0.2.0 Sprint 01 Relay Foundation migration SQL.
+List<String> sprintV020Sprint01MigrationSql() {
+  return [
+    'ALTER TABLE sync_journal ADD COLUMN idempotency_key TEXT',
+    'ALTER TABLE sync_journal ADD COLUMN payload_json TEXT',
+    '''
+    CREATE TABLE IF NOT EXISTS relay_queue (
+      id TEXT PRIMARY KEY,
+      source_import_queue_id TEXT,
+      source_document_id TEXT,
+      target_agent TEXT NOT NULL,
+      event_type TEXT,
+      project TEXT,
+      priority INTEGER NOT NULL DEFAULT 5,
+      status TEXT NOT NULL DEFAULT 'pending',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      started_at TEXT,
+      completed_at TEXT,
+      result_document_id TEXT,
+      error_message TEXT,
+      notice TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_relay_queue_status ON relay_queue(status)',
+    'CREATE INDEX IF NOT EXISTS idx_relay_queue_created ON relay_queue(created_at)',
+    '''
+    CREATE TABLE IF NOT EXISTS relay_idempotency_keys (
+      id TEXT PRIMARY KEY,
+      idempotency_key TEXT NOT NULL UNIQUE,
+      event_type TEXT NOT NULL,
+      result_ref TEXT,
+      processed_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS relay_capability_tokens (
+      id TEXT PRIMARY KEY,
+      task_id TEXT NOT NULL UNIQUE,
+      token_hash TEXT NOT NULL,
+      allowed_action TEXT NOT NULL,
+      allowed_target TEXT NOT NULL,
+      target_document_id TEXT,
+      target_path TEXT,
+      expires_at TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      created_at TEXT NOT NULL
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS relay_result_reviews (
+      id TEXT PRIMARY KEY,
+      task_id TEXT NOT NULL,
+      source_path TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending_review',
+      reject_reason TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_relay_reviews_status ON relay_result_reviews(status)',
+    '''
+    CREATE TABLE IF NOT EXISTS public_lumi_capsules (
+      id TEXT PRIMARY KEY,
+      capsule_id TEXT NOT NULL UNIQUE,
+      export_root_path TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      body_policy TEXT NOT NULL,
+      sensitivity_policy TEXT NOT NULL,
+      export_mode TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'active',
+      manifest_json TEXT,
+      created_at TEXT NOT NULL,
+      deleted_at TEXT
+    )
+    ''',
+    'CREATE INDEX IF NOT EXISTS idx_public_lumi_expires ON public_lumi_capsules(expires_at)',
+    'CREATE UNIQUE INDEX IF NOT EXISTS idx_sync_journal_idempotency ON sync_journal(idempotency_key) WHERE idempotency_key IS NOT NULL',
+  ];
 }
 
 /// Sprint 16 Import Queue (다운로드 감시) migration SQL 목록을 반환한다.

@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 
 import '../../domain/models/git_sync.dart';
 import '../../domain/services/git_sync_service.dart';
+import '../platform/path_adapter.dart' show isPublicLumiExportPath;
 
 /// SAC DOCS workspace에 필요한 .gitignore 필수 규칙 (작업지시문 07).
 const List<String> kRequiredGitignoreRules = [
@@ -49,6 +50,10 @@ bool isExcludedFromCommit(String relativePath) {
   }
   // 비밀/환경 파일
   if (base == '.env' || base.startsWith('.env.') || base.startsWith('secrets.')) {
+    return true;
+  }
+  // v0.2.0 ephemeral public_lumi export (원본 Git Sync 대상 아님)
+  if (isPublicLumiExportPath(path)) {
     return true;
   }
   return false;

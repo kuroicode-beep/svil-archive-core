@@ -41,6 +41,14 @@ import '../data/services/import_queue_service_impl.dart';
 import '../data/services/git_sync_service_impl.dart';
 import '../data/services/download_watcher_service_impl.dart';
 import '../data/services/download_import_coordinator.dart';
+import '../data/services/relay_queue_service_impl.dart';
+import '../data/db/sqlite_write_guard.dart';
+import '../data/relay/relay_capability_token_service.dart';
+import '../data/relay/relay_idempotency_service.dart';
+import '../data/relay/relay_result_intake_service.dart';
+import '../data/relay/relay_sensitivity_service.dart';
+import '../data/relay/public_lumi_gc_service.dart';
+import '../data/sync/relay_journal_service.dart';
 import '../data/services/workspace_integrity_service_impl.dart';
 import '../data/services/search_service_impl.dart';
 import '../data/services/settings_service_impl.dart';
@@ -86,6 +94,7 @@ import '../domain/services/work_queue_service.dart';
 import '../domain/services/workspace_file_inventory_service.dart';
 import '../domain/services/document_import_service.dart';
 import '../domain/services/import_queue_service.dart';
+import '../domain/services/relay_queue_service.dart';
 import '../domain/services/git_sync_service.dart';
 import '../domain/services/download_watcher_service.dart';
 import '../domain/services/workspace_integrity_service.dart';
@@ -123,6 +132,14 @@ class SacContainer {
   WorkspaceIntegrityService? _workspaceIntegrityService;
   DocumentImportService? _documentImportService;
   ImportQueueService? _importQueueService;
+  SqliteWriteGuard? _sqliteWriteGuard;
+  RelayIdempotencyService? _relayIdempotencyService;
+  RelayJournalService? _relayJournalService;
+  RelayQueueService? _relayQueueService;
+  RelaySensitivityService? _relaySensitivityService;
+  RelayCapabilityTokenService? _relayCapabilityTokenService;
+  RelayResultIntakeService? _relayResultIntakeService;
+  PublicLumiGcService? _publicLumiGcService;
   GitSyncService? _gitSyncService;
   DownloadWatcherService? _downloadWatcherService;
   DownloadImportCoordinator? _downloadImportCoordinator;
@@ -335,6 +352,42 @@ class SacContainer {
     return service;
   }
 
+  RelayQueueService get relayQueueService {
+    final service = _relayQueueService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  RelayJournalService get relayJournalService {
+    final service = _relayJournalService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  RelaySensitivityService get relaySensitivityService {
+    final service = _relaySensitivityService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  RelayResultIntakeService get relayResultIntakeService {
+    final service = _relayResultIntakeService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  RelayCapabilityTokenService get relayCapabilityTokenService {
+    final service = _relayCapabilityTokenService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
+  PublicLumiGcService get publicLumiGcService {
+    final service = _publicLumiGcService;
+    if (service == null) throw StateError('Workspace is not opened');
+    return service;
+  }
+
   WorkspaceFileInventoryService get fileInventoryService {
     final service = _fileInventoryService;
     if (service == null) throw StateError('Workspace is not opened');
@@ -524,6 +577,39 @@ class SacContainer {
       workspaceRoot: workspace.rootPath,
     );
     _importQueueService = ImportQueueServiceImpl(databaseService: databaseService);
+    _sqliteWriteGuard = SqliteWriteGuard();
+    _relayIdempotencyService = RelayIdempotencyService(
+      databaseService: databaseService,
+      writeGuard: _sqliteWriteGuard,
+    );
+    _relayJournalService = RelayJournalService(
+      databaseService: databaseService,
+      workspaceRoot: workspace.rootPath,
+      idempotencyService: _relayIdempotencyService!,
+      writeGuard: _sqliteWriteGuard,
+    );
+    _relayCapabilityTokenService = RelayCapabilityTokenService(
+      databaseService: databaseService,
+      writeGuard: _sqliteWriteGuard,
+    );
+    _relayQueueService = RelayQueueServiceImpl(
+      databaseService: databaseService,
+      journalService: _relayJournalService!,
+      writeGuard: _sqliteWriteGuard,
+    );
+    _relaySensitivityService = RelaySensitivityService();
+    _relayResultIntakeService = RelayResultIntakeService(
+      databaseService: databaseService,
+      tokenService: _relayCapabilityTokenService!,
+      journalService: _relayJournalService!,
+      writeGuard: _sqliteWriteGuard,
+    );
+    _publicLumiGcService = PublicLumiGcService(
+      databaseService: databaseService,
+      journalService: _relayJournalService!,
+      writeGuard: _sqliteWriteGuard,
+    );
+    await _publicLumiGcService!.runGc(workspaceRoot: workspace.rootPath);
     _downloadImportCoordinator = DownloadImportCoordinator(
       queueService: _importQueueService!,
       importService: _documentImportService!,

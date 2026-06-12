@@ -213,6 +213,29 @@ String importReportDirectoryPath(String workspaceRoot) {
   return p.join(sacDirectoryPath(workspaceRoot), 'imports');
 }
 
+/// ephemeral public_lumi export root (workspace 밖 SAC_EXPORTS 권장).
+String resolvePublicLumiExportRoot(String workspaceRoot, {String? configuredRoot}) {
+  final configured = configuredRoot?.trim();
+  if (configured != null && configured.isNotEmpty) {
+    return p.normalize(configured);
+  }
+  final parent = p.dirname(p.normalize(p.absolute(workspaceRoot)));
+  return p.join(parent, 'SAC_EXPORTS', 'public_lumi');
+}
+
+/// capsule 디렉터리 절대경로를 반환한다.
+String publicLumiCapsuleDirectory(String exportRoot, String capsuleId) {
+  return p.join(p.normalize(exportRoot), 'capsules', capsuleId);
+}
+
+/// public_lumi 경로가 git commit 대상에서 제외되어야 하는지 판별한다.
+bool isPublicLumiExportPath(String path) {
+  final normalized = path.replaceAll('\\', '/').toLowerCase();
+  return normalized.contains('sac_exports/public_lumi') ||
+      normalized.contains('/public_lumi/') ||
+      normalized.startsWith('sac_exports/');
+}
+
 /// 휴지통 내부 상대경로를 생성한다.
 String buildTrashRelativePath(String documentId, String originalRelativePath) {
   final baseName = p.basename(originalRelativePath);

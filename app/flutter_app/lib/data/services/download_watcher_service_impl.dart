@@ -11,6 +11,7 @@ import '../../domain/models/settings.dart';
 import '../../domain/services/download_watcher_service.dart';
 import '../../domain/services/import_queue_service.dart';
 import '../import/ai_sync_prefix.dart';
+import '../platform/platform_path_adapter.dart' as platform;
 import 'download_import_coordinator.dart';
 
 /// 자동 import는 Sprint 16 범위에서 비활성화한다 (Experimental / Coming Soon).
@@ -57,11 +58,8 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
   String _defaultDownloadsFolder() => resolveDefaultDownloadsFolder();
 
   /// OS 기본 다운로드 폴더 경로를 반환한다 (설정 UI·복원용).
-  static String resolveDefaultDownloadsFolder() {
-    final env = Platform.environment;
-    final home = env['USERPROFILE'] ?? env['HOME'] ?? Directory.current.path;
-    return p.normalize(p.join(home, 'Downloads'));
-  }
+  static String resolveDefaultDownloadsFolder() =>
+      platform.resolveDefaultDownloadsFolder();
 
   @override
   Future<List<ImportQueueItem>> scanOnce() async {
@@ -77,7 +75,14 @@ class DownloadWatcherServiceImpl implements DownloadWatcherService {
     final entities = dir.list(recursive: settings.includeSubfolders, followLinks: false);
     await for (final entity in entities) {
       if (entity is! File) continue;
-      if (p.extension(entity.path).toLowerCase() != '.md') continue;
+      if (!platform.isMarkdownDownloadCandidate(entity.path)) continue;
+      if (!await platform.waitForFileSizeStability(
+        entity.path,
+        stableFor: const Duration(milliseconds: 400),
+        timeout: const Duration(seconds: 3),
+      )) {
+        continue;
+      }
 
       final fileName = p.basename(entity.path);
       final match = stripAiSyncPrefix(fileName, prefixes: settings.prefixes);
