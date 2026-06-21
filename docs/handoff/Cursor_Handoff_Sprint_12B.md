@@ -2,6 +2,8 @@
 
 > **Sprint 12 기준**: `9ec7e43`
 > **Sprint 12B 구현 커밋**: `c2e73a4`
+> **재작업 커밋**: `4d49a7a`
+> **Codex 검증**: PASS (2026.06.08)
 > **작업지시문**: [Sprint 12B WI](https://app.notion.com/p/379864048e548156954fe3603e3b864f)
 
 ## Sprint 12B 구현 요약

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c2c6d6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #727785; }
+        .trash-item-row:hover .action-buttons { opacity: 1; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["jetbrainsMono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- TopNavBar Shell -->
+<header class="bg-surface dark:bg-surface-container-highest flex justify-between items-center px-gutter h-touch_target_accessible w-full docked full-width top-0 border-b border-outline-variant dark:border-outline z-50 fixed">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+</div>
+<nav class="hidden md:flex items-center gap-margin_lg">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-1 rounded transition-opacity duration-150" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-1 rounded transition-opacity duration-150" href="#">Archive</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-1 rounded transition-opacity duration-150" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-base_unit">
+<div class="relative flex items-center bg-surface-container px-3 py-1 rounded-full">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-48 font-body-sm" placeholder="Search deleted items..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high rounded-full transition-opacity">settings</button>
+<button class="material-symbols-outlined p-2 text-primary dark:text-primary-fixed-dim hover:bg-surface-container-high rounded-full transition-opacity">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="bg-surface-container-lowest dark:bg-surface-container-low flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full border-r border-outline-variant dark:border-outline w-sidebar_width z-40 pt-20">
+<div class="mb-margin_lg">
+<div class="flex items-center gap-base_unit">
+<img alt="User Profile" class="w-10 h-10 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQBGpy7ufxCALUNvQsDxqRAUeft67kWd8lI0QUkrDG1uuWH39bR8wrsbaH43CeVzXQRjxlouZ8fD1_mWM7C9wFRCUuopSFvlTZzeN56rB1hUVFaHuT7njKKnu6aeqC8933oz8MHBNJZcJ0AIuhWH9Q105YAIyuKBnFHfg9IGGJOH-nM9-JUd5c0aff7sD-Z8FWDHxkvU5yzusezJ9e-zsXbDmSZT7e2YZR8E5aEm9wRilmuIoeWTiM8GVlWKiCDSom_9HYvnhbw80-"/>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Local-First Sync</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto pb-20">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Document Archive
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span> AI Collaboration
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">folder_shared</span> Personal Archive
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">search</span> Search
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-primary-fixed-dim font-bold bg-surface-container dark:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">delete</span> Trash
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">checklist</span> Task Queue
+            </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">construction</span> MCP Tools
+            </a>
+<div class="mt-4 pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">lock</span> Privacy
+                </a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span> Settings
+                </a>
+</div>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-sidebar_width mr-context_panel_width pt-20 pb-20 px-margin_lg h-screen overflow-y-auto">
+<header class="flex justify-between items-end mb-margin_lg">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface mb-1">Trash</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Manage deleted research documents and AI protocols. Items here are removed from the active index but remain in local storage for 30 days.</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-error text-on-error rounded-lg font-label-caps text-label-caps hover:opacity-90 transition-all">
+<span class="material-symbols-outlined text-[18px]">auto_delete</span>
+                Empty Trash
+            </button>
+</header>
+<!-- Bento Layout for Trash -->
+<div class="grid grid-cols-1 gap-4">
+<!-- Trash Warning Section -->
+<section class="bg-error-container p-6 rounded-xl border border-error/20 mb-margin_lg">
+<div class="flex items-start gap-4">
+<div class="bg-on-error-container/10 p-3 rounded-full">
+<span class="material-symbols-outlined text-on-error-container text-3xl">warning</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-error-container mb-1">Database Removal Protocol</h3>
+<p class="font-body-sm text-body-sm text-on-error-container opacity-80 max-w-2xl">
+                            Permanent deletion will remove files from your local sync-chain and the encrypted cloud relay. Once executed, data recovery is impossible through standard AI recovery protocols. Ensure all high-value research has been backed up to an offline vault.
+                        </p>
+</div>
+</div>
+</section>
+<!-- Trash Table Header -->
+<div class="grid grid-cols-12 gap-4 px-4 py-2 bg-surface-container rounded-t-lg border-b border-outline-variant font-label-caps text-label-caps text-outline">
+<div class="col-span-5">Deleted Item</div>
+<div class="col-span-3">Original Location</div>
+<div class="col-span-2">Date Deleted</div>
+<div class="col-span-2 text-right">Actions</div>
+</div>
+<!-- Trash List Items -->
+<div class="space-y-1">
+<!-- Item 1 -->
+<div class="trash-item-row grid grid-cols-12 gap-4 px-4 py-3 bg-surface-container-lowest border border-transparent hover:border-primary/30 hover:bg-primary/5 rounded-lg items-center transition-all group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md block font-semibold">2024_Neural_Topology_Map.md</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Markdown Document • 1.2MB</span>
+</div>
+</div>
+<div class="col-span-3 font-body-sm text-body-sm text-on-surface-variant">/Archive/Projects/BrainSync</div>
+<div class="col-span-2 font-body-sm text-body-sm text-on-surface-variant">Oct 24, 2023</div>
+<div class="col-span-2 flex justify-end gap-2 action-buttons opacity-0 transition-opacity">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors" title="Restore">
+<span class="material-symbols-outlined">restore_from_trash</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-colors" title="Delete Permanently">
+<span class="material-symbols-outlined">delete_forever</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="trash-item-row grid grid-cols-12 gap-4 px-4 py-3 bg-surface-container-lowest border border-transparent hover:border-primary/30 hover:bg-primary/5 rounded-lg items-center transition-all group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md block font-semibold">AI_Prompt_Weights_v2.json</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">JSON Config • 45KB</span>
+</div>
+</div>
+<div class="col-span-3 font-body-sm text-body-sm text-on-surface-variant">/AI_Protocol/Models/Stable_V1</div>
+<div class="col-span-2 font-body-sm text-body-sm text-on-surface-variant">Oct 22, 2023</div>
+<div class="col-span-2 flex justify-end gap-2 action-buttons opacity-0 transition-opacity">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors" title="Restore">
+<span class="material-symbols-outlined">restore_from_trash</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-colors" title="Delete Permanently">
+<span class="material-symbols-outlined">delete_forever</span>
+</button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="trash-item-row grid grid-cols-12 gap-4 px-4 py-3 bg-surface-container-lowest border border-transparent hover:border-primary/30 hover:bg-primary/5 rounded-lg items-center transition-all group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">folder_zip</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md block font-semibold">Legacy_Raw_Export.zip</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Compressed • 450MB</span>
+</div>
+</div>
+<div class="col-span-3 font-body-sm text-body-sm text-on-surface-variant">/Root/System/Backups</div>
+<div class="col-span-2 font-body-sm text-body-sm text-on-surface-variant">Oct 21, 2023</div>
+<div class="col-span-2 flex justify-end gap-2 action-buttons opacity-0 transition-opacity">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors" title="Restore">
+<span class="material-symbols-outlined">restore_from_trash</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-colors" title="Delete Permanently">
+<span class="material-symbols-outlined">delete_forever</span>
+</button>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="trash-item-row grid grid-cols-12 gap-4 px-4 py-3 bg-surface-container-lowest border border-transparent hover:border-primary/30 hover:bg-primary/5 rounded-lg items-center transition-all group">
+<div class="col-span-5 flex items-center gap-3">
+<div class="w-10 h-10 bg-surface-container rounded flex items-center justify-center text-outline">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md block font-semibold">Graph_Analysis_Render_04.png</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">Image Asset • 4.5MB</span>
+</div>
+</div>
+<div class="col-span-3 font-body-sm text-body-sm text-on-surface-variant">/Archive/Visuals/Exports</div>
+<div class="col-span-2 font-body-sm text-body-sm text-on-surface-variant">Oct 19, 2023</div>
+<div class="col-span-2 flex justify-end gap-2 action-buttons opacity-0 transition-opacity">
+<button class="p-2 text-primary hover:bg-primary/10 rounded-full transition-colors" title="Restore">
+<span class="material-symbols-outlined">restore_from_trash</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-full transition-colors" title="Delete Permanently">
+<span class="material-symbols-outlined">delete_forever</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination or Load More -->
+<div class="mt-8 flex justify-center">
+<button class="px-6 py-2 border border-outline-variant text-on-surface-variant rounded-full font-label-caps text-label-caps hover:bg-surface-container transition-colors">
+                Load More Items
+            </button>
+</div>
+</main>
+<!-- Context Panel (Right) -->
+<aside class="fixed right-0 top-0 h-full w-context_panel_width bg-surface-container-lowest border-l border-outline-variant pt-20 p-gutter z-40 overflow-y-auto">
+<h3 class="font-label-caps text-label-caps text-outline mb-4">Trash Insights</h3>
+<div class="bg-surface-container rounded-xl p-4 mb-margin_lg">
+<h4 class="font-body-md font-bold mb-2">Storage Cleanup</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Emptying trash now would reclaim approximately <span class="text-primary font-bold">1.4 GB</span> of local SSD space.</p>
+<div class="w-full bg-outline-variant h-2 rounded-full mb-1">
+<div class="bg-primary h-2 rounded-full w-[65%]"></div>
+</div>
+<p class="text-[10px] font-label-caps text-on-surface-variant text-right">65% Trash Threshold</p>
+</div>
+<div class="space-y-4">
+<h4 class="font-label-caps text-label-caps text-outline">Recent Activity</h4>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-error mt-2"></div>
+<div>
+<p class="font-body-sm text-body-sm">Mass delete initiated</p>
+<span class="font-label-caps text-[10px] text-on-surface-variant">2 hours ago</span>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
+<div>
+<p class="font-body-sm text-body-sm">Restored "Research_Note_Oct.pdf"</p>
+<span class="font-label-caps text-[10px] text-on-surface-variant">5 hours ago</span>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-2 h-2 rounded-full bg-outline-variant mt-2"></div>
+<div>
+<p class="font-body-sm text-body-sm">Auto-cleanup scheduled</p>
+<span class="font-label-caps text-[10px] text-on-surface-variant">In 4 days</span>
+</div>
+</div>
+</div>
+<div class="mt-margin_lg">
+<div class="aspect-square w-full rounded-xl overflow-hidden border border-outline-variant relative group">
+<img class="w-full h-full object-cover" data-alt="A macro shot of a server rack with blinking blue and red LED lights in a dark room. The lighting is moody and professional, with a focus on high-tech hardware aesthetics. The scene feels organized yet critical, emphasizing data infrastructure and the weight of digital storage management in a modern enterprise environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBoI4AIsKUngIxCF50wcKWXiUfrsEMBCG5i3OCFb1tqyc9AHALW2TipG339U4i6_V06JQjbZQm5iccm7R-gng5gJl3D0MyCEvQXZ9q2yDOY4Ye2-aZFk3gfyqKwyak5g85lOK7x7nSsh7PgBljh8QjVnZ6CTDzPJ70n0rWpNPkB4CcEviqHmHkA2OPzmM1glOwxR8rm42Sn0N2oIqzJ0Pjo8lFsxWaIGGcIOyw-Fe5fMJP-KzQh8wJswueT2ZKBMomUxJQabXT_g4Q"/>
+<div class="absolute inset-0 bg-primary/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="font-label-caps text-label-caps bg-surface-container-lowest px-2 py-1 rounded">Server Status: Nominal</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Footer Shell -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline">MCP Status: Online</span>
+<span class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-margin_lg">
+<button class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">visibility</span> High Contrast
+            </button>
+<button class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">volume_up</span> TTS Playback
+            </button>
+<span class="bg-tertiary/10 text-tertiary px-3 py-0.5 rounded-full font-label-caps text-[10px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">security</span> Privacy-first
+            </span>
+</div>
+</footer>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('.trash-item-row').forEach(row => {
+            row.addEventListener('click', (e) => {
+                // Prevent trigger if clicking buttons
+                if (e.target.closest('button')) return;
+                
+                // Toggle selection
+                row.classList.toggle('border-primary');
+                row.classList.toggle('bg-primary/5');
+            });
+        });
+
+        // Search highlight effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

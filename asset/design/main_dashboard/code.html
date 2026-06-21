@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC — Protocol Hub Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e1e3e4; border-radius: 10px; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- TopNavBar Shell -->
+<header class="bg-surface dark:bg-surface-container-highest text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-touch_target_accessible">
+<div class="flex items-center gap-margin_lg">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim tracking-tighter">SAC</span>
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary py-2 px-2 transition-all duration-150 scale-98" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-2 rounded-lg transition-all" href="#">Archive</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-2 rounded-lg transition-all" href="#">AI Protocol</a>
+</nav>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="relative group hidden sm:block">
+<input class="bg-surface-container border-none rounded-full px-4 py-1.5 text-body-sm focus:ring-2 focus:ring-primary w-64 transition-all" placeholder="Natural language search..." type="text"/>
+<span class="material-symbols-outlined absolute right-3 top-1.5 text-outline">search</span>
+</div>
+<button class="p-2 hover:bg-surface-container-high rounded-full transition-opacity opacity-90 hover:opacity-100">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-1 hover:bg-surface-container-high rounded-full transition-opacity opacity-90 hover:opacity-100 flex items-center gap-2">
+<img class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A clean, professional headshot of a person with a serene expression, set against a soft-focus architectural background. The lighting is bright and even, reflecting a modern studio aesthetic. The color palette is minimal and clean, with soft greys and crisp whites, conveying a sense of organized professionalism and calm reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-h6QqhkwZMxUiZK7iGIyQFpVEByj6G-NKqBFIKB0gmnyumosj3DNudQee224Wd7bEQomxI9lp7kivBswWAZzBaxLg4R3Yta-_D7J3LyCYItqG1PsU4KzbyjDQG5evMLxpkH10UjHIjVisBXfF_kKUMF3QT_JBIdU5o9Qi41u2dqecKyJQ3hmJdB4HJ9RsHSS5hYPaXmz0K3-l24_R73Pn6bkARH-l5sQCR9wfrUVLQhIZZSpLSh_-M9cJ-bjTEENrmhbgY91sEwby"/>
+</button>
+</div>
+</header>
+<!-- SideNavBar Shell -->
+<aside class="bg-surface-container-lowest dark:bg-surface-container-low text-primary dark:text-primary-fixed-dim border-r border-outline-variant dark:border-outline fixed left-0 top-0 h-full w-sidebar_width flex flex-col gap-base_unit p-margin_lg pt-20 z-40">
+<div class="mb-gutter">
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+<div class="space-y-1">
+<a class="flex items-center gap-3 p-2 text-primary dark:text-primary-fixed-dim font-bold bg-surface-container dark:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+</div>
+<div class="mt-auto space-y-1">
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-sidebar_width mr-context_panel_width pt-20 pb-16 px-margin_lg overflow-y-auto h-screen">
+<!-- Dashboard Header -->
+<div class="mb-gutter">
+<h1 class="font-headline-md text-headline-md text-on-background">Protocol Hub</h1>
+<p class="text-on-surface-variant text-body-md">Real-time oversight of ongoing AI knowledge operations.</p>
+</div>
+<!-- AI Status Bento Grid -->
+<section class="grid grid-cols-12 gap-base_unit mb-margin_lg">
+<!-- In-Progress Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-3 p-4 bg-primary-container rounded-xl text-on-primary-container shadow-sm border border-primary/10">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-3xl">clock_loader_60</span>
+<span class="bg-primary px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">Active</span>
+</div>
+<h3 class="font-title-sm text-title-sm mb-1">In-progress</h3>
+<p class="text-body-sm opacity-90">4 Synthesis protocols currently hashing local neural maps.</p>
+</div>
+<!-- Handoff Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-3 p-4 bg-surface-container-high rounded-xl border border-outline-variant">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-3xl text-primary">move_item</span>
+<span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">Pending</span>
+</div>
+<h3 class="font-title-sm text-title-sm mb-1">Handoff</h3>
+<p class="text-body-sm text-on-surface-variant">2 Assets ready for cross-device archival transition.</p>
+</div>
+<!-- Verification Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-3 p-4 bg-tertiary-container rounded-xl text-on-tertiary-container">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-3xl">verified</span>
+<span class="bg-tertiary px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">98% Match</span>
+</div>
+<h3 class="font-title-sm text-title-sm mb-1">Verification</h3>
+<p class="text-body-sm opacity-90">Automated checksum integrity check completed for 2024 Archive.</p>
+</div>
+<!-- Issues Card -->
+<div class="col-span-12 md:col-span-6 lg:col-span-3 p-4 bg-error-container rounded-xl text-on-error-container border border-error/20">
+<div class="flex justify-between items-start mb-2">
+<span class="material-symbols-outlined text-3xl">warning</span>
+<span class="bg-error text-white px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">1 Alert</span>
+</div>
+<h3 class="font-title-sm text-title-sm mb-1">Issues</h3>
+<p class="text-body-sm opacity-90">Sync conflict detected in 'Quantum-01' protocol branch.</p>
+</div>
+</section>
+<!-- Main Content Area -->
+<div class="grid grid-cols-12 gap-margin_lg">
+<!-- Activity Feed (Asymmetric Large Section) -->
+<div class="col-span-12 lg:col-span-8 space-y-margin_lg">
+<div class="bg-surface-container-lowest rounded-xl p-gutter border border-outline-variant">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-title-sm text-title-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">list_alt</span>
+                            Activity Feed
+                        </h2>
+<button class="text-primary text-body-sm font-bold hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<div class="flex gap-4 p-3 hover:bg-surface-container-low rounded-lg transition-all border-l-4 border-primary">
+<div class="w-10 h-10 bg-primary-container rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary">psychology</span>
+</div>
+<div>
+<h4 class="font-title-sm text-body-md font-bold text-on-surface">AI Synthesis: Molecular Biology Archive</h4>
+<p class="text-body-sm text-on-surface-variant">Completed structural tagging for 45 documents. Consistency score: 99.2%.</p>
+<span class="text-[10px] text-outline font-label-caps uppercase mt-1 block">2 minutes ago • Local-only</span>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-low rounded-lg transition-all border-l-4 border-outline-variant">
+<div class="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-on-surface-variant">sync</span>
+</div>
+<div>
+<h4 class="font-title-sm text-body-md font-bold text-on-surface">Cloud Sync: Mobile Handoff</h4>
+<p class="text-body-sm text-on-surface-variant">Encrypted bundle uploaded to primary vault. Sync verification pending.</p>
+<span class="text-[10px] text-outline font-label-caps uppercase mt-1 block">15 minutes ago • Privacy-first</span>
+</div>
+</div>
+<div class="flex gap-4 p-3 hover:bg-surface-container-low rounded-lg transition-all border-l-4 border-error">
+<div class="w-10 h-10 bg-error-container rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-error">contact_mail</span>
+</div>
+<div>
+<h4 class="font-title-sm text-body-md font-bold text-on-surface">Conflict Resolution: Project Ares</h4>
+<p class="text-body-sm text-on-surface-variant">Merge required for Markdown headers in file 'Ares_Overview.md'.</p>
+<span class="text-[10px] text-error font-label-caps uppercase mt-1 block">1 hour ago • Conflict</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Personal Archive Shortcuts -->
+<div>
+<h2 class="font-title-sm text-title-sm mb-4">Archive Shortcuts</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-base_unit">
+<div class="p-4 bg-surface-container rounded-xl hover:border-primary border border-transparent transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">star</span>
+<h5 class="font-bold text-body-md">Favorites</h5>
+<p class="text-[10px] text-outline">12 Documents</p>
+</div>
+<div class="p-4 bg-surface-container rounded-xl hover:border-primary border border-transparent transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">history_edu</span>
+<h5 class="font-bold text-body-md">Research Notes</h5>
+<p class="text-[10px] text-outline">148 Documents</p>
+</div>
+<div class="p-4 bg-surface-container rounded-xl hover:border-primary border border-transparent transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-primary mb-2 group-hover:scale-110 transition-transform">science</span>
+<h5 class="font-bold text-body-md">Draft Protocols</h5>
+<p class="text-[10px] text-outline">5 Documents</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Task Queue Summary (Sidebar style inside main) -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface-container-low rounded-xl p-gutter border border-outline-variant h-full">
+<h2 class="font-title-sm text-title-sm mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">checklist</span>
+                        Task Queue
+                    </h2>
+<div class="space-y-3">
+<div class="flex items-start gap-3 p-3 bg-surface-container-lowest rounded-lg">
+<div class="mt-1">
+<input class="w-4 h-4 rounded border-outline text-primary focus:ring-primary" type="checkbox"/>
+</div>
+<div>
+<p class="text-body-sm font-bold">Review AI Suggestions</p>
+<p class="text-[12px] text-on-surface-variant">Protocol: Lab-01</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 bg-surface-container-lowest rounded-lg">
+<div class="mt-1">
+<input class="w-4 h-4 rounded border-outline text-primary focus:ring-primary" type="checkbox"/>
+</div>
+<div>
+<p class="text-body-sm font-bold">Export Q3 Archive</p>
+<p class="text-[12px] text-on-surface-variant">Destination: Physical Storage</p>
+</div>
+</div>
+<div class="flex items-start gap-3 p-3 bg-surface-container-lowest rounded-lg opacity-60">
+<div class="mt-1">
+<input checked="" class="w-4 h-4 rounded border-outline text-primary focus:ring-primary" type="checkbox"/>
+</div>
+<div>
+<p class="text-body-sm font-bold line-through">Cleanup Temp Files</p>
+<p class="text-[12px] text-on-surface-variant">System: Maintenance</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 bg-surface-container-high rounded-lg text-body-sm font-bold hover:bg-surface-variant transition-all">Add New Task</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Right Panel Shell -->
+<aside class="fixed right-0 top-0 h-full w-context_panel_width bg-surface-container-lowest border-l border-outline-variant p-margin_lg pt-20 z-40 overflow-y-auto">
+<div class="mb-margin_lg">
+<h3 class="font-title-sm text-title-sm mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+                Studio Tips
+            </h3>
+<div class="space-y-4">
+<div class="p-4 bg-primary/5 border-l-4 border-primary rounded-r-lg">
+<p class="text-body-sm font-bold mb-1">Semantic Search</p>
+<p class="text-[13px] text-on-surface-variant">Try searching for concepts like "Neural pathways in cephalopods" instead of keywords for better AI results.</p>
+</div>
+<div class="p-4 bg-surface-container rounded-lg">
+<p class="text-body-sm font-bold mb-1">Keyboard Shortcuts</p>
+<p class="text-[13px] text-on-surface-variant">Press <kbd class="px-1 bg-surface-container-high rounded border">Ctrl</kbd> + <kbd class="px-1 bg-surface-container-high rounded border">P</kbd> to quickly jump between active protocols.</p>
+</div>
+</div>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm mb-4">System Insights</h3>
+<div class="space-y-base_unit">
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">Local Vault</span>
+<span class="font-mono-code text-[12px] text-on-surface">12.4 GB</span>
+</div>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full" style="width: 65%;"></div>
+</div>
+<div class="flex justify-between items-center text-body-sm mt-4">
+<span class="text-on-surface-variant">Sync Health</span>
+<span class="text-tertiary font-bold">Stable</span>
+</div>
+<div class="flex justify-between items-center text-body-sm">
+<span class="text-on-surface-variant">AI Latency</span>
+<span class="text-on-surface">45ms</span>
+</div>
+</div>
+</div>
+<div class="mt-margin_lg pt-margin_lg border-t border-outline-variant">
+<h4 class="text-label-caps font-label-caps text-outline mb-2">LOCAL-FIRST ENCRYPTION</h4>
+<div class="flex items-center gap-2 p-2 bg-primary-container/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="text-[11px] font-bold text-primary">AES-256 ACTIVE</span>
+</div>
+</div>
+</aside>
+<!-- Footer Shell -->
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container dark:bg-surface-container-high text-secondary dark:text-secondary-fixed-dim border-t border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC SVIL ARCHIVE CORE</span>
+<div class="hidden sm:flex gap-gutter">
+<span class="text-body-sm font-label-caps text-label-caps opacity-90 cursor-pointer hover:text-primary underline">MCP Status: Online</span>
+<span class="text-body-sm font-label-caps text-label-caps opacity-90 cursor-pointer hover:text-primary underline">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="font-label-caps text-label-caps hover:text-primary underline transition-opacity opacity-90 hover:opacity-100">High Contrast</button>
+<button class="font-label-caps text-label-caps hover:text-primary underline transition-opacity opacity-90 hover:opacity-100">TTS Playback</button>
+<div class="h-4 w-[1px] bg-outline-variant"></div>
+<span class="text-[11px] font-mono-code text-outline">v2.4.0-STABLE</span>
+</div>
+</footer>
+<!-- Floating Action Button Contextual (Suppress for Dashboard details, but keeping for Quick Entry) -->
+<button class="fixed bottom-16 right-[300px] w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+<script>
+        // Micro-interactions for dashboard cards
+        document.querySelectorAll('.hover\\:bg-surface-container-low').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateX(4px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Simple high contrast toggle mockup
+        const toggleHC = document.querySelector('button:contains("High Contrast")');
+        // Note: Standard toggle implementation would go here.
+    </script>
+</body></html>

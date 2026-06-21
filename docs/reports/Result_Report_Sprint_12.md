@@ -52,7 +52,7 @@ sprint12_implementation_commit: "2e2e4da"
 
 ## 06. Notion
 
-Notion `token_expired`로 완료보고서 페이지는 로컬 문서에 기록. Notion 복구 후 동기화 필요.
+- [Sprint 12 Cursor 완료보고서](https://app.notion.com/p/379864048e5481ddb184e9c7fbde661a) (2026.06.08 동기화)
 
 ## 07. 핸드오프
 

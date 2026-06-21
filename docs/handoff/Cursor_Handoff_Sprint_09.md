@@ -1,7 +1,7 @@
 # Cursor Handoff — Sprint 09 (Codex 최종 재검증 PASS)
 
 > **Sprint 08 기준 커밋**: `36e9d6c`
-> **Sprint 09 구현 커밋**: `a15a4c1`
+> **Sprint 09 구현 커밋**: `cd684a2`
 > **B3 수정 커밋**: `6d2bc91`
 > **Codex 최종 재검증**: PASS / 배포 가능 YES (2026.06.08)
 > **작업지시문**: [Notion Sprint 09](https://app.notion.com/p/378864048e5481d5a3cbd8c1dd7fcd6f)

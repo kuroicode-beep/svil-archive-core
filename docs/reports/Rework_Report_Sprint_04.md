@@ -4,12 +4,14 @@ author: "Cursor"
 created: "2026-06-07"
 verification_report: "Codex Sprint 04 검증 (2026.06.07)"
 base_commit: "b3f24a6"
+rework_commit: "87a3e36"
+codex_reverification: "YES (2026.06.07)"
 ---
 
 # 재작업 완료 보고서 — SAC Sprint 04 (Cursor, 2026.06.07)
 
 원본 검증보고서: SAC Sprint 04 Document Archive UI 검증 (Codex, 2026.06.07)
-대상 커밋: `b3f24a6` → 재작업 후 신규 커밋
+대상 커밋: `b3f24a6` → 재작업 커밋 `87a3e36` → Codex 재검증 **배포 가능 YES**
 
 ## 01. 재작업 요약
 - **사유**: Important — category 편집 시 DB category와 Markdown 경로 불일치

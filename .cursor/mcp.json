@@ -1,5 +1,8 @@
 {
   "mcpServers": {
+    "notion": {
+      "url": "https://mcp.notion.com/mcp"
+    },
     "sac-archive": {
       "command": "C:\\Program Files\\nodejs\\node.exe",
       "args": [

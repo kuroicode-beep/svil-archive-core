@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC — Document Archive Browser</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#727785",
+                    "primary": "#0058be",
+                    "surface-dim": "#d9dadb",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface": "#f8f9fa",
+                    "background": "#f8f9fa",
+                    "on-secondary-container": "#54647a",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-tertiary-fixed": "#002113",
+                    "on-primary-fixed": "#001a42",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "inverse-primary": "#adc6ff",
+                    "surface-bright": "#f8f9fa",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "outline-variant": "#c2c6d6",
+                    "on-background": "#191c1d",
+                    "surface-container": "#edeeef",
+                    "on-surface-variant": "#424754",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#0b1c30",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary-container": "#00855b",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary-container": "#d0e1fb",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191c1d",
+                    "surface-tint": "#005ac2",
+                    "on-tertiary-container": "#f5fff6",
+                    "primary-container": "#2170e4",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary": "#006947",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#505f76",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#fefcff",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#2e3132"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin_lg": "24px",
+                    "context_panel_width": "280px",
+                    "touch_target_default": "40px",
+                    "sidebar_width": "240px",
+                    "touch_target_accessible": "50px",
+                    "gutter": "16px",
+                    "base_unit": "8px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "mono-code": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_accessible w-full fixed top-0 z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+</div>
+<nav class="hidden md:flex items-center gap-margin_lg h-full">
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-1 rounded-lg transition-opacity duration-150" href="#">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary h-full flex items-center px-3" href="#">Archive</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-1 rounded-lg transition-opacity duration-150" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container-low border-none rounded-full pl-10 pr-4 py-1.5 text-body-sm focus:ring-2 focus:ring-primary w-64" placeholder="Search archive..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant">settings</button>
+<button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant">account_circle</button>
+</div>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex pt-touch_target_accessible h-screen overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline w-sidebar_width flex flex-col gap-base_unit p-margin_lg shrink-0 hidden md:flex">
+<div class="flex items-center gap-3 mb-margin_lg">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto custom-scrollbar flex-1">
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</button>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary font-bold bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</button>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</button>
+<div class="h-px bg-outline-variant my-2"></div>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</button>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</button>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-label-caps text-label-caps">Trash</span>
+</button>
+</nav>
+<div class="mt-auto flex flex-col gap-1 pt-margin_lg">
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</button>
+<button class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</button>
+</div>
+</aside>
+<!-- Workspace (Center) -->
+<main class="flex-1 flex flex-col bg-surface-bright overflow-hidden">
+<!-- Header/Filter Bar -->
+<div class="px-margin_lg py-4 border-b border-outline-variant flex items-center justify-between">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Archive Browser</h1>
+<p class="text-body-sm text-on-surface-variant">342 Documents Found</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-on-primary rounded-full hover:shadow-md transition-shadow">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-caps text-label-caps">New Doc</span>
+</button>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-margin_lg custom-scrollbar">
+<div class="grid grid-cols-1 gap-4">
+<!-- Doc Item Active -->
+<div class="group bg-surface-container-lowest border-2 border-primary rounded-xl p-4 cursor-pointer relative shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">description</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Project Neural-Sync Specification</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Synced
+                            </span>
+</div>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mb-3">Technical breakdown of the local-first architecture and the peer-to-peer sync protocol implementation details for Version 2.0...</p>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#architecture</span>
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#draft</span>
+<span class="ml-auto text-xs text-outline italic">Edited 2h ago</span>
+</div>
+</div>
+<!-- Doc Item -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-primary/50 cursor-pointer transition-colors shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">article</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Weekly Research Digest - June</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">cloud_off</span> Local-only
+                            </span>
+</div>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mb-3">Summary of AI research papers including multi-modal transformers and sparse autoencoders for feature extraction in large language models.</p>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#research</span>
+<span class="ml-auto text-xs text-outline italic">Edited 5h ago</span>
+</div>
+</div>
+<!-- Doc Item -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-primary/50 cursor-pointer transition-colors shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">encrypted</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Personal Knowledge Graph Ideas</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock</span> Private-first
+                            </span>
+</div>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mb-3">Drafting the ontological structure for a hierarchical tagging system that integrates seamlessly with existing Markdown file structures.</p>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#personal</span>
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#ideation</span>
+<span class="ml-auto text-xs text-outline italic">Edited Yesterday</span>
+</div>
+</div>
+<!-- Doc Item -->
+<div class="group bg-surface-container-lowest border border-outline-variant rounded-xl p-4 hover:border-primary/50 cursor-pointer transition-colors shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">code</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">API Reference — Core Library</h3>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">check_circle</span> Synced
+                            </span>
+</div>
+<p class="text-body-sm text-on-surface-variant line-clamp-2 mb-3">Comprehensive API documentation for the Svil Archive Core, covering the indexing engine, full-text search, and Markdown parsing logic.</p>
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#docs</span>
+<span class="bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded text-xs font-medium">#stable</span>
+<span class="ml-auto text-xs text-outline italic">Edited 3 days ago</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Panel (Right) -->
+<aside class="w-context_panel_width bg-surface-container-lowest border-l border-outline-variant p-gutter flex flex-col gap-margin_lg hidden lg:flex shrink-0">
+<div>
+<h4 class="font-label-caps text-label-caps text-primary mb-4 uppercase">Document Summary</h4>
+<div class="rounded-lg overflow-hidden border border-outline-variant mb-4">
+<img alt="Document Visualization" class="w-full h-32 object-cover" data-alt="A clean, minimalist digital desktop with a single glowing document icon in the center. The aesthetic is high-key and modern with soft shadows and a professional off-white background. The lighting is bright and airy, reflecting a focused research environment with subtle blue technology accents that represent an advanced knowledge management tool." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrlHVqWQM3ztH75DMXl3nWqXiiqpWPZSC667ebqaspyZtBodN2VTwJUjfzLe-plxgAhyCtWi5NGGg-1V73yKUsI2oGh-EDIoT2XBVNJfzg0z723kuL3g-WArM3ru__JV1ALb43vGMyxb7s-Kv5NAB3C0APIAbBr1mAS1l_kMwaHNeIJn3P1xE9HP94GLNvUWrXw4P4Vd_dtLscXLLLnoEh2hgmiGcl6Q7fNIqIG7kGfCayzgM9QRkn25_i1lK_fMwRnbiuXP6rjgv2"/>
+</div>
+<h2 class="font-title-sm text-title-sm text-on-surface mb-2">Project Neural-Sync Specification</h2>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="bg-surface-container text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold">1,240 WORDS</span>
+<span class="bg-surface-container text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold">5 MIN READ</span>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar">
+<section class="mb-6">
+<h5 class="font-label-caps text-label-caps text-outline mb-2 uppercase">AI Insights</h5>
+<div class="bg-primary-container/10 p-3 rounded-lg border border-primary/20">
+<p class="text-body-sm text-on-surface leading-relaxed">This document outlines a transition from centralized servers to a local-first model. Key risks identified: <span class="font-bold">Conflict resolution on edge cases</span>.</p>
+</div>
+</section>
+<section class="mb-6">
+<h5 class="font-label-caps text-label-caps text-outline mb-2 uppercase">Outline</h5>
+<ul class="text-body-sm text-on-surface-variant space-y-2">
+<li class="flex items-center gap-2 hover:text-primary cursor-pointer"><span class="w-1 h-1 rounded-full bg-primary"></span> 1. Introduction</li>
+<li class="flex items-center gap-2 hover:text-primary cursor-pointer"><span class="w-1 h-1 rounded-full bg-primary"></span> 2. Architecture Overview</li>
+<li class="flex items-center gap-2 hover:text-primary cursor-pointer pl-4"><span class="w-1 h-1 rounded-full bg-outline-variant"></span> 2.1 P2P Syncing</li>
+<li class="flex items-center gap-2 hover:text-primary cursor-pointer pl-4"><span class="w-1 h-1 rounded-full bg-outline-variant"></span> 2.2 Storage Layer</li>
+<li class="flex items-center gap-2 hover:text-primary cursor-pointer"><span class="w-1 h-1 rounded-full bg-primary"></span> 3. Security Protocols</li>
+</ul>
+</section>
+<section>
+<h5 class="font-label-caps text-label-caps text-outline mb-2 uppercase">Sync Status</h5>
+<div class="flex items-center justify-between text-body-sm">
+<span class="text-on-surface-variant">Last backup</span>
+<span class="text-on-surface font-medium">Just now</span>
+</div>
+<div class="flex items-center justify-between text-body-sm mt-1">
+<span class="text-on-surface-variant">Device nodes</span>
+<span class="text-on-surface font-medium">4 active</span>
+</div>
+</section>
+</div>
+<button class="w-full py-2 border-2 border-primary text-primary font-bold rounded-lg hover:bg-primary/5 transition-colors font-label-caps text-label-caps">
+                OPEN FULL EDITOR
+            </button>
+</aside>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden sm:flex items-center gap-gutter">
+<span class="text-body-sm text-secondary dark:text-secondary-fixed-dim flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> MCP Status: Online
+                </span>
+<span class="text-body-sm text-secondary dark:text-secondary-fixed-dim">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-caps text-label-caps text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity">TTS Playback</button>
+<div class="flex items-center gap-2 bg-surface-container-highest px-2 py-0.5 rounded-full border border-outline-variant">
+<span class="text-[10px] font-bold text-on-surface-variant">CONTRAST</span>
+<div class="w-8 h-4 bg-primary rounded-full relative cursor-pointer" onclick="this.querySelector('div').classList.toggle('translate-x-4')">
+<div class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform"></div>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for document card selection
+        const cards = document.querySelectorAll('.group.bg-surface-container-lowest');
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                cards.forEach(c => {
+                    c.classList.remove('border-primary', 'border-2');
+                    c.classList.add('border', 'border-outline-variant');
+                });
+                card.classList.remove('border-outline-variant', 'border');
+                card.classList.add('border-primary', 'border-2');
+            });
+        });
+    </script>
+</body></html>

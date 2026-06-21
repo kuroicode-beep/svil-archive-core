@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Manual Profile — SAC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#727785",
+                    "primary": "#0058be",
+                    "surface-dim": "#d9dadb",
+                    "inverse-on-surface": "#f0f1f2",
+                    "primary-fixed-dim": "#adc6ff",
+                    "surface": "#f8f9fa",
+                    "background": "#f8f9fa",
+                    "on-secondary-container": "#54647a",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e1e3e4",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "tertiary-fixed": "#6ffbbe",
+                    "on-tertiary-fixed": "#002113",
+                    "on-primary-fixed": "#001a42",
+                    "on-tertiary-fixed-variant": "#005236",
+                    "inverse-primary": "#adc6ff",
+                    "surface-bright": "#f8f9fa",
+                    "secondary-fixed": "#d3e4fe",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "outline-variant": "#c2c6d6",
+                    "on-background": "#191c1d",
+                    "surface-container": "#edeeef",
+                    "on-surface-variant": "#424754",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#0b1c30",
+                    "surface-container-high": "#e7e8e9",
+                    "tertiary-container": "#00855b",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary-container": "#d0e1fb",
+                    "tertiary-fixed-dim": "#4edea3",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-surface": "#191c1d",
+                    "surface-tint": "#005ac2",
+                    "on-tertiary-container": "#f5fff6",
+                    "primary-container": "#2170e4",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-container-highest": "#e1e3e4",
+                    "tertiary": "#006947",
+                    "on-secondary": "#ffffff",
+                    "secondary": "#505f76",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#fefcff",
+                    "on-primary": "#ffffff",
+                    "inverse-surface": "#2e3132"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin_lg": "24px",
+                    "context_panel_width": "280px",
+                    "touch_target_default": "40px",
+                    "sidebar_width": "240px",
+                    "touch_target_accessible": "50px",
+                    "gutter": "16px",
+                    "base_unit": "8px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-md": ["Inter"],
+                    "title-sm": ["Inter"],
+                    "mono-code": ["jetbrainsMono"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: 'Inter', sans-serif;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full border-r border-outline-variant dark:border-outline bg-surface-container-lowest dark:bg-surface-container-low w-[240px] z-50">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h2>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">Local-First Sync</p>
+</div>
+</div>
+<nav class="flex-grow space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<div class="py-4">
+<div class="h-px bg-outline-variant"></div>
+</div>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant">
+<div class="flex items-center gap-3 p-2">
+<img alt="User" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional close-up portrait of a thoughtful researcher in a minimalist studio setting. The lighting is soft and natural, emphasizing a clean and organized workspace in the background. The aesthetic is modern and high-key with a palette of soft whites and cool greys, reflecting a focused and professional digital environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3NVAzzC4DZnTGk74MefCDlCJfncRhacCLLqAqgnCdq8u3Y-cgzqoVZPKWCjMO2O2_n32DwYv2OwakdoQ7bmqm-pGUxt5VBy8clmNzaJX54eVQJXZRa0iXDiZREGk2mi9529qf1RBvX3Hp5vwd5Ampc5deAdQUjRVDBYsC-zTYZTC6cr6GtqkqM87MZ29z_bUCg8zG4UhDnGgh_MbQOVmHLyow5Fd7FLHvG9IwCbnUOJ7m-JR4fSDmapn5EDeRhmcFL-haOkpvYkvd"/>
+<div class="overflow-hidden">
+<p class="font-label-caps text-label-caps truncate">Alex Chen</p>
+<p class="text-[10px] text-on-surface-variant">Lead Researcher</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-[240px] p-margin_lg mb-[60px]">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-10">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps">Account</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="font-label-caps text-label-caps text-primary">Manual Profile</span>
+</nav>
+<h1 class="font-display-lg text-display-lg font-bold">Identity &amp; Preferences</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mt-2">Manage how you appear in collaborative spaces and how the system adapts to your research style. All sensitive fields are local-only by default.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-6 h-touch_target_default border border-outline text-on-surface rounded-lg font-label-caps text-label-caps hover:bg-surface-container-high transition-all">Discard Changes</button>
+<button class="px-6 h-touch_target_default bg-primary text-white rounded-lg font-label-caps text-label-caps hover:opacity-90 shadow-md transition-all">Save Profile</button>
+</div>
+</header>
+<!-- Profile Grid -->
+<div class="bento-grid">
+<!-- Identity Card (Large) -->
+<div class="col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg flex gap-margin_lg">
+<div class="flex-shrink-0 flex flex-col items-center gap-4">
+<div class="relative group cursor-pointer">
+<img alt="Avatar" class="w-32 h-32 rounded-full border-4 border-surface shadow-sm object-cover" data-alt="A professional portrait of a male researcher in a modern office environment. The lighting is bright and clean, typical of a professional workspace. The background shows blurred books and tech equipment, conveying a sense of expertise and modern knowledge work. The color palette is dominated by soft whites, blues, and greys." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDo8vy1X8BuZ_OAJJEEV__ZTR9PMBl0NSOC7RUO4WZ1yzfoNsADYxYs2mmdHAVzJMduAeN4_AdycVeiauE3MOFGWQoM_CxgSIicTAFgglFynEXqWbKDhlc6NyPrTzx10enlGMTe5o2HN__HbJi--pF_zKxS1W2B9O7V89RiQzN9qFrbyMWhixWQg7KVtHcK0g9QId8dceCkc0MhrBKALAZNyUMIlhNgyNS_Nm2-BIMNRlDoEVFCNk8Qk3Qwz4y9C4graENenVo3za87"/>
+<div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white text-3xl">photo_camera</span>
+</div>
+</div>
+<span class="px-3 py-1 bg-tertiary-container/10 text-tertiary text-[10px] font-bold rounded-full uppercase tracking-tighter flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                        Verified Sync
+                    </span>
+</div>
+<div class="flex-grow space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Display Name</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-2 font-body-md focus:ring-2 focus:ring-primary focus:outline-none transition-all" type="text" value="Alex Chen"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Researcher Role</label>
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-2 font-body-md focus:ring-2 focus:ring-primary focus:outline-none transition-all" type="text" value="Knowledge Architect"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between">
+<label class="font-label-caps text-label-caps text-on-surface-variant">Bio / Self-Expression</label>
+<span class="text-[10px] text-on-surface-variant">240/500 characters</span>
+</div>
+<textarea class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-2 font-body-md focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none" rows="4">Focusing on local-first knowledge graphs and decentralized research protocols. Interested in how AI can facilitate deep focus rather than distraction.</textarea>
+</div>
+</div>
+</div>
+<!-- Privacy Indicators -->
+<div class="col-span-4 bg-surface-container-low border border-outline-variant rounded-xl p-margin_lg">
+<h3 class="font-title-sm text-title-sm mb-4">Privacy Core</h3>
+<div class="space-y-4">
+<div class="p-3 bg-surface rounded-lg flex items-start gap-3 border border-outline-variant">
+<span class="material-symbols-outlined text-primary mt-0.5">lock</span>
+<div>
+<p class="font-label-caps text-label-caps">Encrypted Profile</p>
+<p class="text-[11px] text-on-surface-variant mt-1">Your detailed preferences are only visible to you and your authorized sync nodes.</p>
+</div>
+</div>
+<div class="p-3 bg-primary-container/10 rounded-lg flex items-start gap-3 border border-primary/20">
+<span class="material-symbols-outlined text-primary mt-0.5">shield</span>
+<div>
+<p class="font-label-caps text-label-caps text-primary">Local-First Vault</p>
+<p class="text-[11px] text-on-surface-variant mt-1">Biometric data and deep search history never leave this device.</p>
+</div>
+</div>
+</div>
+<div class="mt-6">
+<button class="w-full flex items-center justify-between px-4 py-2 border border-outline-variant rounded-lg hover:bg-surface-container transition-all">
+<span class="font-label-caps text-label-caps">Advanced Security</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Research Preferences -->
+<div class="col-span-6 bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg">
+<h3 class="font-title-sm text-title-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+                    System Personalization
+                </h3>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">High Contrast Mode</p>
+<p class="text-[12px] text-on-surface-variant">Increase legibility for long reading sessions</p>
+</div>
+<div class="relative inline-block w-12 h-6 rounded-full bg-outline-variant cursor-pointer transition-colors duration-200">
+<div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">AI Suggestion Depth</p>
+<p class="text-[12px] text-on-surface-variant">Balance between proactive and silent help</p>
+</div>
+<select class="bg-surface border border-outline-variant rounded-lg px-3 py-1 font-label-caps text-[12px]">
+<option>Minimal</option>
+<option selected="">Balanced</option>
+<option>Proactive</option>
+</select>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">Default Archive View</p>
+<p class="text-[12px] text-on-surface-variant">Preferred layout for your research library</p>
+</div>
+<div class="flex gap-1 bg-surface border border-outline-variant rounded-lg p-1">
+<button class="p-1.5 rounded-md hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined text-sm">grid_view</span>
+</button>
+<button class="p-1.5 bg-primary text-white rounded-md shadow-sm">
+<span class="material-symbols-outlined text-sm">view_list</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Preferences / Interests -->
+<div class="col-span-6 bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg">
+<h3 class="font-title-sm text-title-sm mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">tag</span>
+                    Focus Areas &amp; Tags
+                </h3>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed-variant rounded-full text-[12px] font-bold flex items-center gap-1 border border-outline-variant/30">
+                        Knowledge Graphs <span class="material-symbols-outlined text-xs cursor-pointer">close</span>
+</span>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed-variant rounded-full text-[12px] font-bold flex items-center gap-1 border border-outline-variant/30">
+                        AI Ethics <span class="material-symbols-outlined text-xs cursor-pointer">close</span>
+</span>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed-variant rounded-full text-[12px] font-bold flex items-center gap-1 border border-outline-variant/30">
+                        Cybernetics <span class="material-symbols-outlined text-xs cursor-pointer">close</span>
+</span>
+<button class="px-3 py-1 border border-dashed border-outline-variant rounded-full text-[12px] text-on-surface-variant flex items-center gap-1 hover:border-primary hover:text-primary transition-all">
+<span class="material-symbols-outlined text-xs">add</span> Add Tag
+                    </button>
+</div>
+<div class="space-y-4 pt-4 border-t border-outline-variant/30">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Local-Only Metadata</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 bg-surface-container-high rounded-lg">
+<p class="text-[10px] text-on-secondary-fixed-variant font-bold uppercase mb-1">Last Sync</p>
+<p class="font-mono-code text-[12px]">2023-11-24 14:02 UTC</p>
+</div>
+<div class="p-3 bg-surface-container-high rounded-lg">
+<p class="text-[10px] text-on-secondary-fixed-variant font-bold uppercase mb-1">Encryption Mode</p>
+<p class="font-mono-code text-[12px]">AES-256-GCM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Global Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="h-3 w-px bg-outline-variant"></div>
+<span class="flex items-center gap-1 font-label-caps text-label-caps text-tertiary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+                Sync: Up to date
+            </span>
+</div>
+<div class="flex items-center gap-6">
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer opacity-90 hover:opacity-100 transition-all" href="#">MCP Status: Online</a>
+<div class="flex items-center gap-2 cursor-pointer group">
+<span class="font-label-caps text-label-caps text-on-secondary-container group-hover:text-primary">High Contrast</span>
+<div class="w-8 h-4 bg-outline-variant rounded-full relative">
+<div class="absolute left-1 top-1 w-2 h-2 bg-white rounded-full"></div>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-secondary-container cursor-pointer hover:text-primary">play_circle</span>
+</div>
+</footer>
+<script>
+        // Simple micro-interactions for the switches
+        document.querySelectorAll('.relative.inline-block.w-12.h-6').forEach(toggle => {
+            toggle.addEventListener('click', () => {
+                const dot = toggle.querySelector('div');
+                const isActive = dot.classList.contains('translate-x-6');
+                if (isActive) {
+                    dot.classList.remove('translate-x-6', 'bg-white');
+                    dot.classList.add('left-1');
+                    toggle.classList.remove('bg-primary');
+                    toggle.classList.add('bg-outline-variant');
+                } else {
+                    dot.classList.remove('left-1');
+                    dot.classList.add('translate-x-6', 'bg-white');
+                    toggle.classList.remove('bg-outline-variant');
+                    toggle.classList.add('bg-primary');
+                }
+            });
+        });
+
+        // Add smooth hover scales
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => btn.style.transform = 'scale(0.98)');
+            btn.addEventListener('mouseup', () => btn.style.transform = 'scale(1)');
+            btn.addEventListener('mouseleave', () => btn.style.transform = 'scale(1)');
+        });
+    </script>
+</body></html>

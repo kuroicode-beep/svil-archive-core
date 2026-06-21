@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC — Verification Report Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active { color: #0058be; font-weight: 700; }
+    </style>
+</head>
+<body class="bg-surface text-on-background min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<aside class="fixed left-0 top-0 h-full w-[240px] bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-base_unit p-margin_lg z-50">
+<div class="mb-gutter">
+<h1 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Local-First Sync</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 sidebar-active bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<div class="mt-auto pt-gutter border-t border-outline-variant flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</div>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] flex-1 flex flex-col min-h-screen pb-[40px]">
+<!-- TopNavBar (Shared Component) -->
+<header class="sticky top-0 w-full h-touch_target_accessible bg-surface border-b border-outline-variant flex justify-between items-center px-gutter z-40">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+<div class="ml-gutter flex gap-gutter">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:bg-surface-container-high px-2 py-1 rounded" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-primary font-bold border-b-2 border-primary px-2 py-1" href="#">Archive</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:bg-surface-container-high px-2 py-1 rounded" href="#">AI Protocol</a>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150" data-icon="settings">settings</span>
+</div>
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150" data-icon="account_circle">account_circle</span>
+</div>
+</div>
+</header>
+<!-- Canvas Body -->
+<div class="p-margin_lg max-w-6xl mx-auto w-full flex flex-col gap-gutter">
+<!-- Breadcrumbs / Timeline Protocol -->
+<nav class="flex items-center gap-2 mb-gutter">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Protocol</span>
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Validation</span>
+<span class="material-symbols-outlined text-[14px] text-outline" data-icon="chevron_right">chevron_right</span>
+<span class="font-label-caps text-label-caps text-primary font-bold">Verification Report DX-402</span>
+</nav>
+<!-- Report Hero -->
+<section class="bg-surface-container-lowest p-margin_lg rounded-xl border border-outline-variant flex flex-col gap-gutter overflow-hidden relative">
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none bg-gradient-to-l from-primary to-transparent"></div>
+<div class="flex justify-between items-start z-10">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<span class="px-3 py-1 bg-tertiary-container text-on-tertiary-container rounded-full font-label-caps text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                Synced
+                            </span>
+<span class="font-mono-code text-mono-code text-outline">ID: SAC-REP-2023-402</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Verification Report: Neural Mesh Alignment</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">The verification process for the AI Collaboration sub-module is complete. 12 files were modified, with a final integrity score of 99.8%. Manual handoff to the Knowledge Integration layer is required.</p>
+</div>
+<button class="bg-primary text-on-primary px-gutter py-2 rounded-lg font-label-caps text-label-caps hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+                        INITIATE HANDOFF
+                    </button>
+</div>
+</section>
+<!-- Main Report Grid (Bento) -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Changed Files Summary -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter">
+<div class="flex items-center justify-between mb-margin_lg">
+<h3 class="font-title-sm text-title-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="folder_zip">folder_zip</span>
+                            Changed Files Summary
+                        </h3>
+<span class="font-label-caps text-label-caps text-outline">12 TOTAL MODIFICATIONS</span>
+</div>
+<div class="space-y-2">
+<!-- File Row -->
+<div class="flex items-center justify-between p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="description">description</span>
+<div>
+<p class="font-mono-code text-mono-code text-on-surface">/protocols/neural_mesh_v2.md</p>
+<p class="text-[12px] text-outline">Modified 2 mins ago • AI Agent Refactoring</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded font-label-caps text-[10px]">+142</span>
+<span class="px-2 py-0.5 bg-error-container text-on-error-container rounded font-label-caps text-[10px]">-12</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="code">code</span>
+<div>
+<p class="font-mono-code text-mono-code text-on-surface">/scripts/sync_engine_local.py</p>
+<p class="text-[12px] text-outline">Modified 5 mins ago • Performance optimization</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded font-label-caps text-[10px]">+24</span>
+<span class="px-2 py-0.5 bg-error-container text-on-error-container rounded font-label-caps text-[10px]">-86</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="schema">schema</span>
+<div>
+<p class="font-mono-code text-mono-code text-on-surface">/assets/graph_node_v1.json</p>
+<p class="text-[12px] text-outline">Created 12 mins ago • Schema initial build</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded font-label-caps text-[10px]">NEW</span>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="article">article</span>
+<div>
+<p class="font-mono-code text-mono-code text-on-surface">/archive/research_findings_alpha.md</p>
+<p class="text-[12px] text-outline">Modified 1 hour ago • Integrity Check</p>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded font-label-caps text-[10px]">+8</span>
+<span class="px-2 py-0.5 bg-error-container text-on-error-container rounded font-label-caps text-[10px]">-2</span>
+</div>
+</div>
+</div>
+<button class="mt-margin_lg w-full py-2 border border-outline-variant rounded-lg font-label-caps text-label-caps text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                        VIEW ALL 12 CHANGES
+                    </button>
+</div>
+<!-- Unresolved Issues & Stats -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<!-- Unresolved Issues Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter">
+<h3 class="font-title-sm text-title-sm flex items-center gap-2 mb-gutter text-error">
+<span class="material-symbols-outlined" data-icon="warning">warning</span>
+                            Unresolved Issues
+                        </h3>
+<div class="space-y-3">
+<div class="p-3 border-l-4 border-error bg-error-container/10 rounded-r-lg">
+<p class="font-label-caps text-[10px] text-error mb-1">DATA CONFLICT • LOW</p>
+<p class="font-body-sm text-body-sm text-on-surface">Orphaned reference in 'knowledge_base.md' line 44.</p>
+</div>
+<div class="p-3 border-l-4 border-outline bg-surface-container rounded-r-lg">
+<p class="font-label-caps text-[10px] text-outline mb-1">AI RECOMMENDATION • INFO</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Suggesting tag: 'Experimental' for mesh protocols.</p>
+</div>
+</div>
+</div>
+<!-- Handoff Destination -->
+<div class="bg-primary-container text-on-primary-container rounded-xl p-gutter">
+<h3 class="font-label-caps text-label-caps opacity-80 mb-2">TARGET DESTINATION</h3>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-lg bg-on-primary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-[32px]" data-icon="account_tree">account_tree</span>
+</div>
+<div>
+<p class="font-title-sm text-title-sm font-bold">Main Knowledge Graph</p>
+<p class="font-body-sm text-body-sm opacity-80">Branch: production/core-sync</p>
+</div>
+</div>
+</div>
+<!-- Visual Metric -->
+<div class="bg-surface-container-highest rounded-xl p-gutter flex items-center justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-outline">SYSTEM INTEGRITY</p>
+<p class="font-display-lg text-display-lg text-primary font-bold">99.8%</p>
+</div>
+<div class="w-16 h-16 rounded-full border-4 border-primary border-r-transparent animate-spin-slow"></div>
+</div>
+</div>
+</div>
+<!-- Visualization / Graphic Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="h-64 bg-surface-container rounded-xl border border-outline-variant overflow-hidden flex items-center justify-center relative">
+<div class="absolute inset-0 bg-grid-pattern opacity-5"></div>
+<img alt="System Visualization" class="w-full h-full object-cover grayscale brightness-110 contrast-125" data-alt="A macro close-up of a high-tech server circuit board with glowing blue micro-LEDs tracing data paths. The lighting is clinical and sharp, emphasizing the metallic textures and precise engineering. The aesthetic is monochromatic with strong primary blue accents, embodying a sense of high-performance digital architecture and secure data management." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiKn7_zAeJeu45_33nJMBoZUNDmUXpNJCkr1LUUzcKeASQpqwtfem7ZCmP000dxcMPs6R6ZzuYDGESEx5Z70Al0iuf7BelWUUtXlSr1_skqj-QzWGJ8F5LJIj20jcSX0t-yU3kdlC0655mBxDD8mlLqxLxRMMCyHxEsBWWouqSz-C4Y-k1sOkayhEe6CVTRnmOnlheUBzZ_t0Xq5GUZoGGklVb1wDowpDXSO1j25ZeprdX5YfvUcgN9aHEyIukv2OtLGx1oRp75I6Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
+<div class="absolute bottom-4 left-4">
+<span class="font-label-caps text-label-caps bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant">NETWORK TRAJECTORY MAP</span>
+</div>
+</div>
+<div class="h-64 bg-surface-container rounded-xl border border-outline-variant overflow-hidden flex items-center justify-center relative">
+<img alt="Data Integrity Visualization" class="w-full h-full object-cover grayscale" data-alt="A beautiful, abstract digital representation of a global data network seen from space, with shimmering points of light connected by thin translucent threads. The color palette consists of deep indigos and brilliant whites, creating a serene and professional atmosphere. Soft bokeh effects and high-key highlights suggest a state of perfect digital synchronization and immense knowledge storage." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQArFbSzRB6SFBumB1vFDG67OJI5Nui0hDtT9zutNaHtYe_xt29BYPSsHPPhXS45dYSC2xwZHB06nViDuFK4-vTXGx_BlFcbISFp4M0gLc7LRPta6bYH5KQZuF4NxR2mlcZq6vDISsLcR7U3kZJCeU_zIO2ZpTPHctDs8_8DOUc45LjGiK6QylrqLa-PZ4hI-QRq6aOY4rVVozMMEhGPj7r6sasy8t5Zy_T-JHb8aHyyn5CJLfyCSLvOEWL5yidUBMTo2-MlKlOhH2"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
+<div class="absolute bottom-4 left-4">
+<span class="font-label-caps text-label-caps bg-surface-container-lowest px-2 py-1 rounded border border-outline-variant">ENTROPY VALIDATION GRAPH</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Shared Component) -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container border-t border-outline-variant">
+<div class="flex items-center gap-gutter">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC SVIL ARCHIVE CORE</span>
+<span class="font-body-sm text-body-sm text-secondary">• © 2023 Internal Protocol</span>
+</div>
+<div class="flex gap-margin_lg">
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline opacity-90 hover:opacity-100 cursor-pointer" href="#">MCP Status: Online</a>
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline opacity-90 hover:opacity-100 cursor-pointer" href="#">Sync: Up to date</a>
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline opacity-90 hover:opacity-100 cursor-pointer" href="#">High Contrast</a>
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline opacity-90 hover:opacity-100 cursor-pointer" href="#">TTS Playback</a>
+</div>
+</footer>
+</main>
+<script>
+        // Simple micro-interactions
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.98)';
+                el.style.opacity = '0.9';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = 'scale(1)';
+                el.style.opacity = '1';
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'scale(1)';
+                el.style.opacity = '1';
+            });
+        });
+
+        // Atmospheric fade-in effect
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body></html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Memory Archive - SAC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<!-- Tailwind Config Verbatim -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#727785",
+                      "primary": "#0058be",
+                      "surface-dim": "#d9dadb",
+                      "inverse-on-surface": "#f0f1f2",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "inverse-primary": "#adc6ff",
+                      "surface-bright": "#f8f9fa",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "outline-variant": "#c2c6d6",
+                      "on-background": "#191c1d",
+                      "surface-container": "#edeeef",
+                      "on-surface-variant": "#424754",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-high": "#e7e8e9",
+                      "tertiary-container": "#00855b",
+                      "surface-container-low": "#f3f4f5",
+                      "secondary-container": "#d0e1fb",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#191c1d",
+                      "surface-tint": "#005ac2",
+                      "on-tertiary-container": "#f5fff6",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#e1e3e4",
+                      "tertiary": "#006947",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#fefcff",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2e3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin_lg": "24px",
+                      "context_panel_width": "280px",
+                      "touch_target_default": "40px",
+                      "sidebar_width": "240px",
+                      "touch_target_accessible": "50px",
+                      "gutter": "16px",
+                      "base_unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "mono-code": ["jetbrainsMono"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="flex justify-between items-center px-gutter h-touch_target_accessible w-full docked full-width top-0 bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline z-50 fixed">
+<div class="flex items-center gap-margin_lg">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+<div class="hidden md:flex gap-gutter">
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity duration-150" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity duration-150" href="#">Archive</a>
+<a class="font-label-caps text-label-caps text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary px-2 py-1 transition-opacity duration-150" href="#">AI Protocol</a>
+</div>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="relative flex items-center bg-surface-container-low rounded-full px-4 py-1 border border-outline-variant">
+<span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm text-body-sm text-on-surface w-48" placeholder="Search archives..." type="text"/>
+</div>
+<button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150" data-icon="settings">settings</button>
+<button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150" data-icon="account_circle">account_circle</button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline w-sidebar_width z-40 pt-20">
+<div class="mb-gutter">
+<div class="flex items-center gap-base_unit mb-2">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<div>
+<div class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant opacity-70">Local-First Sync</div>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-primary-fixed-dim font-bold bg-surface-container dark:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<div class="h-px bg-outline-variant my-2 opacity-50"></div>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar_width mr-context_panel_width pt-touch_target_accessible pb-touch_target_default min-h-screen">
+<div class="max-w-4xl mx-auto p-margin_lg">
+<!-- Journal Header -->
+<header class="mb-margin_lg flex flex-col gap-2">
+<h1 class="font-headline-md text-headline-md text-on-surface">Memory Archive</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xl">
+                    Capturing context, emotional resonance, and personal preferences for long-term knowledge retention. These notes remain strictly local-only unless explicitly shared.
+                </p>
+</header>
+<!-- Memory Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Active Editor Card -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg flex flex-col gap-gutter">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-base_unit">
+<span class="font-label-caps text-label-caps bg-secondary-container text-on-secondary-fixed-variant px-2 py-1 rounded">MAY 24, 2024</span>
+<span class="font-label-caps text-label-caps bg-tertiary-container/10 text-tertiary px-2 py-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                LOCAL-ONLY
+                            </span>
+</div>
+<div class="flex gap-2">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="attach_file">attach_file</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="mood">mood</button>
+</div>
+</div>
+<div class="flex-1">
+<input class="w-full font-title-sm text-title-sm bg-transparent border-none focus:ring-0 p-0 text-on-surface placeholder:opacity-50" placeholder="Title your reflection..." type="text" value="Research Context: Neural Interface Project"/>
+<textarea class="w-full mt-4 h-48 font-body-md text-body-md bg-transparent border-none focus:ring-0 p-0 text-on-surface-variant resize-none leading-relaxed" placeholder="Write your context here...">I felt a significant breakthrough today regarding the low-latency sync. It reminded me of the first time I used a physical turntable—that immediate tactile response. This tactile preference should be the guiding star for the AI protocol design. We aren't just building a tool; we're building a prosthetic for memory. Feeling optimistic but physically drained.</textarea>
+</div>
+<div class="flex justify-between items-center pt-4 border-t border-outline-variant/30">
+<div class="flex items-center gap-gutter">
+<button class="flex items-center gap-1 font-label-caps text-label-caps text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="link">link</span>
+                                Link to Timeline
+                            </button>
+<button class="flex items-center gap-1 font-label-caps text-label-caps text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="tag">tag</span>
+                                Add Tag
+                            </button>
+</div>
+<button class="bg-primary text-on-primary px-margin_lg py-2 rounded-lg font-label-caps text-label-caps hover:bg-primary-container transition-all">SAVE TO ARCHIVE</button>
+</div>
+</div>
+<!-- Emotional Trend Card -->
+<div class="col-span-12 lg:col-span-4 bg-primary-container/5 border border-primary/20 rounded-xl p-gutter flex flex-col gap-base_unit">
+<span class="font-label-caps text-label-caps text-primary">Emotional Resonance</span>
+<div class="flex-1 flex items-end justify-between h-24 px-2">
+<div class="w-4 bg-primary/40 rounded-t h-1/2"></div>
+<div class="w-4 bg-primary/20 rounded-t h-1/4"></div>
+<div class="w-4 bg-primary/60 rounded-t h-2/3"></div>
+<div class="w-4 bg-primary rounded-t h-full"></div>
+<div class="w-4 bg-primary/30 rounded-t h-1/3"></div>
+<div class="w-4 bg-primary/80 rounded-t h-4/5"></div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-2">Sentiment trending toward <strong>"Focused"</strong> and <strong>"Innovative"</strong> over the last 7 days.</p>
+</div>
+<!-- Past Memories List (Timeline Style) -->
+<div class="col-span-12 flex flex-col gap-gutter mt-margin_lg">
+<h3 class="font-label-caps text-label-caps text-outline">Recent Entries</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Memory Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant hover:border-primary transition-colors rounded-xl p-gutter flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-outline">May 22, 2024</span>
+<span class="material-symbols-outlined text-tertiary" data-icon="verified_user" style="font-variation-settings: 'FILL' 1; font-size: 16px;">verified_user</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-on-surface">Privacy preference update</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3">Decided to keep all biometric telemetry strictly local. The risk of cloud exposure outweighs the benefit of AI-cross-device analysis.</p>
+<div class="flex flex-wrap gap-1 mt-auto pt-2">
+<span class="font-label-caps text-[10px] uppercase border border-outline-variant px-1 rounded text-outline">Privacy</span>
+<span class="font-label-caps text-[10px] uppercase border border-outline-variant px-1 rounded text-outline">Policy</span>
+</div>
+</div>
+<!-- Memory Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant hover:border-primary transition-colors rounded-xl p-gutter flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-outline">May 18, 2024</span>
+<span class="material-symbols-outlined text-primary" data-icon="bookmark" style="font-variation-settings: 'FILL' 1; font-size: 16px;">bookmark</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-on-surface">Coffee Shop Flow</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3">Ambient noise at 65dB is my sweet spot. The ritual of ordering a double espresso triggers the "deep work" mode. Record for future spatial AI prompts.</p>
+<div class="flex flex-wrap gap-1 mt-auto pt-2">
+<span class="font-label-caps text-[10px] uppercase border border-outline-variant px-1 rounded text-outline">Environment</span>
+</div>
+</div>
+<!-- Memory Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant hover:border-primary transition-colors rounded-xl p-gutter flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-outline">May 15, 2024</span>
+<span class="material-symbols-outlined text-error" data-icon="warning" style="font-variation-settings: 'FILL' 1; font-size: 16px;">warning</span>
+</div>
+<h4 class="font-title-sm text-title-sm text-on-surface">Conflict Resolution</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-3">Need to remember that 'Team B' prefers structured agendas over my spontaneous brainstorming sessions. Adapt communication to be more linear.</p>
+<div class="flex flex-wrap gap-1 mt-auto pt-2">
+<span class="font-label-caps text-[10px] uppercase border border-outline-variant px-1 rounded text-outline">Social</span>
+<span class="font-label-caps text-[10px] uppercase border border-outline-variant px-1 rounded text-outline">Work</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Right Panel -->
+<aside class="fixed right-0 top-0 h-full w-context_panel_width bg-surface-container-lowest border-l border-outline-variant z-40 pt-20 p-margin_lg flex flex-col gap-margin_lg">
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-gutter">AI CONTEXTUAL INSIGHTS</h3>
+<div class="bg-surface-container rounded-lg p-base_unit border-l-4 border-primary">
+<p class="font-body-sm text-body-sm text-on-surface leading-tight">Your recent notes suggest a strong preference for <strong>minimalist workspace</strong> setups. Would you like me to hide non-essential UI elements during your peak focus hours (9 AM - 11 AM)?</p>
+<div class="flex gap-2 mt-2">
+<button class="font-label-caps text-[10px] text-primary hover:underline">ACCEPT</button>
+<button class="font-label-caps text-[10px] text-outline hover:underline">DISMISS</button>
+</div>
+</div>
+</div>
+<div>
+<h3 class="font-label-caps text-label-caps text-outline mb-gutter">SYNC STATUS</h3>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm">Global Cloud</span>
+<span class="font-label-caps text-[10px] bg-secondary-container text-on-secondary-fixed-variant px-1 rounded">SYNCED</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-body-sm text-body-sm">Memory Archive</span>
+<span class="font-label-caps text-[10px] bg-tertiary-container/20 text-tertiary px-1 rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+                        LOCAL-ONLY
+                    </span>
+</div>
+</div>
+</div>
+<div class="mt-auto">
+<img class="w-full h-40 object-cover rounded-lg shadow-sm" data-alt="A serene and minimalist home office workspace bathed in soft morning sunlight. The desk is made of light-colored wood, holding only a sleek laptop, a single green plant, and a ceramic mug. The lighting is ethereal and clean, evoking a calm, research-oriented atmosphere consistent with a professional productivity tool. The color palette consists of soft greys, crisp whites, and natural textures, promoting deep focus and tranquility." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmzG-ZrV0lwVm1AcXRbimzbmow_iXs2StcE1TUTqTzk0XELeoFoauh2W-rxdA4NTZSo0H1pqF7BZPYHZU6ObjANPNkgPOc6YP7DqpPa6QhiGvYQjvDZOLJ9rmCq-IEij2eNfAb8NFRcWGFBKd065EfFXPmjcUBKCcDZ97o4df6C7RFyFc5D9etW290GyCh2NAIz9JaL0ytlZHk4wc2_ZxA4BL21e2Go52W7zKZjXLK55Frb-wG6YuQvSOqUxfXQ58erD42zZxiEVQ4"/>
+<p class="font-body-sm text-body-sm italic text-on-surface-variant mt-2 text-center">"Calm leads to clarity."</p>
+</div>
+</aside>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline">
+<div class="flex items-center gap-gutter">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="h-4 w-px bg-outline-variant"></div>
+<span class="font-label-caps text-label-caps text-secondary dark:text-secondary-fixed-dim">MCP Status: Online</span>
+</div>
+<div class="flex items-center gap-margin_lg">
+<a class="font-label-caps text-label-caps text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed-dim underline transition-opacity" href="#">Sync: Up to date</a>
+<div class="flex items-center gap-base_unit bg-surface-container-high px-2 py-0.5 rounded-full border border-outline-variant">
+<span class="font-label-caps text-[10px] text-outline">DARK MODE</span>
+<button class="w-8 h-4 bg-outline rounded-full relative transition-colors" id="theme-toggle">
+<div class="absolute left-1 top-1 w-2 h-2 bg-white rounded-full transition-all duration-200" id="toggle-circle"></div>
+</button>
+</div>
+<button class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="volume_up">volume_up</button>
+</div>
+</footer>
+<script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const toggleCircle = document.getElementById('toggle-circle');
+        let isDark = false;
+
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            document.documentElement.classList.toggle('dark', isDark);
+            toggleCircle.style.left = isDark ? '20px' : '4px';
+            themeToggle.classList.toggle('bg-primary', isDark);
+            themeToggle.classList.toggle('bg-outline', !isDark);
+        });
+
+        // Micro-interaction for hover states
+        const memoryCards = document.querySelectorAll('.bg-surface-container-lowest');
+        memoryCards.forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.99)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

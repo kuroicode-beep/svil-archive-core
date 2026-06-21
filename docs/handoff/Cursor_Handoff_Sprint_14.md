@@ -1,6 +1,7 @@
 # Cursor Handoff — Sprint 14 MCP Archive Service Integration
 
 > **Sprint 14 구현 커밋**: `439a0bd`
+> **Sprint 14 최종 HEAD**: `7d7fd5c` (Codex PASS)
 > **Sprint 13 기준**: `efa97e2` / HEAD `433ede5`
 > **작업지시문**: [Sprint 14 WI](https://app.notion.com/p/379864048e5481c19ca5c2a50e89bdb3)
 
@@ -27,14 +28,13 @@
 - **원인**: PowerShell 함수가 `npm ci` stdout을 반환값에 섞어 `mcp_sidecar_native_binding_included`가 배열로 기록
 - **수정**: npm 출력 `2>&1 | Out-Null`, native binding은 `Test-Path`로 boolean 확정, `Assert-ManifestBooleanFlags` 추가
 
-## Codex에게
+## Codex 최종 검증 (2026.06.08)
 
-- stub JSON 제거 여부
-- clean install: `npm ci && npm run build && npm test` (8/8 + native verify)
-- Windows package `mcp_sidecar_native_binding_included: true`
-- full body 기본 금지
-- absolute path / secret masking
-- `flutter test`
+- **판정**: **PASS / 다음 단계 진행 가능 YES**
+- **HEAD**: `7d7fd5c`
+- clean install 10/10, `verify:native` 2/2, manifest boolean `true`
+- 패키지: `bin/windows/sac_v0.1.0-rc.1_windows_x64_7d7fd5c.zip`
+- 근거: `docs/reports/Codex_Verification_Reverification_Report_Sprint_08_14.md`
 
 ## 소장님 Cursor smoke
 

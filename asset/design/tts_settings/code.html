@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["jetbrainsMono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c2c6d6; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-gutter h-touch_target_accessible w-full fixed top-0 z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+</div>
+<nav class="hidden md:flex items-center gap-margin_lg h-full">
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors px-3 py-1 rounded-lg" href="#">Dashboard</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors px-3 py-1 rounded-lg" href="#">Archive</a>
+<a class="text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors px-3 py-1 rounded-lg" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-base_unit">
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-opacity duration-150 active:scale-95">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high rounded-full text-on-surface-variant transition-opacity duration-150 active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full w-sidebar_width pt-[70px] z-40 hidden md:flex">
+<div class="mb-margin_lg">
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+<div class="flex flex-col gap-1 overflow-y-auto custom-scrollbar">
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">inventory_2</span> Document Archive
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">psychology</span> AI Collaboration
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">folder_shared</span> Personal Archive
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">search</span> Search
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">delete</span> Trash
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">checklist</span> Task Queue
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">construction</span> MCP Tools
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant font-body-sm text-body-sm hover:bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">lock</span> Privacy
+            </div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-primary font-bold font-body-sm text-body-sm bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined">settings</span> Settings
+            </div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-0 md:ml-sidebar_width mt-[50px] mb-[40px] p-margin_lg">
+<div class="max-w-4xl mx-auto">
+<header class="mb-margin_lg">
+<h1 class="font-headline-md text-headline-md text-on-background">TTS Settings</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Configure text-to-speech engines and playback preferences.</p>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-margin_lg">
+<!-- Settings Column -->
+<div class="lg:col-span-8 space-y-margin_lg">
+<!-- Engine Selection -->
+<section class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant">
+<h3 class="font-label-caps text-label-caps text-primary mb-4">TTS ENGINE SOURCE</h3>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex flex-col items-center justify-center p-4 border-2 border-primary rounded-xl bg-primary-container/10">
+<span class="material-symbols-outlined text-primary mb-2">laptop_mac</span>
+<span class="font-label-caps text-label-caps text-on-surface">SYSTEM</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 border border-outline-variant rounded-xl hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">dns</span>
+<span class="font-label-caps text-label-caps text-on-surface">LOCAL</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 border border-outline-variant rounded-xl hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant mb-2">cloud</span>
+<span class="font-label-caps text-label-caps text-on-surface">EXTERNAL</span>
+</button>
+</div>
+</section>
+<!-- Voice Selection & Controls -->
+<section class="bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant space-y-6">
+<div>
+<label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">VOICE SELECTION</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-3 font-body-sm text-body-sm focus:ring-2 focus:ring-primary focus:outline-none">
+<option>Neural British Male (High Quality)</option>
+<option>Neural American Female (Expressive)</option>
+<option>System Standard - Samantha</option>
+<option>Local Whisper-v3 - Base</option>
+</select>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-margin_lg">
+<div>
+<div class="flex justify-between mb-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">PLAYBACK SPEED</label>
+<span class="font-mono-code text-mono-code text-primary">1.2x</span>
+</div>
+<input class="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary" max="2.0" min="0.5" step="0.1" type="range" value="1.2"/>
+</div>
+<div>
+<div class="flex justify-between mb-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant">PITCH</label>
+<span class="font-mono-code text-mono-code text-primary">Normal</span>
+</div>
+<input class="w-full h-2 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary" max="1.5" min="0.5" step="0.1" type="range" value="1.0"/>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">Sentence Highlighting</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Visually track the spoken text</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</section>
+<!-- Privacy Notice -->
+<div class="bg-tertiary-container/10 border border-tertiary/20 p-4 rounded-xl flex gap-3">
+<span class="material-symbols-outlined text-tertiary">security</span>
+<div>
+<h4 class="font-label-caps text-label-caps text-tertiary font-bold mb-1">PRIVACY COMPLIANCE</h4>
+<p class="font-body-sm text-body-sm text-on-tertiary-fixed-variant">External engines process text on remote servers. Use "Local" or "System" sources for maximum privacy and zero data leakage. Synced status: <span class="text-tertiary font-bold underline">End-to-End Encrypted</span>.</p>
+</div>
+</div>
+</div>
+<!-- Test Area Column -->
+<div class="lg:col-span-4 space-y-margin_lg">
+<section class="bg-white p-gutter rounded-xl border border-outline-variant h-full flex flex-col shadow-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">TEST PLAYBACK AREA</h3>
+<div class="flex-1 bg-surface rounded-lg p-4 border border-outline-variant mb-4 font-mono-code text-mono-code text-on-surface-variant leading-relaxed">
+<span class="bg-primary-container/30 text-primary px-1 rounded">The quick brown fox</span> jumps over the lazy dog. This is a sample sentence to test the current voice profile and playback speed. Highlighting is enabled.
+                        </div>
+<div class="space-y-3">
+<button class="w-full bg-primary text-on-primary font-label-caps text-label-caps py-3 rounded-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">play_arrow</span> TEST VOICE
+                            </button>
+<button class="w-full border border-outline-variant text-on-surface-variant font-label-caps text-label-caps py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">stop</span> STOP
+                            </button>
+</div>
+<div class="mt-margin_lg pt-margin_lg border-t border-outline-variant">
+<div class="flex items-center justify-between text-on-surface-variant mb-2">
+<span class="font-label-caps text-label-caps">ENGINE LATENCY</span>
+<span class="font-mono-code text-mono-code text-tertiary">14ms</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden">
+<div class="bg-tertiary w-1/4 h-full"></div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container border-t border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden md:flex gap-4">
+<span class="font-body-sm text-body-sm text-secondary-fixed-variant flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> MCP Status: Online
+                </span>
+<span class="font-body-sm text-body-sm text-secondary-fixed-variant">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-margin_lg">
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer transition-colors duration-200" href="#">High Contrast</a>
+<a class="font-label-caps text-label-caps text-primary font-bold cursor-pointer transition-colors duration-200" href="#">TTS Playback</a>
+</div>
+</footer>
+<!-- FAB (Suppressed on Settings Page) -->
+<script>
+        // Micro-interaction for range inputs
+        const ranges = document.querySelectorAll('input[type="range"]');
+        ranges.forEach(range => {
+            range.addEventListener('input', (e) => {
+                const valSpan = e.target.parentElement.querySelector('span:last-child');
+                if(valSpan) {
+                    if(e.target.step === '0.1') {
+                        valSpan.innerText = e.target.value + (e.target.min === '0.5' ? 'x' : '');
+                    }
+                }
+            });
+        });
+
+        // Test playback animation simulation
+        const playBtn = document.querySelector('button.bg-primary');
+        playBtn.addEventListener('click', () => {
+            playBtn.innerHTML = `<span class="material-symbols-outlined animate-spin">refresh</span> PROCESSING...`;
+            setTimeout(() => {
+                playBtn.innerHTML = `<span class="material-symbols-outlined">play_arrow</span> TEST VOICE`;
+            }, 1000);
+        });
+    </script>
+</body></html>

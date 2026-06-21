@@ -4,7 +4,7 @@ author: "Cursor"
 created: "2026-06-08"
 verification_report: "Codex Sprint 09 검증 (2026.06.08)"
 sprint08_base_commit: "36e9d6c"
-rework_commit: "a15a4c1"
+rework_commit: "cd684a2"
 ---
 
 # 재작업 보고서 — SAC Sprint 09 Codex 검증 반영

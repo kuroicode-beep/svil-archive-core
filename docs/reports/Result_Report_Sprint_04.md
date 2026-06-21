@@ -4,6 +4,8 @@ author: "Cursor"
 created: "2026-06-07"
 sprint03_base_commit: "fc607f3"
 sprint04_implementation_commit: "b3f24a6"
+sprint04_rework_commit: "87a3e36"
+sprint04_final_commit: "87a3e36"
 ---
 
 # 완료 보고서 — SAC Sprint 04 Document Archive UI

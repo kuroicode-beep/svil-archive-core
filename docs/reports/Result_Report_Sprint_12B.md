@@ -14,7 +14,7 @@ sprint12b_implementation_commit: "c2e73a4"
 ## 01. 작업 요약
 
 - **목표**: Windows portable RC 패키지에 MCP sidecar 포함 + packaged path 탐지
-- **결과**: 완료
+- **결과**: 완료 / Codex 최종 PASS (`4d49a7a`)
 
 ## 02. 패키지 출력
 
@@ -54,7 +54,13 @@ sprint12b_implementation_commit: "c2e73a4"
 - `_fileMatchesSprintDoc` — `Sprint_12B`가 `Sprint 12`로 오분류되지 않도록 수정
 - Windows RC 패키지를 `c2e73a4` 기준으로 **flutter release 재빌드** 후 재생성
 
-## 07. 핸드오프
+## 07. Codex 최종 검증
 
-- Codex: `docs/handoff/Codex_Verification_Request_Sprint_12B.md`
+- **판정**: PASS (`HEAD 4d49a7a`, `flutter test` 175/175)
+- **패키지**: `sac_v0.1.0-rc.1_windows_x64_c2e73a4`
+- **Advisory 반영**: `package_windows_rc.ps1` ZIP 압축 retry/delay 보강
+
+## 08. 핸드오프
+
 - 소장님: ZIP 풀고 `sac_app.exe` 실행, Settings MCP 상태 확인
+- 다음: `v0.1.0-rc.1` tag 승인 / 실기기 smoke PASS (수동)

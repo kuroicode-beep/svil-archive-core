@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Collaboration Protocol — SAC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#727785",
+                      "primary": "#0058be",
+                      "surface-dim": "#d9dadb",
+                      "inverse-on-surface": "#f0f1f2",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "inverse-primary": "#adc6ff",
+                      "surface-bright": "#f8f9fa",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "outline-variant": "#c2c6d6",
+                      "on-background": "#191c1d",
+                      "surface-container": "#edeeef",
+                      "on-surface-variant": "#424754",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-high": "#e7e8e9",
+                      "tertiary-container": "#00855b",
+                      "surface-container-low": "#f3f4f5",
+                      "secondary-container": "#d0e1fb",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#191c1d",
+                      "surface-tint": "#005ac2",
+                      "on-tertiary-container": "#f5fff6",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#e1e3e4",
+                      "tertiary": "#006947",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#fefcff",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2e3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin_lg": "24px",
+                      "context_panel_width": "280px",
+                      "touch_target_default": "40px",
+                      "sidebar_width": "240px",
+                      "touch_target_accessible": "50px",
+                      "gutter": "16px",
+                      "base_unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "mono-code": ["jetbrainsMono"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- TopNavBar -->
+<nav class="bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_accessible w-full fixed top-0 z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+</div>
+<div class="hidden md:flex gap-margin_lg h-full items-center">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-all" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-all" href="#">Archive</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-caps text-label-caps px-2 py-1 h-full flex items-center" href="#">AI Protocol</a>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="bg-surface-container rounded-lg px-gutter py-1 flex items-center gap-base_unit">
+<span class="material-symbols-outlined text-outline scale-75">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm text-body-sm w-48" placeholder="Search Studio..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high rounded-full p-1">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high rounded-full p-1">account_circle</button>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline fixed left-0 top-0 h-full w-sidebar_width flex flex-col gap-base_unit p-margin_lg pt-24 z-40">
+<div class="mb-gutter">
+<div class="flex items-center gap-base_unit">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<div>
+<div class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant uppercase tracking-widest">Local-First Sync</div>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto no-scrollbar">
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-primary dark:text-primary-fixed-dim font-bold bg-surface-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</button>
+<div class="h-px bg-outline-variant my-2 mx-3"></div>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-label-caps text-label-caps">Trash</span>
+</button>
+<button class="flex items-center gap-gutter px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</button>
+</nav>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-[240px] pt-24 pb-12 px-margin_lg min-h-screen">
+<!-- Header Section -->
+<header class="mb-gutter flex justify-between items-end">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">AI Collaboration Protocol</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Active Instance: <span class="text-primary font-bold">ALPHA-7-REDACT</span> | Status: In Progress</p>
+</div>
+<div class="flex gap-base_unit">
+<button class="px-4 py-2 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps flex items-center gap-2 hover:opacity-90 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+                    EXECUTE PROTOCOL
+                </button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface rounded-lg font-label-caps text-label-caps hover:bg-surface-container transition-all">
+                    EXPORT SUMMARY
+                </button>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Protocol Tabs Sidebar (Internal Navigation) -->
+<div class="col-span-3 flex flex-col gap-gutter">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-base_unit overflow-hidden">
+<div class="font-label-caps text-[10px] text-outline px-3 py-2 uppercase tracking-tighter">Stages</div>
+<div class="flex flex-col gap-1">
+<button class="tab-btn active flex items-center justify-between px-3 py-3 rounded-lg bg-primary-container text-on-primary-container transition-all group" onclick="switchTab('instructions')">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+<span class="font-label-caps text-label-caps">Instructions</span>
+</div>
+<span class="bg-primary text-on-primary text-[10px] px-1.5 py-0.5 rounded-full">12</span>
+</button>
+<button class="tab-btn flex items-center justify-between px-3 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant transition-all" onclick="switchTab('results')">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-[20px]">monitoring</span>
+<span class="font-label-caps text-label-caps">Result Reports</span>
+</div>
+<span class="bg-tertiary-container text-on-tertiary-container text-[10px] px-1.5 py-0.5 rounded-full">4</span>
+</button>
+<button class="tab-btn flex items-center justify-between px-3 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant transition-all" onclick="switchTab('completion')">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-[20px]">task_alt</span>
+<span class="font-label-caps text-label-caps">Completion</span>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant text-[10px] px-1.5 py-0.5 rounded-full">82%</span>
+</button>
+<button class="tab-btn flex items-center justify-between px-3 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant transition-all" onclick="switchTab('verification')">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+<span class="font-label-caps text-label-caps">Verification</span>
+</div>
+<span class="material-symbols-outlined text-error text-[16px]">error</span>
+</button>
+<button class="tab-btn flex items-center justify-between px-3 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant transition-all" onclick="switchTab('handoff')">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-[20px]">output</span>
+<span class="font-label-caps text-label-caps">Handoff</span>
+</div>
+<span class="material-symbols-outlined text-outline text-[16px]">lock_clock</span>
+</button>
+</div>
+</div>
+<!-- AI Context Insights -->
+<div class="bg-surface-container-high rounded-xl p-gutter border border-outline-variant">
+<div class="flex items-center gap-base_unit mb-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="font-label-caps text-label-caps">AI Insights</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">
+                        Current latency: <span class="text-on-surface font-bold">24ms</span>. Model consistency check passed for document "ARCH-2024-Q1".
+                    </p>
+<div class="w-full bg-surface rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+<div class="flex justify-between mt-2 font-label-caps text-[10px] text-outline">
+<span>CORE STABILITY</span>
+<span>65%</span>
+</div>
+</div>
+</div>
+<!-- Workspace Center (Fluid Content) -->
+<div class="col-span-9 flex flex-col gap-gutter">
+<!-- Main Content Area -->
+<div class="tab-content block bg-surface-container-lowest rounded-xl border border-outline-variant min-h-[500px] flex flex-col overflow-hidden" id="content-instructions">
+<div class="border-b border-outline-variant p-gutter flex justify-between items-center bg-surface-container-low">
+<div class="flex gap-gutter items-center">
+<span class="font-title-sm text-title-sm">Protocol Document: Instructions</span>
+<span class="px-2 py-0.5 bg-blue-100 text-blue-700 font-label-caps text-[10px] rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                PRIVACY-FIRST
+                            </span>
+</div>
+<div class="flex gap-2">
+<button class="p-1 hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[20px]">edit</span></button>
+<button class="p-1 hover:bg-surface-container rounded transition-colors"><span class="material-symbols-outlined text-[20px]">history</span></button>
+</div>
+</div>
+<div class="p-margin_lg flex-1 font-mono-code text-mono-code text-on-surface-variant">
+<p class="mb-4 text-primary">## SESSION START: COLLABORATION_PROTOCOL_V4</p>
+<p class="mb-4">
+                            1. <span class="text-on-surface font-bold">IDENTIFICATION:</span> System must verify archive integrity before initiating "Protocol Document Preview".
+                        </p>
+<p class="mb-4">
+                            2. <span class="text-on-surface font-bold">INGESTION:</span> All documents must be hashed using SHA-256 for local-first sync verification. 
+                        </p>
+<p class="mb-4">
+                            3. <span class="text-on-surface font-bold">REDACTION:</span> Automatically redact PII (Personally Identifiable Information) using the AI-Sync module.
+                        </p>
+<p class="mb-4">
+                            4. <span class="text-on-surface font-bold">SYNC_LOGIC:</span>
+<br/>    - If CONFLICT: Prioritize local-first timestamps.
+                            <br/>    - If SYNCED: Move to "Verification" stage.
+                        </p>
+<div class="mt-8 p-gutter border-l-4 border-primary bg-surface-container-low italic">
+                            "The system's goal is to maintain a high-fidelity knowledge vault while ensuring zero-knowledge leakage to external servers."
+                        </div>
+<div class="mt-8 flex gap-4">
+<div class="p-gutter border border-outline-variant rounded-lg flex-1 group hover:border-primary transition-colors cursor-pointer">
+<div class="font-label-caps text-label-caps text-primary mb-1">LOCAL STATUS</div>
+<div class="font-title-sm text-title-sm text-on-surface">98.2 GB Synced</div>
+</div>
+<div class="p-gutter border border-outline-variant rounded-lg flex-1">
+<div class="font-label-caps text-label-caps text-tertiary mb-1">LAST VERIFIED</div>
+<div class="font-title-sm text-title-sm text-on-surface">14:22:01 UTC</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Hidden Tab Contents -->
+<div class="tab-content hidden bg-surface-container-lowest rounded-xl border border-outline-variant p-margin_lg min-h-[500px]" id="content-results">
+<h2 class="font-headline-md text-headline-md mb-gutter">AI Analysis Results</h2>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="border border-outline-variant rounded-lg p-gutter hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<div class="font-title-sm text-title-sm">Semantic Mapping</div>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 font-label-caps text-[10px] rounded">SYNCED</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Cluster analysis of local archives completed with 99% accuracy across 4,200 entities.</p>
+</div>
+<div class="border border-outline-variant rounded-lg p-gutter">
+<div class="flex justify-between items-start mb-2">
+<div class="font-title-sm text-title-sm">Inference Trace</div>
+<span class="px-2 py-0.5 bg-green-100 text-green-700 font-label-caps text-[10px] rounded">SYNCED</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">No hallucinations detected in document synthesis for the 2024 Research Arc.</p>
+</div>
+</div>
+<img alt="Data Visualization" class="w-full h-64 object-cover mt-gutter rounded-lg border border-outline-variant" data-alt="A sophisticated data visualization dashboard showing interconnected neural network nodes and flowing data streams in a clean, clinical UI. The color palette uses deep blues and soft greys with vibrant green status indicators. The lighting is balanced and professional, suggesting a high-tech corporate research environment with a focus on precision and digital clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCm7PWn011xc_fy4W0_GrZU346Ls_bJydXnGbQgGWJA2i5N42M9x5LY8qeStSELKiMkecI0P7yTm-WFvP44PmMjBylre2ZliRepEwuvSFf-rjV1YgrVmpAgO4G3sFM5SUigQRmoTwo067hoveU3JIIQEg8QRNkzvvLb0RHuiZyldHXgosGEkHUmSz3XjdeOtRq3BMdNyxXeSng2dTw-JU63EMAxdjrdxSR93TAkkrwMXYqV9XaWN3omdLCt8RmWaoCXLeCus-tamSp-"/>
+</div>
+<div class="tab-content hidden bg-surface-container-lowest rounded-xl border border-outline-variant p-margin_lg min-h-[500px]" id="content-verification">
+<div class="flex flex-col items-center justify-center h-full text-center">
+<span class="material-symbols-outlined text-[64px] text-error mb-4">error</span>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">Verification Conflict</h2>
+<p class="text-on-surface-variant max-w-md mb-gutter">Checksum mismatch detected in Document ARCH-7. Manual verification required to proceed with collaboration handoff.</p>
+<div class="flex gap-gutter">
+<button class="px-gutter py-2 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps">Resolve Manually</button>
+<button class="px-gutter py-2 border border-outline-variant text-on-surface rounded-lg font-label-caps text-label-caps">Force Sync</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Right Panel (Metadata/Insights) -->
+<aside class="fixed right-0 top-0 h-full w-context_panel_width bg-surface-container-lowest border-l border-outline-variant pt-24 p-gutter z-30">
+<h3 class="font-label-caps text-label-caps text-outline mb-gutter uppercase tracking-wider">Session Metadata</h3>
+<div class="flex flex-col gap-margin_lg">
+<section>
+<div class="text-[10px] font-label-caps text-on-surface-variant mb-1">PARTICIPANTS</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-primary-container flex items-center justify-center text-[10px] font-bold">US</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-tertiary-container flex items-center justify-center text-[10px] font-bold">AI</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-high flex items-center justify-center text-[12px]"><span class="material-symbols-outlined text-[14px]">add</span></div>
+</div>
+</section>
+<section>
+<div class="text-[10px] font-label-caps text-on-surface-variant mb-1">PROTOCOL TAGS</div>
+<div class="flex flex-wrap gap-1">
+<span class="px-2 py-1 bg-surface-container border border-outline-variant rounded font-label-caps text-[10px]">#local-first</span>
+<span class="px-2 py-1 bg-surface-container border border-outline-variant rounded font-label-caps text-[10px]">#neural-sync</span>
+<span class="px-2 py-1 bg-surface-container border border-outline-variant rounded font-label-caps text-[10px]">#q1-review</span>
+</div>
+</section>
+<section class="bg-surface-container-low rounded-lg p-base_unit border border-outline-variant">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-[16px] text-amber-600">history</span>
+<span class="font-label-caps text-[10px] font-bold">Activity Log</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="border-l-2 border-outline-variant pl-3 py-0.5">
+<div class="text-[10px] font-bold text-on-surface">Instructions updated</div>
+<div class="text-[9px] text-outline">2 mins ago by User</div>
+</div>
+<div class="border-l-2 border-primary pl-3 py-0.5">
+<div class="text-[10px] font-bold text-on-surface">Analysis auto-start</div>
+<div class="text-[9px] text-outline">15 mins ago by System</div>
+</div>
+<div class="border-l-2 border-outline-variant pl-3 py-0.5">
+<div class="text-[10px] font-bold text-on-surface">Archive mounted</div>
+<div class="text-[9px] text-outline">1 hour ago by System</div>
+</div>
+</div>
+</section>
+</div>
+</aside>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden md:flex gap-gutter">
+<span class="font-label-caps text-label-caps text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    MCP Status: Online
+                </span>
+<span class="font-label-caps text-label-caps text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">sync</span>
+                    Sync: Up to date
+                </span>
+</div>
+</div>
+<div class="flex items-center gap-gutter h-full">
+<button class="text-on-secondary-container dark:text-on-secondary-fixed-variant font-label-caps text-label-caps hover:text-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+                High Contrast
+            </button>
+<button class="text-on-secondary-container dark:text-on-secondary-fixed-variant font-label-caps text-label-caps hover:text-primary transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">volume_up</span>
+                TTS Playback
+            </button>
+</div>
+</footer>
+<script>
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // Show selected content
+            const activeContent = document.getElementById('content-' + tabId);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('block');
+            }
+
+            // Update UI state of buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-primary-container', 'text-on-primary-container');
+                btn.classList.add('hover:bg-surface-container', 'text-on-surface-variant');
+                const badge = btn.querySelector('.bg-primary, .bg-tertiary-container, .bg-surface-container-high');
+                if (badge && !btn.classList.contains('active')) {
+                    // Reset non-active badge styles if needed
+                }
+            });
+
+            const activeBtn = event.currentTarget;
+            activeBtn.classList.add('active', 'bg-primary-container', 'text-on-primary-container');
+            activeBtn.classList.remove('hover:bg-surface-container', 'text-on-surface-variant');
+        }
+    </script>
+</body></html>

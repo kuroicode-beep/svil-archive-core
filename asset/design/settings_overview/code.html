@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["jetbrainsMono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter h-touch_target_accessible w-full docked full-width top-0 bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline fixed z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+</div>
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-2 rounded-lg transition-opacity duration-150" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-2 rounded-lg transition-opacity duration-150" href="#">Archive</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-3 py-2 rounded-lg transition-opacity duration-150" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150">settings</button>
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim p-2 hover:bg-surface-container-high rounded-full transition-opacity duration-150">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full docked left-0 h-screen w-sidebar_width bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline pt-20 hidden md:flex">
+<div class="mb-gutter">
+<p class="font-title-sm text-title-sm font-bold text-on-surface dark:inverse-on-surface">Research Studio</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto no-scrollbar">
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span class="font-label-caps text-label-caps">Trash</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-on-surface-variant hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+<a class="flex items-center gap-3 p-2 text-primary dark:text-primary-fixed-dim font-bold hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-sidebar_width pt-24 pb-20 px-margin_lg min-h-screen">
+<div class="max-w-6xl mx-auto">
+<header class="mb-margin_lg">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Settings Overview</h1>
+<p class="font-body-md text-on-surface-variant">Configure your personal research environment and synchronization parameters.</p>
+</header>
+<div class="settings-grid">
+<!-- General Settings -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="tune">tune</span>
+<h2 class="font-title-sm text-title-sm">General</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">App behavior, startup options, and window management settings.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Startup: Library</span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Auto-Save</span>
+</div>
+</div>
+<!-- Workspace -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="grid_view">grid_view</span>
+<h2 class="font-title-sm text-title-sm">Workspace</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">Manage archive directories, markdown themes, and editor preferences.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">3 Panes</span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Mono Font</span>
+</div>
+</div>
+<!-- SQLite Engine -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="database">database</span>
+<h2 class="font-title-sm text-title-sm">SQLite Engine</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">Local database indexing, optimization routines, and query logs.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-tertiary-container/10 text-tertiary font-bold rounded text-[10px] flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> SYNCED
+                        </span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">v3.42.0</span>
+</div>
+</div>
+<!-- MCP Extensions -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="extension">extension</span>
+<h2 class="font-title-sm text-title-sm">MCP Protocol</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">Manage Model Context Protocol servers and tool definitions.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-primary-container/10 text-primary text-[10px] font-bold rounded uppercase">4 Active</span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Local Host</span>
+</div>
+</div>
+<!-- Privacy & Encryption -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="encrypted">encrypted</span>
+<h2 class="font-title-sm text-title-sm">Privacy &amp; Security</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">End-to-end encryption keys, lock timeouts, and telemetry toggles.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-primary-container text-on-primary-container text-[10px] font-bold rounded flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">lock</span> SECURE
+                        </span>
+</div>
+</div>
+<!-- Language & Region -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="language">language</span>
+<h2 class="font-title-sm text-title-sm">Language</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">UI localization, date formats, and spellcheck dictionaries.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">English (US)</span>
+</div>
+</div>
+<!-- Accessibility -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="accessibility_new">accessibility_new</span>
+<h2 class="font-title-sm text-title-sm">Accessibility</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">High contrast modes, screen reader support, and target scaling.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Scale: 100%</span>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Std Contrast</span>
+</div>
+</div>
+<!-- Backup & Recovery -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="history">history</span>
+<h2 class="font-title-sm text-title-sm">Backup</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">Snapshot management, version history, and export tools.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Hourly Snaps</span>
+</div>
+</div>
+<!-- System Logs -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="terminal">terminal</span>
+<h2 class="font-title-sm text-title-sm">Debug Logs</h2>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-gutter">Real-time sync telemetry, error reports, and performance profiling.</p>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">Level: Info</span>
+</div>
+</div>
+</div>
+<!-- Visual Decorative Section (Bento Insight) -->
+<section class="mt-12 mb-gutter">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="md:col-span-2 bg-primary-container text-on-primary-container p-gutter rounded-xl relative overflow-hidden h-48">
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md mb-2">Sync Health</h3>
+<p class="max-w-md font-body-sm text-body-sm opacity-90">Your research studio is currently optimized. All local SQLite buffers have been flushed and encrypted in the last 4 minutes.</p>
+<button class="mt-4 px-4 py-2 bg-surface text-primary font-bold rounded-lg text-label-caps uppercase hover:opacity-90 transition-opacity">Run Diagnostics</button>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10 scale-150 rotate-12">
+<span class="material-symbols-outlined text-[160px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+<div class="bg-surface-container-high border border-outline-variant p-gutter rounded-xl flex flex-col justify-center items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface mb-4 flex items-center justify-center border border-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-primary text-3xl">storage</span>
+</div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Storage Utilization</p>
+<p class="font-display-lg text-display-lg font-bold">12.4 GB</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline">
+<div class="flex items-center gap-gutter">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<span class="h-4 w-px bg-outline-variant"></span>
+<span class="font-body-sm text-body-sm text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> MCP Status: Online
+            </span>
+</div>
+<div class="flex items-center gap-gutter">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary dark:hover:text-primary-fixed-dim underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity" href="#">Sync: Up to date</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary dark:hover:text-primary-fixed-dim underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity" href="#">High Contrast</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary dark:hover:text-primary-fixed-dim underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity" href="#">TTS Playback</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions for settings cards
+        document.querySelectorAll('.settings-grid > div').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+                card.style.transition = 'transform 0.1s ease';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple high contrast toggle mock
+        const contrastBtn = document.querySelectorAll('footer a')[1];
+        contrastBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            document.documentElement.classList.toggle('dark');
+        });
+    </script>
+</body></html>

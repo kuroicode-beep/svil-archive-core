@@ -1,7 +1,7 @@
 # Codex Verification Request — Sprint 09 (재검증)
 
 > **Sprint 08 기준 커밋**: `36e9d6c`
-> **Sprint 09 구현 커밋**: `a15a4c1`
+> **Sprint 09 구현 커밋**: `cd684a2`
 > **Codex 1차 검증**: 부분완료 — B1 + B2 + I1 + I2 → 재작업 완료
 > **Codex 재검증**: 부분완료 — B3 → 2차 재작업 `6d2bc91`
 > **범위**: Integrity Hardening / Execution Recovery / macOS Smoke

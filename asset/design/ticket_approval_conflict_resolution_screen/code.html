@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC - Ticket Approval &amp; Conflict Resolution</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .diff-added { background-color: rgba(0, 105, 71, 0.1); color: #006947; }
+        .diff-removed { background-color: rgba(186, 26, 26, 0.1); color: #ba1a1a; text-decoration: line-through; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(225, 227, 228, 0.5);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#727785",
+                      "primary": "#0058be",
+                      "surface-dim": "#d9dadb",
+                      "inverse-on-surface": "#f0f1f2",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "inverse-primary": "#adc6ff",
+                      "surface-bright": "#f8f9fa",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "outline-variant": "#c2c6d6",
+                      "on-background": "#191c1d",
+                      "surface-container": "#edeeef",
+                      "on-surface-variant": "#424754",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-high": "#e7e8e9",
+                      "tertiary-container": "#00855b",
+                      "surface-container-low": "#f3f4f5",
+                      "secondary-container": "#d0e1fb",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#191c1d",
+                      "surface-tint": "#005ac2",
+                      "on-tertiary-container": "#f5fff6",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#e1e3e4",
+                      "tertiary": "#006947",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#fefcff",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2e3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin_lg": "24px",
+                      "context_panel_width": "280px",
+                      "touch_target_default": "40px",
+                      "sidebar_width": "240px",
+                      "touch_target_accessible": "50px",
+                      "gutter": "16px",
+                      "base_unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "mono-code": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full bg-surface-container-lowest border-r border-outline-variant w-sidebar_width z-50">
+<div class="mb-margin_lg">
+<h1 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+</nav>
+<div class="mt-auto pt-margin_lg border-t border-outline-variant">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<div class="mt-4 flex items-center gap-3 px-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+</div>
+<div class="overflow-hidden">
+<p class="font-label-caps text-label-caps truncate">Admin User</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] flex-1 flex flex-col min-h-screen relative pb-[40px]">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-gutter h-touch_target_accessible w-full bg-surface border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+<div class="h-6 w-px bg-outline-variant"></div>
+<h2 class="font-headline-md text-headline-md">AI Protocol: Approval Queue</h2>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-sm focus:outline-none focus:ring-2 focus:ring-primary w-64" placeholder="Search protocol logs..." type="text"/>
+</div>
+<button class="w-touch_target_default h-touch_target_default flex items-center justify-center hover:bg-surface-container-high rounded-full transition-opacity duration-150 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-margin_lg grid grid-cols-12 gap-gutter">
+<!-- Alert Banner -->
+<div class="col-span-12 mb-4">
+<div class="flex items-center gap-3 p-4 bg-error-container text-on-error-container rounded-xl border border-error/20">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<p class="font-label-caps text-label-caps">Conflict Detected: Protocol ID-9981</p>
+<p class="font-body-sm text-body-sm">AI-suggested metadata restructuring conflicts with user-modified document "Project_Alpha_Spec.md". Manual resolution required.</p>
+</div>
+</div>
+</div>
+<!-- Resolution Workspace (Bento Style) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
+<!-- AI Diff Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="px-gutter py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<h3 class="font-title-sm text-title-sm">AI Modification Proposal</h3>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2 py-0.5 rounded-full bg-tertiary-container/10 text-tertiary text-[10px] font-bold uppercase tracking-wider">Confidence: 98%</span>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-[10px] font-bold uppercase tracking-wider">Token Scope: 1.2k</span>
+</div>
+</div>
+<div class="p-gutter">
+<div class="font-mono-code text-mono-code bg-surface p-4 rounded border border-outline-variant overflow-x-auto whitespace-pre">
+<span class="text-on-surface-variant"># Project Alpha Specification</span>
+<span class="diff-removed">- status: draft</span>
+<span class="diff-added">+ status: active</span>
+<span class="diff-removed">- version: 0.1.2</span>
+<span class="diff-added">+ version: 1.0.0-rc</span>
+<span class="text-on-surface-variant">
+## Architecture Overview</span>
+<span class="diff-removed">- The system relies on a central node...</span>
+<span class="diff-added">+ The architecture utilizes a distributed mesh topology...</span>
+<span class="text-on-surface-variant">
+## Metadata</span>
+<span class="diff-added">+ tags: [distributed, protocol, v1-release]</span>
+<span class="diff-added">+ author_id: SAC-AI-CORE-01</span></div>
+</div>
+<div class="px-gutter py-4 bg-surface-container-low border-t border-outline-variant flex gap-3">
+<button class="flex-1 py-2 bg-primary text-on-primary font-label-caps text-label-caps rounded-lg hover:opacity-90 active:scale-[0.98] transition-all">Approve &amp; Merge</button>
+<button class="flex-1 py-2 border border-outline text-on-surface font-label-caps text-label-caps rounded-lg hover:bg-surface-container transition-all">Reject Changes</button>
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant font-label-caps text-label-caps rounded-lg hover:bg-surface-container-high transition-all">Review Later</button>
+</div>
+</div>
+<!-- Conflict Details Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+<div class="px-gutter py-4 border-b border-outline-variant">
+<h3 class="font-title-sm text-title-sm">Granular Conflict Resolution</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-caps text-label-caps">
+<th class="p-4 border-b border-outline-variant">Property</th>
+<th class="p-4 border-b border-outline-variant">Local Version (User)</th>
+<th class="p-4 border-b border-outline-variant">Incoming (AI)</th>
+<th class="p-4 border-b border-outline-variant text-right">Selection</th>
+</tr>
+</thead>
+<tbody class="font-body-sm text-body-sm">
+<tr class="hover:bg-surface-container/50 border-b border-outline-variant/30 transition-colors">
+<td class="p-4 font-bold">Status</td>
+<td class="p-4">draft</td>
+<td class="p-4 text-tertiary">active</td>
+<td class="p-4 text-right">
+<div class="inline-flex bg-surface-container-low rounded-lg p-1 border border-outline-variant">
+<button class="px-3 py-1 bg-primary text-on-primary rounded-md font-label-caps text-[10px]">User</button>
+<button class="px-3 py-1 text-on-surface-variant font-label-caps text-[10px]">AI</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container/50 border-b border-outline-variant/30 transition-colors">
+<td class="p-4 font-bold">Priority</td>
+<td class="p-4">Medium</td>
+<td class="p-4 text-tertiary">High</td>
+<td class="p-4 text-right">
+<div class="inline-flex bg-surface-container-low rounded-lg p-1 border border-outline-variant">
+<button class="px-3 py-1 text-on-surface-variant font-label-caps text-[10px]">User</button>
+<button class="px-3 py-1 bg-primary text-on-primary rounded-md font-label-caps text-[10px]">AI</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Context Panel -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<!-- AI Insight Card -->
+<div class="bg-primary-container/10 border border-primary/20 rounded-xl p-6 relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<span class="font-label-caps text-label-caps text-primary">Protocol Recommendation</span>
+</div>
+<p class="font-body-md text-body-md mb-4 italic">"The AI suggest 'active' status because the codebase linked to this spec has reached branch maturity 'release-1.0'."</p>
+<div class="flex items-center gap-4">
+<img class="w-12 h-12 rounded-lg object-cover" data-alt="A close-up high-definition digital rendering of a sleek server farm illuminated by cool blue and teal LED lights. The atmosphere is quiet and futuristic, representing high-speed computing and data integrity. The lighting is soft but precise, emphasizing the technological sophistication of a modern research facility. The overall color palette consists of deep indigos and bright cyan highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkthDHXVhQHgncDWH_M240ZZFdG00V37yf7cQYKQJ_Sdc3CfBMD-cYzmZ7j6awFWZW3Intgh36LcyzsX6gEz7wRHhJcTW-sWKKDzbKSL1J0Bv26Zst7KA7lRCSHw6Fphilk0feVc9AGTLuNTKj9jXLbT89XlJuFtin4y6LktXoP0Wq3_1-7mruPh19z-AeDp57E5dL8deV3nffDV7SKs4Q4rUtGuRUDEucr9EjHZf0ST_tIEfd5VPAEgRj8sfdt5EoUT67T2Rlg6nD"/>
+<div>
+<p class="font-label-caps text-label-caps">Model: SAC-GPT-v4</p>
+<p class="text-[10px] text-on-surface-variant">Last synced: 2m ago</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Sync Health Widget -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg">
+<h4 class="font-label-caps text-label-caps mb-4">Sync Integrity</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<span class="text-[11px] font-bold uppercase text-on-surface-variant">Local Database</span>
+<span class="text-tertiary font-label-caps text-label-caps">99.9% Reliable</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full w-[99.9%]"></div>
+</div>
+<div class="flex justify-between items-end">
+<span class="text-[11px] font-bold uppercase text-on-surface-variant">AI Latency</span>
+<span class="text-primary font-label-caps text-label-caps">42ms</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[15%]"></div>
+</div>
+</div>
+<div class="mt-6 p-3 bg-surface rounded border border-outline-variant flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">security</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Privacy First</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">ENCRYPTED</span>
+</div>
+</div>
+<!-- Conflict History -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg">
+<h4 class="font-label-caps text-label-caps mb-4">Resolution History</h4>
+<ul class="space-y-4">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-outline text-sm mt-1">history</span>
+<div>
+<p class="font-body-sm text-body-sm leading-tight">Merged <b>User</b> version of <i>API_Keys.env</i></p>
+<p class="text-[10px] text-on-surface-variant">Today, 10:45 AM</p>
+</div>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-outline text-sm mt-1">history</span>
+<div>
+<p class="font-body-sm text-body-sm leading-tight">Accepted <b>AI</b> update for <i>README.md</i></p>
+<p class="text-[10px] text-on-surface-variant">Yesterday, 4:20 PM</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container border-t border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<span class="h-3 w-px bg-outline-variant"></span>
+<div class="flex items-center gap-4">
+<span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1 cursor-pointer opacity-90 hover:opacity-100 hover:text-primary transition-all">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                        MCP Status: Online
+                    </span>
+<span class="font-label-caps text-label-caps text-on-secondary-container cursor-pointer opacity-90 hover:opacity-100 hover:text-primary transition-all">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer">High Contrast</button>
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer">TTS Playback</button>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interaction: Toggle selection buttons
+        document.querySelectorAll('.inline-flex button').forEach(button => {
+            button.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-on-primary');
+                    btn.classList.add('text-on-surface-variant');
+                });
+                this.classList.remove('text-on-surface-variant');
+                this.classList.add('bg-primary', 'text-on-primary');
+            });
+        });
+
+        // Simple hover effect for diff code block
+        const codeBlock = document.querySelector('.font-mono-code');
+        codeBlock.addEventListener('mouseenter', () => {
+            codeBlock.style.borderColor = '#0058be';
+        });
+        codeBlock.addEventListener('mouseleave', () => {
+            codeBlock.style.borderColor = '#c2c6d6';
+        });
+    </script>
+</body></html>

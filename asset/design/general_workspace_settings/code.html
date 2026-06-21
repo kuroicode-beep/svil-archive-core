@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC — Workspace Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .settings-card {
+            transition: border-color 0.2s ease-in-out;
+        }
+        .settings-card:hover {
+            border-color: #0058be;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#727785",
+                      "primary": "#0058be",
+                      "surface-dim": "#d9dadb",
+                      "inverse-on-surface": "#f0f1f2",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "inverse-primary": "#adc6ff",
+                      "surface-bright": "#f8f9fa",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "outline-variant": "#c2c6d6",
+                      "on-background": "#191c1d",
+                      "surface-container": "#edeeef",
+                      "on-surface-variant": "#424754",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-high": "#e7e8e9",
+                      "tertiary-container": "#00855b",
+                      "surface-container-low": "#f3f4f5",
+                      "secondary-container": "#d0e1fb",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#191c1d",
+                      "surface-tint": "#005ac2",
+                      "on-tertiary-container": "#f5fff6",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#e1e3e4",
+                      "tertiary": "#006947",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#fefcff",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2e3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin_lg": "24px",
+                      "context_panel_width": "280px",
+                      "touch_target_default": "40px",
+                      "sidebar_width": "240px",
+                      "touch_target_accessible": "50px",
+                      "gutter": "16px",
+                      "base_unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "mono-code": ["JetBrains Mono"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-touch_target_accessible bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+</div>
+<nav class="hidden md:flex gap-margin_lg h-full">
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-high px-4 transition-opacity duration-150" href="#">Dashboard</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-high px-4 transition-opacity duration-150" href="#">Archive</a>
+<a class="flex items-center text-on-surface-variant hover:bg-surface-container-high px-4 transition-opacity duration-150" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-gutter">
+<div class="hidden md:flex items-center bg-surface-container-low px-3 py-1 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-outline text-[18px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm px-2 w-48" placeholder="Search settings..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-high p-2 rounded-lg">settings</button>
+<button class="material-symbols-outlined text-primary hover:bg-surface-container-high p-2 rounded-lg">account_circle</button>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-touch_target_accessible h-[calc(100vh-100px)] w-sidebar_width flex flex-col gap-base_unit p-margin_lg bg-surface-container-lowest border-r border-outline-variant">
+<div class="mb-gutter">
+<div class="flex items-center gap-base_unit">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary font-bold text-title-sm">RS</div>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h2>
+<p class="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-wider">Local-First Sync</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<div class="my-2 border-t border-outline-variant opacity-30"></div>
+<a class="flex items-center gap-3 p-2 rounded-lg text-primary font-bold bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar_width mt-touch_target_accessible p-margin_lg pb-32">
+<div class="max-w-4xl mx-auto">
+<header class="mb-margin_lg">
+<h1 class="font-headline-md text-headline-md text-on-surface">Workspace Settings</h1>
+<p class="font-body-md text-on-surface-variant">Manage your local storage paths, archive environments, and data safety protocols.</p>
+</header>
+<!-- Settings Grid -->
+<div class="space-y-gutter">
+<!-- Workspace Paths Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface">Active Workspaces</h3>
+<p class="font-body-sm text-on-surface-variant">The directories where SAC stores your encrypted markdown archives.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-caps text-label-caps hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Add Workspace
+                        </button>
+</div>
+<div class="space-y-3">
+<!-- Workspace Item 1 -->
+<div class="settings-card flex items-center justify-between p-4 border border-outline-variant rounded-lg bg-surface">
+<div class="flex items-center gap-gutter">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">folder_shared</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md font-bold">Research_Primary</span>
+<p class="font-mono-code text-body-sm text-outline">/Users/username/Documents/SAC/Research_Primary</p>
+</div>
+</div>
+<div class="flex items-center gap-base_unit">
+<span class="bg-tertiary-container/10 text-tertiary px-3 py-1 rounded-full text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                    Synced
+                                </span>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error p-2">delete</button>
+</div>
+</div>
+<!-- Workspace Item 2 -->
+<div class="settings-card flex items-center justify-between p-4 border border-outline-variant rounded-lg bg-surface">
+<div class="flex items-center gap-gutter">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">folder_shared</span>
+</div>
+<div>
+<span class="font-title-sm text-body-md font-bold">Project_Zero_Dark</span>
+<p class="font-mono-code text-body-sm text-outline">/Volumes/SecureKey/SAC_Archives/Project_Zero</p>
+</div>
+</div>
+<div class="flex items-center gap-base_unit">
+<span class="bg-primary-container/10 text-primary px-3 py-1 rounded-full text-label-caps flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                                    Encrypted
+                                </span>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-error p-2">delete</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Behavior & Defaults -->
+<section class="grid md:grid-cols-2 gap-gutter">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-title-sm text-title-sm text-on-surface">Startup Behavior</h3>
+<span class="material-symbols-outlined text-primary">rocket_launch</span>
+</div>
+<div class="flex items-center justify-between mt-4">
+<div>
+<label class="font-body-md text-on-surface">Reopen Last Workspace</label>
+<p class="font-body-sm text-on-surface-variant">Automatically load the last used path on boot.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<h3 class="font-title-sm text-title-sm text-on-surface">Backup &amp; Sync</h3>
+<span class="material-symbols-outlined text-primary">backup</span>
+</div>
+<div class="mt-4 flex flex-col gap-3">
+<button class="w-full flex items-center justify-center gap-2 border border-primary text-primary px-4 py-2 rounded-lg font-label-caps text-label-caps hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+                                Manual Backup Trigger
+                            </button>
+<p class="font-body-sm text-on-surface-variant text-center">Last backup: 14 mins ago</p>
+</div>
+</div>
+</section>
+<!-- Decorative Illustration Section -->
+<section class="relative h-48 rounded-xl overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover opacity-80" data-alt="A clean, minimalist overhead view of a modern workstation with a sleek keyboard and a digital tablet showing architectural wireframes. The lighting is soft and natural, coming from a large window off-camera, emphasizing a calm and focused research studio atmosphere. The color palette is composed of cool grays, crisp whites, and deep corporate blues, creating a professional and organized visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBh_rmsswr2Y16FN31tDT6pnyu99MpwMDQX4dPEzDf7X9xuX-_gkatC_chop27cse_BI7PEaG44MGtxS5epakrv-vaSsnsuHZzvGHeExqwoEI2nxcZGBg2dkpS97q_Fe5OGaS5b_hD6UYQAiGSmM4TBqrg1qwLQzxoOOqunRQBTCuzSreJcJeMor3uJDnzeolDqG-mut0QZz1WlWDh9APHsyCiKTQROJpuHc3NaxZG07B2MXZW85SAZO6AVZ97HTQhvtrkjg_FkpH5"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface via-transparent to-transparent flex items-center p-gutter">
+<div class="max-w-xs">
+<h4 class="font-title-sm text-title-sm text-on-surface">Local-First Privacy</h4>
+<p class="font-body-sm text-on-surface-variant">Your data never leaves your machine unless you explicitly enable cloud bridging.</p>
+</div>
+</div>
+</section>
+<!-- Storage Info -->
+<section class="bg-surface-container-high/30 border border-outline-variant rounded-xl p-gutter">
+<div class="flex items-center gap-base_unit mb-2">
+<span class="material-symbols-outlined text-secondary">database</span>
+<h3 class="font-label-caps text-label-caps text-secondary uppercase">Storage Integrity</h3>
+</div>
+<div class="w-full bg-surface-variant h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[42%]"></div>
+</div>
+<div class="flex justify-between mt-2 font-body-sm text-on-surface-variant">
+<span>4.2 GB used of 10 GB Local Buffer</span>
+<span class="text-primary font-bold">42% Capacity</span>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container border-t border-outline-variant">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden md:flex gap-gutter">
+<span class="font-label-caps text-label-caps text-tertiary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                    MCP Status: Online
+                </span>
+<span class="font-label-caps text-label-caps text-on-secondary-container">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer">High Contrast</button>
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary underline cursor-pointer">TTS Playback</button>
+</div>
+</footer>
+<script>
+        // Micro-interaction for toggle switch
+        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const label = e.target.closest('label').previousElementSibling.querySelector('label');
+                if(e.target.checked) {
+                    console.log('Feature Enabled');
+                } else {
+                    console.log('Feature Disabled');
+                }
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[placeholder="Search settings..."]');
+        if(searchInput) {
+            searchInput.addEventListener('focus', () => {
+                searchInput.parentElement.classList.add('border-primary');
+            });
+            searchInput.addEventListener('blur', () => {
+                searchInput.parentElement.classList.remove('border-primary');
+            });
+        }
+    </script>
+</body></html>

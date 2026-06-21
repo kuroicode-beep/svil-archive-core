@@ -3,7 +3,7 @@ title: "Result Report — SAC Sprint 09"
 author: "Cursor"
 created: "2026-06-08"
 sprint08_base_commit: "36e9d6c"
-sprint09_commit: "a15a4c1"
+sprint09_commit: "cd684a2"
 ---
 
 # 완료 보고서 — SAC Sprint 09 Integrity Hardening / Execution Recovery / macOS Smoke

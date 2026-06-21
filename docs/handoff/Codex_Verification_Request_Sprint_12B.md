@@ -7,17 +7,17 @@
 
 ## 검증 항목
 
-- [ ] `mcp/sidecar`가 portable package에 포함 (`dist/index.js`)
-- [ ] `BUILD_MANIFEST.json` — `mcp_sidecar_included: true`, 상대 경로만
-- [ ] manifest/install에 secret/token/API key 없음
-- [ ] `INSTALL.txt` MCP sidecar 안내 포함
-- [ ] packaged sidecar path 탐지 (exe 기준 `mcp/sidecar/dist`)
-- [ ] dev fallback / not found 상태 테스트
-- [ ] `remote_mcp_enabled: false`, `external_api_enabled: false` 유지
-- [ ] Sprint 05~12 회귀
-- [ ] `flutter analyze` / `flutter test` / MCP sidecar build
-- [ ] Windows portable ZIP 재생성 성공
-- [ ] Git 커밋 / 로컬 완료보고서 정합
+- [x] `mcp/sidecar`가 portable package에 포함 (`dist/index.js`)
+- [x] `BUILD_MANIFEST.json` — `mcp_sidecar_included: true`, 상대 경로만
+- [x] manifest/install에 secret/token/API key 없음
+- [x] `INSTALL.txt` MCP sidecar 안내 포함
+- [x] packaged sidecar path 탐지 (exe 기준 `mcp/sidecar/dist`)
+- [x] dev fallback / not found 상태 테스트
+- [x] `remote_mcp_enabled: false`, `external_api_enabled: false` 유지
+- [x] Sprint 05~12 회귀
+- [x] `flutter analyze` / `flutter test` / MCP sidecar build
+- [x] Windows portable ZIP 재생성 성공
+- [x] Git 커밋 / 로컬 완료보고서 정합
 
 ## 핵심 파일
 
@@ -25,7 +25,7 @@
 - `lib/data/services/mcp_bridge_status_service_impl.dart`
 - `scripts/package_windows_rc.ps1`
 - `test/sprint12b_integration_test.dart`
-- `bin/windows/sac_v0.1.0-rc.1_windows_x64_9ec7e43/BUILD_MANIFEST.json`
+- `bin/windows/sac_v0.1.0-rc.1_windows_x64_c2e73a4/BUILD_MANIFEST.json`
 
 ## 실행 명령
 
@@ -51,3 +51,10 @@ powershell -ExecutionPolicy Bypass -File scripts/package_windows_rc.ps1 -SkipFlu
 - [x] Sprint 12B manifest 분리 + Sprint 12/12B docs 매칭 정밀화
 - [x] report consistency 회귀 175/175 PASS
 - [x] Windows RC 패키지 flutter release 재빌드 + commit `c2e73a4` 정합
+
+## Codex 최종 검증 (2026.06.08)
+
+- **판정**: PASS / 배포 가능 YES
+- **HEAD**: `4d49a7a`
+- **패키지**: `bin/windows/sac_v0.1.0-rc.1_windows_x64_c2e73a4/`
+- **Advisory**: `Compress-Archive` Windows 파일 잠금 — retry/delay 보강 권장 (후속 반영)

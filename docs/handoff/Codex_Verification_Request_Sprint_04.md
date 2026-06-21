@@ -2,7 +2,7 @@
 
 ## 검증 대상
 - Sprint 04 Document Archive UI (폴더 트리 / 메타데이터 / sync UI / Theme / File watcher)
-- 기준 커밋: (Sprint 04 구현 커밋)
+- 기준 커밋: `87a3e36` (재작업 완료, Codex 재검증 YES)
 - 브랜치: `master`
 
 ## 검증 항목

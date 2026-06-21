@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC Task Queue | AI Job Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c2c6d6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #727785; }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid #e1e3e4;
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["jetbrainsMono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden h-screen flex">
+<!-- SideNavBar (Authority: JSON) -->
+<aside class="flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full w-sidebar_width bg-surface-container-lowest border-r border-outline-variant z-50">
+<div class="mb-margin_lg">
+<h1 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70">Local-First Sync</p>
+</div>
+<nav class="flex-1 flex flex-col gap-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<!-- Active State Navigation Logic: Task Queue -->
+<a class="flex items-center gap-3 px-3 py-2 text-primary font-bold bg-surface-container-high rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="construction">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container rounded-lg transition-colors duration-200 mt-auto" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="mt-base_unit pt-margin_lg border-t border-outline-variant flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-resolution professional headshot of a researcher in a bright, modern studio. The lighting is soft and natural, emphasizing a calm and focused atmosphere. The background is a clean, minimalist office with soft blue and grey tones, perfectly matching the professional research studio design aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDwT2goUXbHOAgcHCFKETm1DklXNssnX0Sjz4urox86Kjsxu5r3KLfNLgfrHyoGUTcVMgDUnVNMfifwIkcqgbLqEtWO7bI5Y2Z-NPSpk4bG07STizAM71tJljDDxAndiTG_SS_Ib0rLzLS01Y81fjV3zw0ueXZhHVAHNcA2SgkcyN5FWFq-V_v61lb8hrwDHDXBP-AG3iVsgDAyJ2QXjUt0XUQggLV3zhiDks0hJ0O0EaVocWlkHAtHNchhugQ6XNTDXSP9ZfbtLWUu"/>
+</div>
+<div class="flex-1">
+<p class="font-label-caps text-label-caps text-on-surface font-bold">Dr. Aris Thorne</p>
+<p class="text-[10px] text-on-surface-variant">Admin Priority Tier</p>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-sidebar_width flex-1 flex flex-col relative bg-surface overflow-hidden">
+<!-- TopNavBar (Authority: JSON) -->
+<header class="flex justify-between items-center px-gutter h-touch_target_accessible w-full bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-gutter">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+<nav class="hidden md:flex gap-margin_lg">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">Archive</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">AI Protocol</a>
+</nav>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="relative flex items-center">
+<input class="bg-surface-container border-none rounded-lg text-body-sm px-4 py-1.5 w-64 focus:ring-1 focus:ring-primary" placeholder="Filter tasks..." type="text"/>
+</div>
+<button class="w-touch_target_default h-touch_target_default flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+<button class="w-touch_target_default h-touch_target_default flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Content Canvas -->
+<section class="flex-1 p-margin_lg overflow-y-auto pb-24">
+<!-- Summary Header -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-margin_lg">
+<div class="bg-surface-container-low p-margin_lg rounded-xl border border-outline-variant flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Active Jobs</span>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg font-bold">14</span>
+<span class="material-symbols-outlined text-primary text-[32px] animate-pulse-soft" data-icon="sync">sync</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-margin_lg rounded-xl border border-outline-variant flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Pending Approval</span>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg font-bold">06</span>
+<span class="material-symbols-outlined text-secondary text-[32px]" data-icon="pending_actions">pending_actions</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-margin_lg rounded-xl border border-outline-variant flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Sync Conflicts</span>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg font-bold text-error">02</span>
+<span class="material-symbols-outlined text-error text-[32px]" data-icon="warning">warning</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-margin_lg rounded-xl border border-outline-variant flex flex-col gap-2">
+<span class="font-label-caps text-label-caps text-on-surface-variant">Avg Completion</span>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-display-lg font-bold">1.2s</span>
+<span class="material-symbols-outlined text-tertiary text-[32px]" data-icon="speed">speed</span>
+</div>
+</div>
+</div>
+<!-- Main Queue Layout (Bento Grid Style) -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Priority Lane (Left Column) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-gutter">
+<div class="flex items-center justify-between px-2">
+<h2 class="font-headline-md text-headline-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="bolt">bolt</span>
+                            Priority Execution Lane
+                        </h2>
+<div class="flex gap-2">
+<span class="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-0.5 rounded-full">Bypass Queue: Enabled</span>
+</div>
+</div>
+<!-- Task Cards -->
+<div class="flex flex-col gap-base_unit">
+<!-- Running Task -->
+<div class="glass-card p-gutter rounded-xl hover:border-primary transition-all duration-200 group relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-1 bg-primary"></div>
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="neurology">neurology</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm">Semantic Mesh Re-Indexing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Job ID: SAC-9942-AI</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-primary bg-primary-container/20 px-3 py-1 rounded-full border border-primary/20">Running</span>
+<p class="font-mono-code text-[11px] mt-1 text-on-surface-variant">CPU: 42% | MEM: 1.2GB</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-[11px] font-label-caps text-on-surface-variant">
+<span>Processing metadata shards...</span>
+<span>72%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[72%] transition-all duration-500"></div>
+</div>
+</div>
+</div>
+<!-- Conflict Task -->
+<div class="glass-card p-gutter rounded-xl border-error/30 hover:border-error transition-all duration-200 group relative">
+<div class="absolute top-0 left-0 h-full w-1 bg-error"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-error-container" data-icon="cloud_off">cloud_off</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm">Sync Conflict: Local Archive "Theology-Draft"</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Job ID: ERR-552-SYNC</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="bg-error text-white font-label-caps text-label-caps px-4 py-2 rounded-lg hover:brightness-110">Resolve</button>
+<button class="border border-outline-variant text-on-surface-variant font-label-caps text-label-caps px-4 py-2 rounded-lg hover:bg-surface-container">Ignore</button>
+</div>
+</div>
+</div>
+<!-- Pending Task -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl opacity-80 hover:opacity-100 transition-all duration-200">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="summarize">summarize</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm">Cross-Ref: 2024 Research Papers</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Job ID: SAC-1002-AI</p>
+</div>
+</div>
+<div class="text-right">
+<span class="font-label-caps text-label-caps text-on-secondary-container bg-secondary-container/50 px-3 py-1 rounded-full">Pending</span>
+<p class="font-label-caps text-[10px] mt-1 text-on-surface-variant">In queue: 2m 14s</p>
+</div>
+</div>
+</div>
+<!-- Completed Task -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl opacity-60 hover:opacity-100 transition-all duration-200">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="check_circle">check_circle</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm">Backup Archive: Vol. 04</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Completed 12m ago</p>
+</div>
+</div>
+<button class="text-primary font-label-caps text-label-caps hover:underline">View Report</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Context Stats (Right Column) -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<div class="px-2">
+<h2 class="font-headline-md text-headline-md">Queue Health</h2>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-margin_lg flex flex-col gap-margin_lg">
+<div>
+<div class="flex justify-between items-center mb-base_unit">
+<span class="font-label-caps text-label-caps">Server Load</span>
+<span class="text-error font-mono-code font-bold">88%</span>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full w-[88%]"></div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant pb-2">Active Protocols</h4>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-body-sm text-body-sm">Deep Scan V2</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="toggle_on">toggle_on</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<span class="font-body-sm text-body-sm">Neural OCR</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="toggle_off">toggle_off</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-body-sm text-body-sm">Local Sync Anchor</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="toggle_on">toggle_on</span>
+</div>
+</div>
+<div class="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/10">
+<p class="font-body-sm text-body-sm italic text-on-surface-variant leading-relaxed">
+                                "Priority Lane is currently optimized for Dr. Thorne's session. Non-critical AI background jobs have been throttled to ensure 0ms latency for active indexing."
+                            </p>
+</div>
+</div>
+<!-- Visual Accent Card -->
+<div class="relative rounded-xl overflow-hidden aspect-video border border-outline-variant shadow-lg">
+<img class="w-full h-full object-cover" data-alt="A macro visualization of a digital data stream or neural network. Glowing cyan and deep blue particles are flowing through a structured grid, representing AI task processing and information flow. The lighting is dark with vibrant neon accents, evoking a high-tech research studio atmosphere with precise digital elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKoWjPLFSTCjx_cCVhDI8FcneXkA3uoAkCmG8T631HAMk-9L01FEDOmrzNtFGIPEXyHrLVHuVREDKg0Ezha69chVrfePi8Kicmzk-OIk0S20CFIdhOrlJ9rPbMVHyji-TRZExtYYDEw1tdnChHQ25rhszRKUrbr6dU63rdOb-fobLDReEvBDWSm34wmIrW7RQMm-g06J6eUBRmU4mPOJHSR3ZKkrDw1mth1-tkNEbVnEQlw7yOJpLLnIHgxYmeeM-G4Qk99vVc_gZ4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-gutter">
+<span class="text-white font-label-caps text-label-caps">Network Latency</span>
+<span class="text-primary-fixed-dim font-display-lg text-[20px] font-bold">14ms Global Mesh</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer (Authority: JSON) -->
+<footer class="fixed bottom-0 left-0 w-full z-40 bg-surface-container border-t border-outline-variant flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<span class="flex items-center gap-1 font-label-caps text-[10px] text-tertiary">
+<span class="material-symbols-outlined text-[14px]" data-icon="circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">circle</span>
+                    MCP Status: Online
+                </span>
+</div>
+<div class="flex items-center gap-gutter">
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary transition-colors cursor-pointer opacity-90 hover:opacity-100" href="#">Sync: Up to date</a>
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary transition-colors cursor-pointer opacity-90 hover:opacity-100" href="#">High Contrast</a>
+<a class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary transition-colors cursor-pointer opacity-90 hover:opacity-100" href="#">TTS Playback</a>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interaction for Progress bar
+        const progressBars = document.querySelectorAll('.bg-primary.h-full');
+        progressBars.forEach(bar => {
+            let width = parseInt(bar.style.width);
+            setInterval(() => {
+                if(width < 99) {
+                    width += Math.random() * 0.5;
+                    bar.style.width = width + '%';
+                    const label = bar.parentElement.previousElementSibling.querySelector('span:last-child');
+                    if(label) label.innerText = Math.floor(width) + '%';
+                }
+            }, 3000);
+        });
+
+        // Search highlight interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.classList.add('w-80');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.classList.remove('w-80');
+        });
+    </script>
+</body></html>

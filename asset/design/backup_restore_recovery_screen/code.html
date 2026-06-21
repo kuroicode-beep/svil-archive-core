@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC - Backup &amp; Recovery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["jetbrainsMono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-hidden">
+<!-- TopNavBar Component -->
+<header class="bg-surface dark:bg-surface-container-highest text-primary dark:text-primary-fixed-dim border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_accessible w-full fixed top-0 z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+<span class="font-label-caps text-label-caps uppercase ml-gutter opacity-60">Personal Research Studio</span>
+</div>
+<div class="hidden md:flex gap-margin_lg items-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity" href="#">Archive</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity" href="#">AI Protocol</a>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="relative flex items-center bg-surface-container-low px-base_unit rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 font-body-sm text-body-sm p-1 w-48" placeholder="Search archive..." type="text"/>
+</div>
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-1 rounded-full">settings</span>
+<span class="material-symbols-outlined cursor-pointer hover:bg-surface-container-high p-1 rounded-full">account_circle</span>
+</div>
+</header>
+<!-- SideNavBar Component -->
+<aside class="bg-surface-container-lowest dark:bg-surface-container-low text-on-surface-variant dark:text-surface-variant border-r border-outline-variant dark:border-outline fixed left-0 top-0 h-full w-sidebar_width z-40 mt-touch_target_accessible hidden md:flex flex-col gap-base_unit p-margin_lg">
+<div class="flex items-center gap-gutter mb-margin_lg">
+<div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">shield_with_heart</span>
+</div>
+<div>
+<div class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</div>
+<div class="font-body-sm text-body-sm opacity-60">Local-First Sync</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</div>
+<div class="pt-margin_lg"></div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</div>
+<div class="flex items-center gap-gutter p-2 text-primary font-bold bg-surface-container rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</div>
+<div class="flex items-center gap-gutter p-2 hover:bg-surface-container dark:hover:bg-inverse-surface rounded-lg cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</div>
+</nav>
+</aside>
+<!-- Main Workspace -->
+<main class="md:ml-sidebar_width pt-touch_target_accessible pb-touch_target_default h-screen overflow-y-auto">
+<div class="max-w-5xl mx-auto p-margin_lg">
+<!-- Header Section -->
+<div class="mb-margin_lg">
+<h1 class="font-headline-md text-headline-md text-on-surface flex items-center gap-base_unit">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">backup</span>
+                    Backup &amp; Recovery
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mt-base_unit">
+                    Secure your research with cryptographic journaling. Every markdown node and AI interaction is preserved in your local-first repository.
+                </p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-margin_lg">
+<!-- Status Card (Bento Large) -->
+<div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant p-margin_lg rounded-xl">
+<div class="flex justify-between items-start mb-margin_lg">
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface mb-1">Health &amp; Integrity</h3>
+<div class="flex items-center gap-base_unit">
+<span class="bg-tertiary-container/20 text-tertiary font-label-caps text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Synced</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Last backup: 14 minutes ago</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-margin_lg py-2 rounded-lg font-label-caps text-label-caps hover:opacity-90 transition-all scale-active:0.98">
+                            BACKUP NOW
+                        </button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-gutter">
+<div class="p-base_unit bg-surface-container rounded-lg text-center">
+<div class="text-primary font-display-lg text-display-lg font-bold">4.2</div>
+<div class="font-label-caps text-[10px] uppercase text-on-surface-variant">GB Size</div>
+</div>
+<div class="p-base_unit bg-surface-container rounded-lg text-center">
+<div class="text-primary font-display-lg text-display-lg font-bold">12k</div>
+<div class="font-label-caps text-[10px] uppercase text-on-surface-variant">Nodes</div>
+</div>
+<div class="p-base_unit bg-surface-container rounded-lg text-center">
+<div class="text-primary font-display-lg text-display-lg font-bold">100%</div>
+<div class="font-label-caps text-[10px] uppercase text-on-surface-variant">Integrity</div>
+</div>
+<div class="p-base_unit bg-surface-container rounded-lg text-center">
+<div class="text-primary font-display-lg text-display-lg font-bold">RSA</div>
+<div class="font-label-caps text-[10px] uppercase text-on-surface-variant">Encrypt</div>
+</div>
+</div>
+</div>
+<!-- Recovery Strategy (Bento Vertical) -->
+<div class="bg-surface-container-high border border-outline-variant p-margin_lg rounded-xl flex flex-col justify-between">
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface mb-gutter">Recovery Core</h3>
+<div class="space-y-gutter">
+<div class="flex items-start gap-gutter">
+<span class="material-symbols-outlined text-primary">history_edu</span>
+<div>
+<div class="font-label-caps text-label-caps">Journaling</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Point-in-time reconstruction.</div>
+</div>
+</div>
+<div class="flex items-start gap-gutter">
+<span class="material-symbols-outlined text-primary">cloud_sync</span>
+<div>
+<div class="font-label-caps text-label-caps">Mirror Sync</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">3 Peer-to-peer mirrors.</div>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-margin_lg border border-primary text-primary px-margin_lg py-2 rounded-lg font-label-caps text-label-caps hover:bg-primary/5 transition-colors">
+                        CONFIGURE MIRRORS
+                    </button>
+</div>
+<!-- Archive Snapshots (Bento Bottom Left) -->
+<div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant p-margin_lg rounded-xl">
+<div class="flex justify-between items-center mb-margin_lg">
+<h3 class="font-title-sm text-title-sm text-on-surface">Snapshot History</h3>
+<span class="font-label-caps text-label-caps text-primary cursor-pointer hover:underline">View Log</span>
+</div>
+<div class="space-y-base_unit">
+<!-- Snapshot Item -->
+<div class="flex items-center justify-between p-gutter hover:bg-surface-container transition-colors rounded-lg border border-transparent hover:border-outline-variant group">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">archive</span>
+<div>
+<div class="font-body-md text-body-md font-bold">Weekly Full-Studio Export</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Archive-2023-Oct-22.zip • 1.2 GB</div>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">download</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="restore">restore</span>
+</div>
+</div>
+<!-- Snapshot Item -->
+<div class="flex items-center justify-between p-gutter hover:bg-surface-container transition-colors rounded-lg border border-transparent hover:border-outline-variant group">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">archive</span>
+<div>
+<div class="font-body-md text-body-md font-bold">Pre-AI Protocol Update</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Snapshot-0092-A • 840 MB</div>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">download</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="restore">restore</span>
+</div>
+</div>
+<!-- Snapshot Item -->
+<div class="flex items-center justify-between p-gutter hover:bg-surface-container transition-colors rounded-lg border border-transparent hover:border-outline-variant group">
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline group-hover:text-primary">archive</span>
+<div>
+<div class="font-body-md text-body-md font-bold">Initial Studio Setup</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Genesis-Block • 12 MB</div>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">download</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="restore">restore</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Emergency Reconstruction (Bento Bottom Right) -->
+<div class="bg-surface-container-low border-2 border-dashed border-outline-variant p-margin_lg rounded-xl flex flex-col items-center justify-center text-center">
+<div class="w-16 h-16 bg-error-container text-on-error-container rounded-full flex items-center justify-center mb-gutter">
+<span class="material-symbols-outlined text-4xl">emergency_home</span>
+</div>
+<h3 class="font-title-sm text-title-sm text-on-surface mb-2">Recovery Mode</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-margin_lg px-gutter">
+                        Reconstruct workspace from raw markdown files and local journal logs if the index is corrupted.
+                    </p>
+<button class="w-full bg-surface-container-highest border border-outline text-on-surface font-label-caps text-label-caps py-2 rounded-lg hover:bg-inverse-surface hover:text-inverse-on-surface transition-all">
+                        START RECONSTRUCTION
+                    </button>
+</div>
+</div>
+<!-- Visualization / Graphic Area -->
+<div class="mt-margin_lg relative rounded-xl overflow-hidden h-64 bg-surface-container-highest border border-outline-variant">
+<img alt="Data Encryption Visual" class="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-overlay" data-alt="A macro cinematic shot of a computer motherboard illuminated with glowing blue and white fiber optic lights representing data flow. The aesthetic is clean, industrial, and high-tech, aligning with a professional research studio atmosphere. Minimalist lighting highlights the precision of the hardware against a deep shadow background, emphasizing security and data integrity. The mood is calm and trust-inspiring." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ1JAZ0iC6z8MsgBcFZ91XQrB7oW564pjtK_RBLjh1mnW7wxowqleZhFCWnRL2r-ERvmwRMtEYeoj4FM3kYXjPIvWY86uhBgR0tqLe67Jxt1nLjK11G1EL4Hyj35iM8cu9wxGGYDAygWvNTvEr0BRZUxDD9iLltX2nwVQHn7W61Z3rKT2xJnb8P80KAgxTtlbfC8UFF51pLZWvOLZGvwtnxiqypNLYt2ti7yUZoLf57T0kkXqrYRzCNV-yyb7ev_6lTCWqVrezNtrj"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center p-margin_lg text-center z-10">
+<span class="material-symbols-outlined text-5xl text-primary mb-gutter">verified_user</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">End-to-End Encryption</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg mt-base_unit">
+                        Your backups are encrypted using your private master key. Not even the sync peers can read your content.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Panel (Right) -->
+<aside class="fixed right-0 top-0 h-full w-context_panel_width border-l border-outline-variant bg-surface-container-lowest p-margin_lg pt-touch_target_accessible hidden xl:flex flex-col gap-margin_lg">
+<div>
+<h4 class="font-label-caps text-label-caps text-primary mb-gutter uppercase tracking-widest">Active Sync Peers</h4>
+<div class="space-y-base_unit">
+<div class="flex items-center gap-base_unit">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="font-body-sm text-body-sm">MacBook Pro (Primary)</span>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<span class="font-body-sm text-body-sm">Workstation-LX</span>
+</div>
+<div class="flex items-center gap-base_unit">
+<div class="w-2 h-2 rounded-full bg-outline opacity-40"></div>
+<span class="font-body-sm text-body-sm text-on-surface-variant opacity-60">iPad Pro (Offline)</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-gutter rounded-lg border border-outline-variant">
+<h4 class="font-label-caps text-label-caps text-on-surface mb-2">Storage Quota</h4>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden mb-2">
+<div class="h-full bg-primary w-[42%]"></div>
+</div>
+<div class="flex justify-between font-label-caps text-[10px] text-on-surface-variant">
+<span>4.2 GB used</span>
+<span>10 GB total</span>
+</div>
+</div>
+<div class="flex-1"></div>
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-gutter">Auto-Backup Rules</h4>
+<div class="space-y-base_unit">
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-sm text-body-sm">Hourly Snapshots</span>
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-sm text-body-sm">Compress Assets</span>
+<input checked="" class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between cursor-pointer group">
+<span class="font-body-sm text-body-sm">Sync AI History</span>
+<input class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox"/>
+</label>
+</div>
+</div>
+</aside>
+<!-- Footer Component -->
+<footer class="fixed bottom-0 left-0 w-full z-40 bg-surface-container dark:bg-surface-container-high text-secondary dark:text-secondary-fixed-dim border-t border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-margin_lg">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden sm:flex gap-gutter font-body-sm text-body-sm opacity-80">
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> MCP Status: Online</span>
+<span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter font-label-caps text-label-caps">
+<span class="hover:text-primary dark:hover:text-primary-fixed-dim underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity">High Contrast</span>
+<span class="hover:text-primary dark:hover:text-primary-fixed-dim underline cursor-pointer opacity-90 hover:opacity-100 transition-opacity">TTS Playback</span>
+</div>
+</footer>
+<!-- Interactive Layer for atmospheric effect -->
+<div class="fixed inset-0 pointer-events-none z-[-1] opacity-30" id="glow-effect"></div>
+<script>
+        // Simple micro-interaction for the glow effect
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('glow-effect');
+            const x = e.clientX;
+            const y = e.clientY;
+            glow.style.background = `radial-gradient(circle 400px at ${x}px ${y}px, rgba(0, 88, 190, 0.08), transparent)`;
+        });
+
+        // Toggle state logic simulator
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                console.log('Preference updated:', this.nextElementSibling ? this.nextElementSibling.innerText : 'Unknown');
+            });
+        });
+    </script>
+</body></html>

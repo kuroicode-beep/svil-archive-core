@@ -1,0 +1,20 @@
+﻿{
+    "product":  "SAC",
+    "version":  "0.1.0-rc.1",
+    "commit":  "582355a",
+    "platform":  "windows-x64",
+    "built_at":  "2026-06-09 11:06",
+    "entrypoint":  "sac_app.exe",
+    "package_type":  "portable-zip",
+    "mcp_sidecar_included":  true,
+    "mcp_sidecar_path":  "mcp/sidecar",
+    "mcp_sidecar_build":  "pass",
+    "mcp_sidecar_runtime":  "local-stdio",
+    "mcp_sidecar_node_modules_included":  true,
+    "mcp_sidecar_native_binding_included":  true,
+    "external_api_enabled":  false,
+    "remote_mcp_enabled":  false,
+    "sidecar_process_managed_by_app":  true,
+    "tray_resident_supported":  true,
+    "windows_autostart_supported":  true
+}

@@ -4,7 +4,8 @@
 > **Sprint 10 구현 커밋**: `1db8bfd`
 > **범위**: RC / Smoke / Packaging Readiness
 > **작업지시문**: [Notion Sprint 10](https://app.notion.com/p/379864048e5481499f62ea09b10524a5)
-> **Cursor 자체 검증**: 2026.06.08 — analyze/test/sidecar PASS
+> **Sprint 10B flake fix**: `51810b7` | **HEAD**: `9c47b7e`
+> **Cursor 자체 검증**: 2026.06.08 — analyze/test/sidecar PASS (병렬 126/126)
 
 ## 검증 항목
 

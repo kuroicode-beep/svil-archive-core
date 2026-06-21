@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC — Document Editor</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .markdown-body {
+      line-height: 1.6;
+    }
+    .markdown-body h1 { @apply font-display-lg text-display-lg mb-4; }
+    .markdown-body p { @apply font-body-md text-body-md mb-4 text-on-surface-variant; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    .editor-line-number { width: 32px; text-align: right; padding-right: 12px; color: #a1a1aa; font-family: 'JetBrains Mono', monospace; font-size: 12px; user-select: none; }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline": "#727785",
+            "primary": "#0058be",
+            "surface-dim": "#d9dadb",
+            "inverse-on-surface": "#f0f1f2",
+            "primary-fixed-dim": "#adc6ff",
+            "surface": "#f8f9fa",
+            "background": "#f8f9fa",
+            "on-secondary-container": "#54647a",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e1e3e4",
+            "on-secondary-fixed-variant": "#38485d",
+            "tertiary-fixed": "#6ffbbe",
+            "on-tertiary-fixed": "#002113",
+            "on-primary-fixed": "#001a42",
+            "on-tertiary-fixed-variant": "#005236",
+            "inverse-primary": "#adc6ff",
+            "surface-bright": "#f8f9fa",
+            "secondary-fixed": "#d3e4fe",
+            "surface-container-lowest": "#ffffff",
+            "on-error-container": "#93000a",
+            "secondary-fixed-dim": "#b7c8e1",
+            "outline-variant": "#c2c6d6",
+            "on-background": "#191c1d",
+            "surface-container": "#edeeef",
+            "on-surface-variant": "#424754",
+            "error": "#ba1a1a",
+            "on-secondary-fixed": "#0b1c30",
+            "surface-container-high": "#e7e8e9",
+            "tertiary-container": "#00855b",
+            "surface-container-low": "#f3f4f5",
+            "secondary-container": "#d0e1fb",
+            "tertiary-fixed-dim": "#4edea3",
+            "on-primary-fixed-variant": "#004395",
+            "on-surface": "#191c1d",
+            "surface-tint": "#005ac2",
+            "on-tertiary-container": "#f5fff6",
+            "primary-container": "#2170e4",
+            "on-error": "#ffffff",
+            "primary-fixed": "#d8e2ff",
+            "surface-container-highest": "#e1e3e4",
+            "tertiary": "#006947",
+            "on-secondary": "#ffffff",
+            "secondary": "#505f76",
+            "error-container": "#ffdad6",
+            "on-primary-container": "#fefcff",
+            "on-primary": "#ffffff",
+            "inverse-surface": "#2e3132"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "margin_lg": "24px",
+            "context_panel_width": "280px",
+            "touch_target_default": "40px",
+            "sidebar_width": "240px",
+            "touch_target_accessible": "50px",
+            "gutter": "16px",
+            "base_unit": "8px"
+          },
+          "fontFamily": {
+            "body-sm": ["Inter"],
+            "label-caps": ["Inter"],
+            "body-md": ["Inter"],
+            "title-sm": ["Inter"],
+            "mono-code": ["JetBrains Mono"],
+            "headline-md": ["Inter"],
+            "display-lg": ["Inter"]
+          },
+          "fontSize": {
+            "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+            "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-surface font-body-md text-on-surface overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar (JSON Anchor Implementation) -->
+<header class="bg-surface dark:bg-surface-container-highest border-b border-outline-variant dark:border-outline flex justify-between items-center px-gutter h-touch_target_accessible w-full z-50">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary dark:text-primary-fixed-dim">SAC</span>
+</div>
+<nav class="hidden md:flex items-center gap-gutter">
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity duration-150" href="#">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary font-label-caps text-label-caps px-2 py-1" href="#">Archive</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high dark:hover:bg-inverse-surface px-2 py-1 transition-opacity duration-150" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-base_unit">
+<button class="p-2 hover:bg-surface-container-high dark:hover:bg-inverse-surface rounded-full transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+<button class="p-2 hover:bg-surface-container-high dark:hover:bg-inverse-surface rounded-full transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (JSON Anchor Implementation) -->
+<aside class="hidden lg:flex flex-col gap-base_unit p-margin_lg w-sidebar_width bg-surface-container-lowest dark:bg-surface-container-low border-r border-outline-variant dark:border-outline shrink-0">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+</div>
+<div>
+<div class="font-title-sm text-title-sm font-bold text-on-surface dark:text-inverse-on-surface">Research Studio</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</div>
+</div>
+</div>
+<div class="space-y-1">
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary">Dashboard</span>
+</div>
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg bg-surface-container-high text-primary font-bold transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</div>
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary">AI Collaboration</span>
+</div>
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary">Personal Archive</span>
+</div>
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container dark:hover:bg-inverse-surface transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant group-hover:text-primary">Search</span>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant space-y-1">
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Task Queue</span>
+</div>
+<div class="px-2 py-2 flex items-center gap-3 rounded-lg hover:bg-surface-container cursor-pointer">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Privacy</span>
+</div>
+</div>
+</aside>
+<!-- Workspace (Center) -->
+<main class="flex-1 flex flex-col bg-surface-container-lowest overflow-hidden">
+<!-- Editor Toolbar -->
+<div class="h-14 border-b border-outline-variant px-gutter flex items-center justify-between shrink-0 bg-surface">
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-container border border-outline-variant rounded-lg p-1">
+<button class="px-3 py-1 bg-surface-container-lowest shadow-sm rounded-lg text-primary font-bold text-label-caps transition-all">Edit</button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface font-label-caps transition-all">Preview</button>
+<button class="px-3 py-1 text-on-surface-variant hover:text-on-surface font-label-caps transition-all">Split</button>
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary" data-icon="cloud_done" style="font-variation-settings: 'FILL' 1;">cloud_done</span>
+<span class="bg-tertiary-container/10 text-tertiary font-label-caps text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Synced</span>
+</div>
+</div>
+<div class="flex items-center gap-base_unit">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container rounded-full hover:scale-[0.98] transition-transform duration-150">
+<span class="material-symbols-outlined text-[20px]" data-icon="play_circle">play_circle</span>
+<span class="font-label-caps text-label-caps">Listen (TTS)</span>
+</button>
+<button class="p-2 hover:bg-surface-container rounded-full">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Editor Content -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-margin_lg">
+<div class="max-w-3xl mx-auto">
+<!-- Document Header -->
+<div class="mb-10">
+<input class="w-full bg-transparent border-none outline-none font-display-lg text-display-lg font-bold text-on-surface placeholder:text-outline-variant mb-2 p-0 focus:ring-0" type="text" value="The Mechanics of Knowledge Retention"/>
+<div class="flex flex-wrap items-center gap-4 text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-sm text-body-sm">Oct 24, 2023</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="label">label</span>
+<span class="font-body-sm text-body-sm">Cognition, Methodology</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-body-sm text-body-sm text-primary">Private Archive</span>
+</div>
+</div>
+</div>
+<!-- Markdown Editor Interface -->
+<div class="flex font-mono-code text-mono-code text-on-surface-variant min-h-[500px]">
+<div class="editor-line-number leading-[28px]">
+              1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15
+            </div>
+<div class="flex-1 pl-4 border-l border-outline-variant/30 leading-[28px] focus:outline-none" contenteditable="true" spellcheck="false">
+              # Executive Summary<br/><br/>
+              Long-term knowledge retention is not merely a function of repetition but of **associative depth**. In this document, we explore how the <span class="text-primary underline decoration-2 underline-offset-4">SAC Architecture</span> facilitates these connections via local-first sync and AI-assisted cross-referencing.<br/><br/>
+              ## Core Principles<br/>
+              - **Decentralization**: Data remains on local hardware.<br/>
+              - **Encryption**: End-to-end multi-layer protocols.<br/>
+              - **Discovery**: Non-linear navigation paths.<br/><br/>
+              &gt; "Knowledge is not a library of facts, but a web of relationships."<br/><br/>
+              The importance of maintaining an isolated environment for deep research cannot be overstated. By removing the frantic noise of collaborative cloud platforms, researchers can engage in deep focus mode.
+            </div>
+</div>
+</div>
+</div>
+</main>
+<!-- Context Panel (Right) -->
+<aside class="hidden xl:flex flex-col w-context_panel_width bg-surface border-l border-outline-variant shrink-0">
+<div class="p-4 border-b border-outline-variant flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface font-bold uppercase tracking-widest">Context &amp; Insights</span>
+<span class="material-symbols-outlined text-outline" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-6">
+<!-- AI Insight Card -->
+<div class="bg-primary-container/5 rounded-xl p-4 border border-primary/10">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-[18px]" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps font-bold">AI Suggestion</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3 italic leading-relaxed">
+            "You have 3 similar notes regarding 'Neural Plasticity' that might correlate with this chapter. Would you like to merge or cross-link?"
+          </p>
+<button class="w-full py-2 bg-primary text-on-primary text-label-caps rounded-lg hover:brightness-110 transition-all">Link Related Docs</button>
+</div>
+<!-- Related Documents -->
+<div>
+<h4 class="font-label-caps text-label-caps text-on-surface mb-4">Related Documents</h4>
+<div class="space-y-3">
+<!-- Doc Item 1 -->
+<div class="group cursor-pointer p-3 rounded-lg border border-transparent hover:border-outline-variant hover:bg-surface-container-low transition-all">
+<div class="flex items-center justify-between mb-1">
+<span class="text-on-surface font-title-sm text-[14px] line-clamp-1">Neuro-linguistic Patterns</span>
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="open_in_new">open_in_new</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+<span class="text-[11px] font-label-caps text-on-surface-variant">Last edited 2d ago</span>
+</div>
+</div>
+<!-- Doc Item 2 -->
+<div class="group cursor-pointer p-3 rounded-lg border border-transparent hover:border-outline-variant hover:bg-surface-container-low transition-all">
+<div class="flex items-center justify-between mb-1">
+<span class="text-on-surface font-title-sm text-[14px] line-clamp-1">The Art of Zettelkasten</span>
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="open_in_new">open_in_new</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span>
+<span class="text-[11px] font-label-caps text-on-surface-variant">Last edited 5d ago</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Document Stats -->
+<div class="pt-4 border-t border-outline-variant">
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-3 rounded-lg text-center">
+<div class="font-headline-md text-primary">1,248</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant">Words</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-lg text-center">
+<div class="font-headline-md text-primary">8.5m</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant">Read Time</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer (JSON Anchor Implementation) -->
+<footer class="bg-surface-container dark:bg-surface-container-high border-t border-outline-variant dark:border-outline fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-gutter">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="hidden sm:flex gap-4">
+<span class="font-body-sm text-body-sm text-secondary dark:text-secondary-fixed-dim flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500"></span> MCP Status: Online
+        </span>
+<span class="font-body-sm text-body-sm text-secondary dark:text-secondary-fixed-dim">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary transition-all underline decoration-transparent hover:decoration-primary">High Contrast</button>
+<button class="font-label-caps text-label-caps text-on-secondary-container hover:text-primary transition-all">TTS Playback</button>
+<div class="h-4 w-px bg-outline-variant mx-2"></div>
+<div class="flex items-center gap-2 group cursor-pointer">
+<span class="material-symbols-outlined text-[18px] text-primary" data-icon="info">info</span>
+<span class="font-label-caps text-label-caps text-secondary">v4.2.0-Alpha</span>
+</div>
+</div>
+</footer>
+<script>
+    // Simple micro-interaction for active toggle states
+    document.querySelectorAll('.flex.bg-surface-container.border button').forEach(button => {
+      button.addEventListener('click', function() {
+        this.parentElement.querySelectorAll('button').forEach(btn => {
+          btn.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary', 'font-bold');
+          btn.classList.add('text-on-surface-variant');
+        });
+        this.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary', 'font-bold');
+        this.classList.remove('text-on-surface-variant');
+      });
+    });
+
+    // Visual atmospheric effect: Subtle mouse-follow shadow on the center main container
+    const main = document.querySelector('main');
+    main.addEventListener('mousemove', (e) => {
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth) * 20;
+      const y = (clientY / window.innerHeight) * 20;
+      // Reserved for subtle depth effects if needed
+    });
+  </script>
+</body></html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#727785",
+                      "primary": "#0058be",
+                      "surface-dim": "#d9dadb",
+                      "inverse-on-surface": "#f0f1f2",
+                      "primary-fixed-dim": "#adc6ff",
+                      "surface": "#f8f9fa",
+                      "background": "#f8f9fa",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e1e3e4",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-tertiary-fixed": "#002113",
+                      "on-primary-fixed": "#001a42",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "inverse-primary": "#adc6ff",
+                      "surface-bright": "#f8f9fa",
+                      "secondary-fixed": "#d3e4fe",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "outline-variant": "#c2c6d6",
+                      "on-background": "#191c1d",
+                      "surface-container": "#edeeef",
+                      "on-surface-variant": "#424754",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-high": "#e7e8e9",
+                      "tertiary-container": "#00855b",
+                      "surface-container-low": "#f3f4f5",
+                      "secondary-container": "#d0e1fb",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-primary-fixed-variant": "#004395",
+                      "on-surface": "#191c1d",
+                      "surface-tint": "#005ac2",
+                      "on-tertiary-container": "#f5fff6",
+                      "primary-container": "#2170e4",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#e1e3e4",
+                      "tertiary": "#006947",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#505f76",
+                      "error-container": "#ffdad6",
+                      "on-primary-container": "#fefcff",
+                      "on-primary": "#ffffff",
+                      "inverse-surface": "#2e3132"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin_lg": "24px",
+                      "context_panel_width": "280px",
+                      "touch_target_default": "40px",
+                      "sidebar_width": "240px",
+                      "touch_target_accessible": "50px",
+                      "gutter": "16px",
+                      "base_unit": "8px"
+              },
+              "fontFamily": {
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "title-sm": ["Inter"],
+                      "mono-code": ["jetbrainsMono"],
+                      "headline-md": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .bento-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: border-color 0.2s ease;
+        }
+        .bento-card:hover {
+            border-color: #0058be;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e1e3e4;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<aside class="hidden md:flex flex-col gap-base_unit p-margin_lg fixed left-0 top-0 h-full bg-surface-container-lowest border-r border-outline-variant w-sidebar_width z-50">
+<div class="flex items-center gap-base_unit mb-margin_lg">
+<div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+<div>
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h2>
+<p class="font-body-sm text-[10px] text-on-surface-variant uppercase tracking-widest">Local-First Sync</p>
+</div>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto custom-scrollbar flex-grow">
+<!-- Navigation items with active state logic for Settings -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">delete</span>
+<span class="font-label-caps text-label-caps">Trash</span>
+</a>
+<div class="h-px bg-outline-variant my-2"></div>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-surface-container text-primary font-bold transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container text-sm">person</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-caps text-[11px] font-bold">RESEARCHER_01</span>
+<span class="text-[10px] text-on-surface-variant">Admin Level</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-grow md:ml-[240px] pb-24">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex justify-between items-center px-gutter h-touch_target_accessible w-full bg-surface border-b border-outline-variant sticky top-0 z-40">
+<div class="flex items-center gap-base_unit">
+<h1 class="font-display-lg text-display-lg font-bold text-primary">SAC</h1>
+<div class="hidden md:flex gap-gutter ml-8">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">Dashboard</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">Archive</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-opacity" href="#">AI Protocol</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="pl-10 pr-4 py-1.5 bg-surface-container border-none rounded-full text-sm w-64 focus:ring-2 focus:ring-primary" placeholder="Global Studio Search..." type="text"/>
+</div>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center hover:bg-surface-container-high rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Settings Workspace -->
+<div class="max-w-6xl mx-auto p-margin_lg">
+<div class="mb-8">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-sm">language</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Global Configuration</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Language &amp; Region</h2>
+<p class="font-body-md text-on-surface-variant mt-1">Configure your personal research environment's linguistic and regional parameters.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- UI Language Selection (Bento Style) -->
+<div class="md:col-span-8 bento-card rounded-xl p-margin_lg shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">translate</span>
+<h3 class="font-title-sm text-title-sm">Interface Language</h3>
+</div>
+<span class="px-3 py-1 bg-primary-container text-on-primary-container rounded-full text-[10px] font-bold uppercase tracking-widest">Primary</span>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+<button class="flex flex-col items-start p-4 border-2 border-primary bg-primary/5 rounded-xl text-left transition-all">
+<span class="text-xs text-primary font-bold mb-1">Default</span>
+<span class="font-body-md font-bold">한국어 (Korean)</span>
+<span class="text-xs text-on-surface-variant mt-2">시스템 기본값</span>
+</button>
+<button class="flex flex-col items-start p-4 border border-outline-variant hover:border-primary rounded-xl text-left transition-all">
+<span class="text-xs text-on-surface-variant font-bold mb-1">L10N</span>
+<span class="font-body-md font-bold">English (US)</span>
+<span class="text-xs text-on-surface-variant mt-2">Full Translation</span>
+</button>
+<button class="flex flex-col items-start p-4 border border-outline-variant hover:border-primary rounded-xl text-left transition-all">
+<span class="text-xs text-on-surface-variant font-bold mb-1">L10N</span>
+<span class="font-body-md font-bold">简体中文 (Chinese)</span>
+<span class="text-xs text-on-surface-variant mt-2">完整翻译</span>
+</button>
+<button class="flex flex-col items-start p-4 border border-outline-variant hover:border-primary rounded-xl text-left transition-all opacity-60">
+<span class="text-xs text-on-surface-variant font-bold mb-1">BETA</span>
+<span class="font-body-md font-bold">日本語 (Japanese)</span>
+<span class="text-xs text-on-surface-variant mt-2">베타 테스트 중</span>
+</button>
+<button class="flex flex-col items-start p-4 border border-outline-variant hover:border-primary rounded-xl text-left transition-all opacity-60">
+<span class="text-xs text-on-surface-variant font-bold mb-1">BETA</span>
+<span class="font-body-md font-bold">Français (French)</span>
+<span class="text-xs text-on-surface-variant mt-2">En cours</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 border border-dashed border-outline-variant hover:bg-surface-container rounded-xl transition-all">
+<span class="material-symbols-outlined text-outline">add_circle</span>
+<span class="font-label-caps text-label-caps mt-1">Request More</span>
+</button>
+</div>
+</div>
+<!-- AI Behavior & TTS (Bento Style) -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<div class="bento-card rounded-xl p-6 shadow-sm flex-grow">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-tertiary">smart_toy</span>
+<h3 class="font-title-sm text-title-sm">AI Protocol</h3>
+</div>
+<div class="space-y-4">
+<div>
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase mb-2 block">Response Language</label>
+<select class="w-full bg-surface-container border-none rounded-lg font-body-sm focus:ring-2 focus:ring-primary py-2.5">
+<option>Follow Interface (Korean)</option>
+<option>English (Direct &amp; Technical)</option>
+<option>Multilingual (Automatic)</option>
+</select>
+</div>
+<div>
+<label class="font-label-caps text-[11px] text-on-surface-variant uppercase mb-2 block">TTS Synthesis</label>
+<select class="w-full bg-surface-container border-none rounded-lg font-body-sm focus:ring-2 focus:ring-primary py-2.5">
+<option>Standard Korean (Male)</option>
+<option>Standard Korean (Female)</option>
+<option>Professional English (UK)</option>
+<option>Professional English (US)</option>
+</select>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-high rounded-xl p-6 border border-outline-variant">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1">info</span>
+<div>
+<h4 class="font-label-caps text-label-caps font-bold">Translation Note</h4>
+<p class="font-body-sm text-[12px] text-on-surface-variant mt-1 leading-relaxed">
+                                    Markdown documents are preserved in their original source language. Automatic translation occurs only during AI interaction cycles to maintain semantic integrity.
+                                </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Formats and Region (Asymmetric Grid) -->
+<div class="md:col-span-12 bento-card rounded-xl p-margin_lg shadow-sm">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<h3 class="font-title-sm text-title-sm">Regional Formatting</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Date Format -->
+<div class="space-y-6">
+<h4 class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-2">Temporal Data</h4>
+<div class="space-y-4">
+<label class="flex items-center gap-4 cursor-pointer group">
+<input checked="" class="w-5 h-5 text-primary border-outline-variant focus:ring-primary" name="date_format" type="radio"/>
+<div>
+<p class="font-body-md font-bold group-hover:text-primary transition-colors">YYYY. MM. DD.</p>
+<p class="font-body-sm text-on-surface-variant">Standard ISO Extended (Korean)</p>
+</div>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary" name="date_format" type="radio"/>
+<div>
+<p class="font-body-md font-bold group-hover:text-primary transition-colors">MM/DD/YYYY</p>
+<p class="font-body-sm text-on-surface-variant">US Standard</p>
+</div>
+</label>
+<label class="flex items-center gap-4 cursor-pointer group">
+<input class="w-5 h-5 text-primary border-outline-variant focus:ring-primary" name="date_format" type="radio"/>
+<div>
+<p class="font-body-md font-bold group-hover:text-primary transition-colors">DD-MM-YYYY</p>
+<p class="font-body-sm text-on-surface-variant">European Standard</p>
+</div>
+</label>
+</div>
+</div>
+<!-- Number/Currency Format -->
+<div class="space-y-6">
+<h4 class="font-label-caps text-label-caps text-primary border-b border-outline-variant pb-2">Numerical Logic</h4>
+<div class="space-y-4">
+<div>
+<label class="font-body-sm text-on-surface-variant mb-1 block">Decimal Separator</label>
+<div class="flex gap-2">
+<button class="flex-grow py-2 bg-primary text-white rounded-lg font-bold">Dot ( . )</button>
+<button class="flex-grow py-2 bg-surface-container text-on-surface rounded-lg">Comma ( , )</button>
+</div>
+</div>
+<div>
+<label class="font-body-sm text-on-surface-variant mb-1 block">Currency Indicator</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-outline">₩</span>
+<input class="w-full pl-8 pr-4 py-2 bg-surface-container border-none rounded-lg text-sm" readonly="" type="text" value="KRW (South Korean Won)"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Visual Preview Card -->
+<div class="bg-surface-container-low rounded-xl p-6 border border-dashed border-outline-variant relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2">
+<span class="material-symbols-outlined text-[64px] text-outline/10 select-none">visibility</span>
+</div>
+<h4 class="font-label-caps text-[10px] text-on-surface-variant uppercase mb-4">Real-time Preview</h4>
+<div class="space-y-3 font-mono-code text-mono-code">
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Date:</span>
+<span class="font-bold">2024. 05. 24.</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Time:</span>
+<span class="font-bold">14:30:05 (24h)</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Value:</span>
+<span class="font-bold">₩ 12,500.00</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant">Weight:</span>
+<span class="font-bold">1.25 kg</span>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-outline-variant/30">
+<p class="text-[11px] italic text-on-surface-variant">"Preview data updates instantly as you modify regional settings."</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="mt-12 flex items-center justify-between p-6 bg-surface-container-highest rounded-2xl border border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cloud_sync</span>
+<div>
+<p class="font-body-md font-bold">Cloud Synchronization Active</p>
+<p class="font-body-sm text-on-surface-variant">Changes will be pushed to all connected research nodes.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 rounded-lg font-bold text-on-surface-variant hover:bg-surface-variant transition-colors">Discard</button>
+<button class="px-8 py-2.5 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Commit Changes</button>
+</div>
+</div>
+</div>
+<!-- Language Specific Graphic Section -->
+<section class="max-w-6xl mx-auto px-margin_lg py-8">
+<div class="rounded-3xl overflow-hidden relative h-[300px] border border-outline-variant group">
+<img alt="Global Research" class="w-full h-full object-cover grayscale brightness-75 group-hover:scale-105 transition-transform duration-700" data-alt="A cinematic, wide-angle shot of a minimalist research workspace with multiple glowing digital screens displaying diverse typography and linguistic scripts including Korean, Latin, and Chinese characters. The lighting is soft, cold blue and white, creating a focused, professional atmosphere for deep knowledge work. The aesthetic is clean, high-tech, and silent, reflecting the 'Personal Research Studio' brand identity. Subtle digital data overlays float in the air, representing global connectivity and information synthesis." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0Ru7RLESFB8zhWU0RaAM8UeRqpwN2oOaQpknPS7N5E4Jex1gXLF0oawQLnMaXdINxSuT5F-VP4hQz6We1Nj7nk_h8XAlA3e-a7eFyqBrN2YdvbbElGjOWMAFIAsW83r00W7nPuu7GTOTEU_Wn_LMtwEq-_ZmRJAI5n07OjZ4SVXC0WvJIUs3vd74ImNYiIexLMa1xvHEpJfLyATAylT0fdfSmwQ0-ch-cXvJvlFkOlNo30pFYLhXLYMUqa7B7myBb0bA1R9zdqv4q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-margin_lg">
+<span class="text-primary-fixed-dim font-label-caps text-label-caps uppercase tracking-widest mb-2">Global Context Protocol</span>
+<h3 class="text-white font-headline-md text-headline-md max-w-lg">Seamlessly navigate between languages while maintaining the core meaning of your research.</h3>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-gutter h-touch_target_default bg-surface-container border-t border-outline-variant">
+<div class="flex items-center gap-base_unit">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<div class="h-4 w-px bg-outline-variant mx-2"></div>
+<div class="flex gap-4">
+<span class="font-body-sm text-body-sm text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                    MCP Status: Online
+                </span>
+<span class="font-body-sm text-body-sm text-secondary">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-secondary">Accessibility</span>
+<button class="w-8 h-4 bg-outline-variant rounded-full relative transition-colors">
+<span class="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full"></span>
+</button>
+</div>
+<div class="flex gap-gutter">
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary underline cursor-pointer" href="#">High Contrast</a>
+<a class="font-label-caps text-label-caps text-secondary hover:text-primary underline cursor-pointer" href="#">TTS Playback</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for the UI
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.style.transform = 'scale(0.98)';
+            });
+            el.addEventListener('mouseup', () => {
+                el.style.transform = '';
+            });
+        });
+
+        // Hover effect for language cards
+        const langCards = document.querySelectorAll('.bento-card button');
+        langCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                if (!card.classList.contains('border-primary')) {
+                    card.classList.add('bg-surface-container-low');
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                if (!card.classList.contains('border-primary')) {
+                    card.classList.remove('bg-surface-container-low');
+                }
+            });
+        });
+    </script>
+</body></html>

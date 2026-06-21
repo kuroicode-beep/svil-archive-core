@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAC - Database &amp; Performance Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#727785",
+                        "primary": "#0058be",
+                        "surface-dim": "#d9dadb",
+                        "inverse-on-surface": "#f0f1f2",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-tertiary-fixed": "#002113",
+                        "on-primary-fixed": "#001a42",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "inverse-primary": "#adc6ff",
+                        "surface-bright": "#f8f9fa",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "outline-variant": "#c2c6d6",
+                        "on-background": "#191c1d",
+                        "surface-container": "#edeeef",
+                        "on-surface-variant": "#424754",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e7e8e9",
+                        "tertiary-container": "#00855b",
+                        "surface-container-low": "#f3f4f5",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#005ac2",
+                        "on-tertiary-container": "#f5fff6",
+                        "primary-container": "#2170e4",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#e1e3e4",
+                        "tertiary": "#006947",
+                        "on-secondary": "#ffffff",
+                        "secondary": "#505f76",
+                        "error-container": "#ffdad6",
+                        "on-primary-container": "#fefcff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3132"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_lg": "24px",
+                        "context_panel_width": "280px",
+                        "touch_target_default": "40px",
+                        "sidebar_width": "240px",
+                        "touch_target_accessible": "50px",
+                        "gutter": "16px",
+                        "base_unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"],
+                        "mono-code": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}],
+                        "mono-code": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center px-gutter h-touch_target_accessible w-full z-50 fixed top-0 left-0">
+<div class="flex items-center gap-base_unit">
+<span class="font-display-lg text-display-lg font-bold text-primary">SAC</span>
+</div>
+<div class="hidden md:flex items-center gap-margin_lg">
+<nav class="flex gap-margin_lg h-full items-center">
+<a class="text-on-surface-variant hover:bg-surface-container-high px-3 py-1 rounded transition-opacity duration-150 font-label-caps text-label-caps" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high px-3 py-1 rounded transition-opacity duration-150 font-label-caps text-label-caps" href="#">Archive</a>
+<a class="text-on-surface-variant hover:bg-surface-container-high px-3 py-1 rounded transition-opacity duration-150 font-label-caps text-label-caps" href="#">AI Protocol</a>
+</nav>
+<div class="flex items-center gap-gutter ml-gutter border-l border-outline-variant pl-gutter">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-lg transition-all duration-150">search</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-lg transition-all duration-150">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-lg transition-all duration-150" style="font-variation-settings: 'FILL' 1;">account_circle</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<div class="flex flex-1 pt-touch_target_accessible pb-touch_target_default overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest border-r border-outline-variant flex flex-col gap-base_unit p-margin_lg fixed left-0 top-touch_target_accessible h-[calc(100vh-90px)] w-sidebar_width z-40">
+<div class="mb-gutter">
+<h2 class="font-title-sm text-title-sm font-bold text-on-surface">Research Studio</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Local-First Sync</p>
+</div>
+<nav class="flex flex-col gap-1 overflow-y-auto scrollbar-hide">
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-caps text-label-caps">Document Archive</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+<span class="font-label-caps text-label-caps">AI Collaboration</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="folder_shared">folder_shared</span>
+<span class="font-label-caps text-label-caps">Personal Archive</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-label-caps text-label-caps">Search</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+<span class="font-label-caps text-label-caps">Trash</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="checklist">checklist</span>
+<span class="font-label-caps text-label-caps">Task Queue</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="construction">construction</span>
+<span class="font-label-caps text-label-caps">MCP Tools</span>
+</div>
+<div class="flex items-center gap-3 p-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+<span class="font-label-caps text-label-caps">Privacy</span>
+</div>
+<!-- Active Item -->
+<div class="flex items-center gap-3 p-2 rounded-lg bg-surface-container text-primary font-bold transition-colors duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</div>
+</nav>
+</aside>
+<!-- Canvas Workspace -->
+<main class="flex-1 ml-sidebar_width p-margin_lg overflow-y-auto bg-surface">
+<div class="max-w-5xl mx-auto space-y-margin_lg">
+<!-- Page Header -->
+<div class="flex justify-between items-end pb-gutter border-b border-outline-variant">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface mb-1">Database &amp; Performance</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Optimize local storage and indexing for large-scale research archives.</p>
+</div>
+<div class="flex items-center gap-base_unit bg-tertiary-container/10 px-3 py-1.5 rounded-full">
+<span class="material-symbols-outlined text-tertiary text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-tertiary font-label-caps text-label-caps">Synced &amp; Optimized</span>
+</div>
+</div>
+<!-- Bento Grid for DB Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- SQLite Info Card -->
+<div class="col-span-1 md:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">database</span>
+</div>
+<div>
+<h3 class="font-title-sm text-title-sm text-on-surface">SQLite Engine</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Version 3.42.0 • WAL Mode Enabled</p>
+</div>
+</div>
+<button class="bg-surface-container-high hover:bg-outline-variant px-4 py-2 rounded-lg font-label-caps text-label-caps transition-all">REBUILD INDEX</button>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-6">
+<div class="space-y-1">
+<p class="font-label-caps text-label-caps text-on-surface-variant">DATABASE SIZE</p>
+<p class="font-headline-md text-headline-md text-on-surface">1.24 GB</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-caps text-label-caps text-on-surface-variant">TOTAL DOCUMENTS</p>
+<p class="font-headline-md text-headline-md text-on-surface">42,891</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-caps text-label-caps text-on-surface-variant">INDEX OVERHEAD</p>
+<p class="font-headline-md text-headline-md text-on-surface">184 MB</p>
+</div>
+<div class="space-y-1">
+<p class="font-label-caps text-label-caps text-on-surface-variant">AVG QUERY LATENCY</p>
+<p class="font-headline-md text-headline-md text-on-surface">4.2 ms</p>
+</div>
+</div>
+</div>
+<!-- Indexing Queue Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm flex flex-col">
+<h3 class="font-title-sm text-title-sm text-on-surface mb-2">Indexing Queue</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">Processing background knowledge nodes...</p>
+<div class="flex-1 flex flex-col justify-center gap-gutter">
+<div class="relative pt-1">
+<div class="flex mb-2 items-center justify-between">
+<div>
+<span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-primary bg-primary-container/20">
+                                            Active Task
+                                        </span>
+</div>
+<div class="text-right">
+<span class="text-xs font-semibold inline-block text-primary">
+                                            87%
+                                        </span>
+</div>
+</div>
+<div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-surface-container-high">
+<div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-primary transition-all duration-500" style="width:87%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-on-surface-variant">Remaining Items</span>
+<span class="text-on-surface font-mono-code">142</span>
+</div>
+<div class="flex justify-between items-center text-body-sm font-body-sm">
+<span class="text-on-surface-variant">Estimated Time</span>
+<span class="text-on-surface font-mono-code">12 min</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Performance Settings Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-margin_lg">
+<section class="space-y-gutter">
+<h2 class="font-title-sm text-title-sm text-on-surface">Runtime Optimization</h2>
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="p-gutter border-b border-outline-variant hover:bg-surface-container-low transition-colors group">
+<div class="flex justify-between items-start">
+<div class="max-w-[80%]">
+<h4 class="font-body-md font-bold text-on-surface">Lazy-Load Large Attachments</h4>
+<p class="text-body-sm text-on-surface-variant">Defer loading of PDFs and high-res images until viewed to save RAM.</p>
+</div>
+<input checked="" class="form-checkbox w-10 h-6 text-primary border-outline-variant rounded-full focus:ring-0 cursor-pointer transition-all" type="checkbox"/>
+</div>
+</div>
+<div class="p-gutter border-b border-outline-variant hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="max-w-[80%]">
+<h4 class="font-body-md font-bold text-on-surface">Background Indexing Priority</h4>
+<p class="text-body-sm text-on-surface-variant">Allocate more CPU threads when the system is idle for faster search updates.</p>
+</div>
+<div class="flex items-center gap-2">
+<select class="bg-surface-container-high border-none rounded-lg text-body-sm focus:ring-primary">
+<option>Balanced</option>
+<option>Aggressive</option>
+<option>Battery Saver</option>
+</select>
+</div>
+</div>
+</div>
+<div class="p-gutter hover:bg-surface-container-low transition-colors">
+<div class="flex justify-between items-start">
+<div class="max-w-[80%]">
+<h4 class="font-body-md font-bold text-on-surface">Vector Embeddings Cache</h4>
+<p class="text-body-sm text-on-surface-variant">Keep semantic search vectors in memory for instant AI collaboration.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono-code text-body-sm text-primary">512 MB</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary">edit</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Advanced Hints & Maintenance -->
+<section class="space-y-gutter">
+<h2 class="font-title-sm text-title-sm text-on-surface">Performance Insights</h2>
+<div class="bg-primary-container/5 border border-primary/20 rounded-xl p-gutter space-y-gutter">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+<div>
+<h4 class="font-body-md font-bold text-on-surface">Large Workspace Detected</h4>
+<p class="text-body-sm text-on-surface-variant mt-1">Your archive has exceeded 10,000 nodes. We recommend enabling "Full-Text Indexing" on only active folders to maintain UI responsiveness.</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest/50 p-base_unit rounded border border-outline-variant/30 flex items-center justify-between">
+<span class="font-label-caps text-label-caps text-on-surface-variant">LAST INTEGRITY CHECK</span>
+<span class="font-mono-code text-body-sm text-tertiary">2 hours ago (Success)</span>
+</div>
+<div class="space-y-gutter">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant/20 pb-1">DATABASE MAINTENANCE</h4>
+<div class="grid grid-cols-2 gap-base_unit">
+<button class="bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-container rounded-lg py-2 px-3 text-body-sm transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">cleaning_services</span> VACUUM DB
+                                    </button>
+<button class="bg-surface-container-high border border-outline-variant text-on-surface hover:bg-surface-container rounded-lg py-2 px-3 text-body-sm transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">history</span> ROLLBACK LOGS
+                                    </button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Visualization of Workspace Growth -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm overflow-hidden relative">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-title-sm text-title-sm text-on-surface">Storage Growth (Last 30 Days)</h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs font-label-caps">Core DB</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="text-xs font-label-caps">Assets</span>
+</div>
+</div>
+</div>
+<div class="h-48 w-full flex items-end justify-between gap-2 px-2">
+<!-- Simulated Bar Chart -->
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[20%]">
+<div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm group-hover:opacity-40 transition-opacity"></div>
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Day 1: 0.8GB</div>
+</div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[25%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[28%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[26%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[32%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[40%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[38%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[45%]"><div class="absolute inset-0 bg-primary opacity-20 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[52%]"><div class="absolute inset-0 bg-primary opacity-30 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[60%]"><div class="absolute inset-0 bg-primary opacity-30 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[65%]"><div class="absolute inset-0 bg-primary opacity-30 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[72%]"><div class="absolute inset-0 bg-primary opacity-40 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[85%]"><div class="absolute inset-0 bg-primary opacity-50 rounded-t-sm"></div></div>
+<div class="flex-1 bg-surface-container-high rounded-t-sm relative group h-[100%]"><div class="absolute inset-0 bg-primary opacity-70 rounded-t-sm"></div></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container border-t border-outline-variant fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-touch_target_default">
+<div class="flex items-center gap-gutter">
+<span class="font-label-caps text-label-caps font-bold text-on-surface">SAC Svil Archive Core</span>
+<span class="h-4 w-px bg-outline-variant"></span>
+<div class="flex items-center gap-4">
+<span class="text-secondary font-label-caps text-label-caps cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline">MCP Status: Online</span>
+<span class="text-secondary font-label-caps text-label-caps cursor-pointer opacity-90 hover:opacity-100 hover:text-primary underline">Sync: Up to date</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<button class="text-secondary font-label-caps text-label-caps hover:text-primary hover:bg-surface-container-high px-2 py-1 rounded transition-all">High Contrast</button>
+<button class="text-secondary font-label-caps text-label-caps hover:text-primary hover:bg-surface-container-high px-2 py-1 rounded transition-all flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">play_circle</span> TTS Playback
+            </button>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for the Rebuild button
+        const rebuildBtn = document.querySelector('button:contains("REBUILD INDEX")');
+        if(rebuildBtn) {
+            rebuildBtn.addEventListener('click', () => {
+                rebuildBtn.innerText = "INDEXING...";
+                rebuildBtn.classList.add('animate-pulse');
+                setTimeout(() => {
+                    rebuildBtn.innerText = "REBUILD INDEX";
+                    rebuildBtn.classList.remove('animate-pulse');
+                }, 3000);
+            });
+        }
+
+        // Search highlight effect
+        document.querySelectorAll('input[type="checkbox"]').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const parent = e.target.closest('.p-gutter');
+                if(e.target.checked) {
+                    parent.classList.add('bg-primary-container/5');
+                } else {
+                    parent.classList.remove('bg-primary-container/5');
+                }
+            });
+        });
+
+        // Toggle selection for mobile vs desktop navigation logic would go here
+        // But design system enforces specific visibility for mobile vs desktop
+    </script>
+</body></html>
